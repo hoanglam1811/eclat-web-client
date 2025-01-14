@@ -75,6 +75,21 @@ const Home = () => {
             status: "Còn hàng",
             imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
             total_reviews: 200
+        },
+        {
+            id: "5",
+            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
+            quantity: 20,
+            description: "Dainty butterfly necklace in gold.",
+            origin_price: 1200000,
+            disc_price: 600000,
+            origin_country: "Vietnam",
+            skinTypeId: "All Skin Types",
+            brandId: "Brand C",
+            average_rating: 4.9,
+            status: "Còn hàng",
+            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
+            total_reviews: 200
         }
     ];
 
@@ -154,7 +169,7 @@ const Home = () => {
             <hr className=" mt-20 w-[50%] mx-auto border-t-2 border-[#578a3f]" />
             <section className="p-6">
                 <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f]">SẢN PHẨM BÁN CHẠY</h2>
-                <menu className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mt-10">
+                <menu className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mt-10">
                     {isLoading ? (
                         <ProductSkeleton />
                     ) : error ? (
@@ -167,7 +182,7 @@ const Home = () => {
                         </p>
                     ) : (
                         products.map((product: any) => (
-                            <Card key={product.product_id} product={product} />
+                            <Card key={product.id} product={product} />
                         ))
 
                     )}
@@ -179,17 +194,17 @@ const Home = () => {
             <section className="p-6">
                 <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f]">DANH MỤC SẢN PHẨM</h2>
 
-                <div className="flex flex-col md:flex-row gap-6 items-center mt-10">
-                    <div className="w-full md:w-1/3 flex justify-center items-center">
+                <div className="flex flex-col md:flex-row gap-3 items-center mt-10">
+                    <div className="w-full md:w-1/4 flex justify-center items-center">
                         <img
                             src={DMSP}
                             alt="Danh mục sản phẩm"
-                            className="w-full h-auto max-h-[600px] object-cover rounded-md shadow-lg"
+                            className="w-full max-h-[400px] object-cover rounded-md shadow-lg"
                         />
                     </div>
 
-                    <div className="w-full md:w-2/3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 -mt-8 md:-mt-12">
-                        {products.slice(0, 3).map((product: any) => (
+                    <div className="w-full md:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 -mt-8 md:-mt-12">
+                        {products.slice(0, 4).map((product: any) => (
                             <Card key={product.id} product={product} />
                         ))}
                     </div>

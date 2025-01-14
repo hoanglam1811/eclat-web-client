@@ -20,6 +20,15 @@ const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsDropdownVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDropdownVisible(false);
+  };
 
   const handleLogout = () => {
     setIsLoading(true);
@@ -43,7 +52,7 @@ const Header = () => {
     //   }
 
     //   if (user.role.toLowerCase() === RoleNames.STAFF.toLowerCase()) {
-        navigate(`${RouteNames.ACCOUNT}`);
+    navigate(`${RouteNames.ACCOUNT}`);
     //   }
     // }
   };
@@ -78,8 +87,47 @@ const Header = () => {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          <li className="mr-5">
+          <li
+            className="mr-5"
+            style={{ position: "relative", cursor: "pointer" }}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
             <Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link>
+            {isDropdownVisible && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: "-500%", 
+                  backgroundColor: "#fff",
+                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
+                  padding: "15px",
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "30px",
+                  zIndex: 1,
+                  borderRadius: "8px", 
+                  minWidth: "300px",
+                  fontSize: "14px", 
+                }}
+              >
+                {categories.map((category) => (
+                  <div key={category.name} style={{ minWidth: "120px" }}>
+                    <strong style={{ display: "block", marginBottom: "10px", fontSize: "14px" }}>
+                      {category.name}
+                    </strong>
+                    <ul style={{ paddingLeft: "10px", margin: 0, fontSize: "12px" }}>
+                      {category.items.map((item) => (
+                        <li key={item} style={{ marginBottom: "5px" }}>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            )}
           </li>
           <li className="mr-5">
             <Link to={RouteNames.SPECIAL_CARE}>{navigation.SPECIAL_CARE}</Link>
@@ -95,7 +143,7 @@ const Header = () => {
           </li>
           <li className="mr-5">
             <Link to={RouteNames.CART} className="flex items-center text-gray-700 hover:text-blue-600 transition">
-              <ShoppingCartOutlined style={{ fontSize: "22px"}} className="mr-2" />
+              <ShoppingCartOutlined style={{ fontSize: "22px" }} className="mr-2" />
             </Link>
           </li>
           <li className="mr-5">
@@ -139,3 +187,52 @@ const Header = () => {
 };
 
 export default Header;
+
+const categories = [
+  {
+    name: "Làm Sạch Da",
+    items: [
+      "Tẩy Trang Mặt",
+      "Sữa Rửa Mặt",
+      "Tẩy Tế Bào Chết Da Mặt",
+      "Toner / Nước Cân Bằng Da",
+    ],
+  },
+  {
+    name: "Đặc Trị",
+    items: ["Serum / Tinh Chất", "Hỗ Trợ Trị Mụn"],
+  },
+  {
+    name: "Dưỡng Ẩm",
+    items: [
+      "Xịt Khoáng",
+      "Lotion / Sữa Dưỡng",
+      "Kem / Gel / Dầu Dưỡng",
+    ],
+  },
+  {
+    name: "Chống Nắng",
+    items: [],
+  },
+  {
+    name: "Dưỡng Mắt",
+    items: [],
+  },
+  {
+    name: "Dưỡng Môi",
+    items: [],
+  },
+  {
+    name: "Mặt Nạ",
+    items: [],
+  },
+  {
+    name: "Dụng Cụ Chăm Sóc Da",
+    items: [
+      "Bông Tẩy Trang",
+      "Dụng Cụ / Máy Rửa Mặt",
+      "Máy Xông Mặt / Đẩy Tinh Chất",
+    ],
+  },
+];
+

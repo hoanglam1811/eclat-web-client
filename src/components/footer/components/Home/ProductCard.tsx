@@ -7,13 +7,13 @@ const ProductCard = ({ product }: { product: any }) => {
 
   return (
     <Link to={`/product/${product?.id}`}>
-      <div className="relative flex flex-col items-center gap-4 p-4 rounded-lg hover:shadow-xl transition-transform transform hover:scale-105">
+      <div className="relative flex flex-col items-center gap-2 p-4 rounded-lg hover:shadow-xl transition-transform transform hover:scale-105">
         {/* Product Image */}
         <div className="relative">
           <img
             src={product?.imageUrl}
             alt={product?.name}
-            className="w-80 h-80 object-contain rounded"
+            className="w-50 h-50 object-contain rounded"
           />
           {discountPercentage > 0 && (
             <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs font-bold py-1 px-2 rounded-full">

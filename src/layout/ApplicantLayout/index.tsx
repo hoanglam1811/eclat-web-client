@@ -5,11 +5,11 @@ import Footer from "../../components/footer";
 const ClientLayout = () => {
   return (
     <>
-      <div className="flex flex-col gap-8 h-screen">
+      {/* <div className="flex flex-col gap-8 h-screen"> */}
         <Header />
         <Outlet />
         <Footer />
-      </div>
+      {/* </div> */}
     </>
   );
 };

@@ -121,7 +121,7 @@ const ProductDetails = () => {
     return (
         <>
             <section>
-                <div className="top-0 left-0 items-start ml-8 z-10">
+                <div className="mt-10 mb-10 top-0 left-0 items-start ml-8 z-10">
                     <div>
                         <Breadcrumb className="">
                             <BreadcrumbList className="text-[#000]">
@@ -147,7 +147,7 @@ const ProductDetails = () => {
                 <section className="flex justify-between items-start p-8 bg-gradient-to-r rounded-xl shadow-2xl">
                     {/* Image */}
                     <div className="w-full sm:w-1/2 md:w-1/3 max-h-[800px]">
-                        <img src={product?.imageUrl} alt={product?.name} className="w-full h-auto rounded-lg shadow-xl transform transition duration-500 hover:scale-105" />
+                        <img src={product?.imageUrl} alt={product?.name} className="w-full h-auto rounded-lg shadow-xl transform transition duration-500 " />
                     </div>
 
                     {/* Product Details */}

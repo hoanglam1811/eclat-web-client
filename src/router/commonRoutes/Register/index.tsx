@@ -15,14 +15,6 @@ const Register = () => {
         return () => clearInterval(interval);
     }, []);
 
-    const handleSignUpClick = () => {
-        setIsSignUp(true);
-    };
-
-    const handleLoginClick = () => {
-        setIsSignUp(false);
-    };
-
     return (
         <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
             <div
@@ -58,8 +50,8 @@ const Register = () => {
                         animation: "fadeIn 1s ease-in-out",
                     }}
                 >
-                    <h2 style={{ fontFamily: "Montserrat, sans-serif", color: "#578a3f", marginBottom: "30px" }}>
-                        Đăng ký người dùng với Éclat
+                    <h2 className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", color: "#578a3f", marginBottom: "30px" }}>
+                        ĐĂNG KÍ VỚI ÉCLAT 
                     </h2>
 
                     <input
@@ -163,7 +155,7 @@ const Register = () => {
                         Đăng ký
                     </button>
 
-                    <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
+                    <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
                         Bạn đã có tài khoản?{" "}
                         <Link
                             to="/login"

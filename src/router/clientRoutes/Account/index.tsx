@@ -10,12 +10,13 @@ const Account = () => {
         name: "Lam Nguyen",
         email: "nguyenhoanglam18112003@gmail.com",
         addresses: "430 Điện Biên Phủ",
+        phone_number: "0902601297"
     };
 
     return (
         <>
             <section>
-                <div className="top-0 left-0 items-start ml-8 z-10">
+                <div className="mt-10 mb-10 top-0 left-0 items-start ml-8 z-10">
                     <div>
                         <Breadcrumb className="">
                             <BreadcrumbList className="text-[#000]">
@@ -94,6 +95,10 @@ const Account = () => {
                             <div className="flex justify-between items-center">
                                 <span className="text-black font-bold">Số địa chỉ:</span>
                                 <span className="font-medium text-black">{user.addresses || "N/a"}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-black font-bold">Số điện thoại:</span>
+                                <span className="font-medium text-black">{user.phone_number || "N/a"}</span>
                             </div>
                         </div>
                     </section>

@@ -8,16 +8,9 @@ import Cart from "./Cart/index.tsx";
 import Account from "./Account/index.tsx";
 import AccountOrders from "./Orders/index.tsx";
 import AccountChangePassword from "./ChangePassword/index.tsx";
+import Products from "./Products/index.tsx";
 
 const publicRoutes: RouteObject[] = [
-  {
-    path: RouteNames.LOGIN,
-    element: <Login />,
-  },
-  {
-    path: RouteNames.REGISTER,
-    element: <Register />,
-  },
   {
     path: RouteNames.HOME,
     element: <Home />,
@@ -41,6 +34,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.ACCOUNT_CHANGE_PASSWORD,
     element: <AccountChangePassword />,
+  },
+  {
+    path: RouteNames.PRODUCTS,
+    element: <Products />,
   }
 ];
 

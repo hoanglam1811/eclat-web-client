@@ -10,7 +10,6 @@ const Footer = () => {
 
   return (
     <footer
-      className="mt-10"
       style={{
         padding: "40px 20px",
         backgroundColor: "#f8f7da",

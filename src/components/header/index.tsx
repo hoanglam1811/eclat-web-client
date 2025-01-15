@@ -99,7 +99,7 @@ const Header = () => {
                 style={{
                   position: "absolute",
                   top: "100%",
-                  left: "-500%", 
+                  left: "-500%",
                   backgroundColor: "#fff",
                   boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
                   padding: "15px",
@@ -107,9 +107,9 @@ const Header = () => {
                   flexDirection: "row",
                   gap: "30px",
                   zIndex: 1,
-                  borderRadius: "8px", 
+                  borderRadius: "8px",
                   minWidth: "300px",
-                  fontSize: "14px", 
+                  fontSize: "14px",
                 }}
               >
                 {categories.map((category) => (

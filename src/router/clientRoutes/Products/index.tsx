@@ -148,7 +148,82 @@ const Products = () => {
             total_reviews: 200
         },
         {
-            id: "4",
+            id: "5",
+            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
+            quantity: 20,
+            description: "Dainty butterfly necklace in gold.",
+            origin_price: 1200000,
+            disc_price: 600000,
+            origin_country: "Vietnam",
+            skinTypeId: "All Skin Types",
+            brandId: "Brand C",
+            average_rating: 4.9,
+            status: "Còn hàng",
+            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
+            total_reviews: 200
+        },
+        {
+            id: "6",
+            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
+            quantity: 50,
+            description: "Beautiful earrings with a unique palm design.",
+            origin_price: 835000,
+            disc_price: 120000,
+            origin_country: "USA",
+            skinTypeId: "All Skin Types",
+            brandId: "Brand A",
+            average_rating: 4.5,
+            status: "Hết hàng",
+            imageUrl: "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
+            total_reviews: 200
+        },
+        {
+            id: "7",
+            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
+            quantity: 30,
+            description: "Elegant necklace with a red birthstone.",
+            origin_price: 100000,
+            disc_price: 90000,
+            origin_country: "USA",
+            skinTypeId: "Sensitive Skin",
+            brandId: "Brand B",
+            average_rating: 4.8,
+            status: "Còn hàng",
+            imageUrl: "https://product.hstatic.net/1000006063/product/glam_2.11.1_18a5ca6f9b814d9bb11125d8c6d2f704_1024x1024.png",
+            total_reviews: 200
+        },
+        {
+            id: "8",
+            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
+            quantity: 20,
+            description: "Dainty butterfly necklace in gold.",
+            origin_price: 1200000,
+            disc_price: 600000,
+            origin_country: "Vietnam",
+            skinTypeId: "All Skin Types",
+            brandId: "Brand C",
+            average_rating: 4.9,
+            status: "Còn hàng",
+            imageUrl: "https://product.hstatic.net/1000006063/product/1_b5d9938d4e0d4b71b98a3ac1e059d73e_1024x1024.png",
+            total_reviews: 200
+        },
+        {
+            id: "9",
+            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
+            quantity: 20,
+            description: "Dainty butterfly necklace in gold.",
+            origin_price: 1200000,
+            disc_price: 600000,
+            origin_country: "Vietnam",
+            skinTypeId: "All Skin Types",
+            brandId: "Brand C",
+            average_rating: 4.9,
+            status: "Còn hàng",
+            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
+            total_reviews: 200
+        },
+        {
+            id: "10",
             name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
             quantity: 20,
             description: "Dainty butterfly necklace in gold.",
@@ -164,13 +239,25 @@ const Products = () => {
         }
     ];
 
+    const ITEMS_PER_PAGE = 10;
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const totalPages = Math.ceil(products?.length / ITEMS_PER_PAGE);
+    const paginatedmProducts = products?.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE
+    );
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     return (
         <>
-            <section>
-                <div className="mt-10 mb-10 top-0 left-0 items-start ml-8 z-10">
+            <section className="bg-gray-100 p-6">
+                <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
                         <Breadcrumb className="">
                             <BreadcrumbList className="text-[#333]">
@@ -191,45 +278,46 @@ const Products = () => {
                 </div>
             </section>
 
-            <div style={{ width: '100%', height: '120px', overflow: 'hidden',  }}>
-                <div style={{ direction: 'rtl' }}>
-                    <Carousel
-                        autoplay
-                        autoplaySpeed={1500}
-                        dots={false}
-                        slidesToShow={4}
-                        slidesToScroll={1}
-                        infinite={true}
-                        effect="scrollx"
-                    >
-                        {brands.map((brand, index) => (
-                            <div
-                                key={index}
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    height: '100%',
-                                }}
-                            >
-                                <img
-                                    src={brand.logo}
-                                    alt={brand.label}
+            <div className="max-w-8xl mx-auto p-6 bg-gray-100 ">
+                <div style={{ width: '100%', height: '120px', overflow: 'hidden', }}>
+                    <div style={{ direction: 'rtl' }}>
+                        <Carousel
+                            autoplay
+                            autoplaySpeed={1500}
+                            dots={false}
+                            slidesToShow={4}
+                            slidesToScroll={1}
+                            infinite={true}
+                            effect="scrollx"
+                        >
+                            {brands.map((brand, index) => (
+                                <div
+                                    key={index}
                                     style={{
-                                        maxHeight: '80px',
-                                        objectFit: 'contain',
-                                        margin: '0 10px', // Khoảng cách giữa các logo
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        height: '100%',
                                     }}
-                                />
-                            </div>
-                        ))}
-                    </Carousel>
+                                >
+                                    <img
+                                        src={brand.logo}
+                                        alt={brand.label}
+                                        style={{
+                                            maxHeight: '80px',
+                                            objectFit: 'contain',
+                                            marginTop: '25px', // Khoảng cách giữa các logo
+                                        }}
+                                    />
+                                </div>
+                            ))}
+                        </Carousel>
+                    </div>
                 </div>
             </div>
 
 
-
-            <div className="max-w-8xl mx-auto p-6 bg-white shadow-lg  mb-12">
+            <div className="max-w-8xl mx-auto p-6 bg-gray-100">
                 <div className="flex gap-2">
                     <div className="w-full md:w-1/5 p-6 bg-white shadow-md">
                         <div>
@@ -306,11 +394,31 @@ const Products = () => {
                                     No data found matching your search.
                                 </p>
                             ) : (
-                                products.map((product: any) => (
+                                paginatedmProducts.map((product: any) => (
                                     <Card key={product.id} product={product} />
                                 ))
                             )}
+
                         </menu>
+                        <div style={{ marginTop: "20px", marginBottom: '10px', textAlign: 'right' }}>
+                            {Array.from({ length: totalPages }, (_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => handlePageChange(index + 1)}
+                                    style={{
+                                        margin: "0 5px",
+                                        padding: "5px 10px",
+                                        backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                                        color: currentPage === index + 1 ? "white" : "black",
+                                        border: "none",
+                                        borderRadius: "5px",
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    {index + 1}
+                                </button>
+                            ))}
+                        </div>
                     </section>
                 </div>
             </div>

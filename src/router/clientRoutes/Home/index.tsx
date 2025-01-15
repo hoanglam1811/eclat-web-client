@@ -90,7 +90,7 @@ const Home = () => {
             status: "Còn hàng",
             imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
             total_reviews: 200
-        }
+        },
     ];
 
     const [isLoading, setIsLoading] = useState(false);

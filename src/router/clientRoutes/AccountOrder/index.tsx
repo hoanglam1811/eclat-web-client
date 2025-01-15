@@ -1,15 +1,92 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
 import { KeyOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
+import { Table, Tag } from "antd";
+import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 
-const Account = () => {
-
+const AccountOrder = () => {
     const user = {
         name: "Lam Nguyen",
         email: "nguyenhoanglam18112003@gmail.com",
         phone_number: "0902601297"
     };
+
+    const orders = [
+        {
+            id: "ORD12345",
+            product: "Sản phẩm A",
+            quantity: 2,
+            date: "2023-12-25",
+            status: "Đang giao",
+            phone: "0902601297",
+            name: "Lam Nguyen"
+        },
+        {
+            id: "ORD12346",
+            product: "Sản phẩm B",
+            quantity: 1,
+            date: "2023-12-20",
+            status: "Hoàn thành",
+            phone: "0902601297",
+            name: "Lam Nguyen"
+        },
+        {
+            id: "ORD12347",
+            product: "Sản phẩm C",
+            quantity: 3,
+            date: "2023-12-15",
+            status: "Đã hủy",
+            phone: "0902601297",
+            name: "Lam Nguyen"
+        }
+    ];
+
+    const columns: any = [
+        {
+            title: "ID Đơn Hàng",
+            dataIndex: "id",
+            key: "id",
+            render: (text: any) => <span className="font-medium">{text}</span>
+        },
+        {
+            title: "Sản Phẩm",
+            dataIndex: "product",
+            key: "product"
+        },
+        {
+            title: "Số Lượng",
+            dataIndex: "quantity",
+            key: "quantity",
+            align: "center"
+        },
+        {
+            title: "Ngày Mua",
+            dataIndex: "date",
+            key: "date"
+        },
+        {
+            title: "Trạng Thái",
+            dataIndex: "status",
+            key: "status",
+            render: (status: any) => {
+                let color = "blue";
+                if (status === "Hoàn thành") color = "green";
+                else if (status === "Đã hủy") color = "red";
+                return <Tag color={color}>{status}</Tag>;
+            }
+        },
+        {
+            title: "Số Điện Thoại",
+            dataIndex: "phone",
+            key: "phone"
+        },
+        {
+            title: "Tên Khách Hàng",
+            dataIndex: "name",
+            key: "name"
+        }
+    ];
 
     return (
         <>
@@ -31,7 +108,7 @@ const Account = () => {
                                 </BreadcrumbItem>
                                 <BreadcrumbItem>
                                     <p className="text-[#000] font-medium md:text-xl text-lg">
-                                        Thông tin tài khoản
+                                        Đơn hàng của bạn
                                     </p>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
@@ -40,9 +117,7 @@ const Account = () => {
                 </div>
             </section>
 
-            {/* <div className="flex items-center justify-center max-w-full bg-gray-100"> */}
             <div className="bg-gray-100">
-
                 {/* Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 p-6">
                     {/* Sidebar */}
@@ -80,27 +155,16 @@ const Account = () => {
                         </ul>
                     </div>
 
-                    {/* Profile Details */}
-                    <section className=" bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-5 col-end-12">
-                        <h2 className="text-lg font-bold text-gray-800 mb-6">Thông Tin Tài Khoản</h2>
-                        <div className="space-y-6">
-                            {/* Name */}
-                            <div className="flex justify-between items-center border-b pb-4">
-                                <span className="text-black font-bold">Họ tên:</span>
-                                <span className="font-medium text-black">{user.name}</span>
-                            </div>
-
-                            {/* Email */}
-                            <div className="flex justify-between items-center border-b pb-4">
-                                <span className="text-black font-bold">Email:</span>
-                                <span className="font-medium text-black">{user.email}</span>
-                            </div>
-
-                            <div className="flex justify-between items-center">
-                                <span className="text-black font-bold">Số điện thoại:</span>
-                                <span className="font-medium text-black">{user.phone_number || "N/a"}</span>
-                            </div>
-                        </div>
+                    <section className="bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-5 col-end-12">
+                        <h2 className="text-lg font-bold text-gray-800 mb-6">Đơn hàng của bạn</h2>
+                        {/* Order Table */}
+                        <Table
+                            dataSource={orders}
+                            columns={columns}
+                            rowKey="id"
+                            pagination={{ pageSize: 5 }}
+                            bordered
+                        />
                     </section>
                 </div>
             </div>
@@ -108,4 +172,4 @@ const Account = () => {
     );
 }
 
-export default Account;
+export default AccountOrder;

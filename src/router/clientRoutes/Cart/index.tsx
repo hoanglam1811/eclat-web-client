@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
+import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
+import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState<any[]>([]);
@@ -32,9 +34,24 @@ const Cart = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-100 pt-11">
             {/* Nội dung */}
-            <h1 className="text-2xl font-bold text-[#578a3f] flex justify-start ml-40 mt-10">GIỎ HÀNG CỦA BẠN</h1>
+            <div className="mb-10 top-0 left-0 items-start ml-8 z-10">
+                <div>
+                    <Breadcrumb className="">
+                        <BreadcrumbList className="text-[#000]">
+                            <BreadcrumbItem>
+                                <Link to="/" className="md:text-xl text-lg">Trang chủ</Link>
+                            </BreadcrumbItem>
+                            <BreadcrumbSeparator />
+                            <BreadcrumbItem>
+                                <p className="text-[#000] font-medium md:text-xl text-lg">Giỏ hàng của bạn</p>
+                            </BreadcrumbItem>
+                        </BreadcrumbList>
+                    </Breadcrumb>
+                </div>
+            </div>
+
             <div className="max-w-7xl mx-auto p-6">
                 <div className="flex space-x-2">
                     {/* Phần giỏ hàng */}

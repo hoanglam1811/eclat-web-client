@@ -34,25 +34,31 @@ const Cart = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-100 pt-11">
+        <>
             {/* Nội dung */}
-            <div className="mb-10 top-0 left-0 items-start ml-8 z-10">
-                <div>
-                    <Breadcrumb className="">
-                        <BreadcrumbList className="text-[#000]">
-                            <BreadcrumbItem>
-                                <Link to="/" className="md:text-xl text-lg">Trang chủ</Link>
-                            </BreadcrumbItem>
-                            <BreadcrumbSeparator />
-                            <BreadcrumbItem>
-                                <p className="text-[#000] font-medium md:text-xl text-lg">Giỏ hàng của bạn</p>
-                            </BreadcrumbItem>
-                        </BreadcrumbList>
-                    </Breadcrumb>
+            <section className="bg-gray-100 p-6">
+                <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
+                    <div>
+                        <Breadcrumb className="">
+                            <BreadcrumbList className="text-[#000]">
+                                <BreadcrumbItem>
+                                    <Link to="/" className="md:text-xl text-lg">
+                                        Trang chủ
+                                    </Link>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <p className="text-[#000] font-medium md:text-xl text-lg">
+                                        Giỏ hàng
+                                    </p>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div className="max-w-7xl mx-auto p-6">
+            <div className=" bg-gray-100 pt-5 pl-20 pr-20 pb-10">
                 <div className="flex space-x-2">
                     {/* Phần giỏ hàng */}
                     <div className="w-4/5 bg-white rounded-lg shadow-md p-6 border border-gray-200">
@@ -189,7 +195,7 @@ const Cart = () => {
                     </button>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 

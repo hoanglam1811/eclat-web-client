@@ -1,7 +1,8 @@
-import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
+import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
 import { KeyOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
+import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 
 const Account = () => {
 

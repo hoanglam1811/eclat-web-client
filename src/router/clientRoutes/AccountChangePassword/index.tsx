@@ -13,7 +13,6 @@ const AccountChangePassword = () => {
     };
 
     const onFinish = (values: any) => {
-        // Xử lý đổi mật khẩu (có thể kết nối với API)
         console.log("Form Values: ", values);
         if (values.newPassword !== values.confirmPassword) {
             notification.error({ message: "Mật khẩu xác nhận không khớp!" })
@@ -107,7 +106,7 @@ const AccountChangePassword = () => {
                                     <input
                                         type="password"
                                         id="oldPassword"
-                                        placeholder="Enter old password"
+                                        placeholder="Nhập mật khẩu cũ"
                                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
@@ -125,7 +124,7 @@ const AccountChangePassword = () => {
                                         <input
                                             type="password"
                                             id="password"
-                                            placeholder="Enter new password"
+                                            placeholder="Nhập mật khẩu mới"
                                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                         />
                                     </div>
@@ -141,7 +140,7 @@ const AccountChangePassword = () => {
                                         <input
                                             type="password"
                                             id="confirmPassword"
-                                            placeholder="Confirm new password"
+                                            placeholder="Xác nhận mật khẩu mới"
                                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                         />
                                     </div>

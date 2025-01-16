@@ -17,6 +17,7 @@ const RouteNames = {
   ACCOUNT:"/account",
   ACCOUNT_ORDERS: "/account/orders",
   ACCOUNT_CHANGE_PASSWORD: "/account/change-password",
+  PAYMENT:"/cart/payment/"
 };
 
 export default RouteNames;

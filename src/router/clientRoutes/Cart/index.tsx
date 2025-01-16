@@ -3,9 +3,16 @@ import { Link } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
+import { useNavigate } from "react-router-dom";
+
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState<any[]>([]);
+    const navigate = useNavigate();
+
+    const handlePayment = () => {
+        navigate("/cart/payment/");
+    };
 
     useEffect(() => {
         const storedCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
@@ -85,14 +92,15 @@ const Cart = () => {
                                                     alt={item.name}
                                                     className="w-16 h-16 rounded object-cover"
                                                 />
-                                                <div className="flex-1">
+                                                <div className="flex-1 text-left">
                                                     {/* Tên sản phẩm */}
-                                                    <p
-                                                        className="text-sm font-medium text-gray-800 break-words text-left"
+                                                    <a
+                                                        href={`/product/${item.id}`}
+                                                        className="text-sm font-medium text-blue-600 hover:underline break-words text-left "
                                                         style={{ maxWidth: "250px" }}
                                                     >
                                                         {item.name}
-                                                    </p>
+                                                    </a>
                                                     {/* Màu sắc */}
                                                     <p className="text-sm text-gray-500 text-left">{item.color}</p>
                                                 </div>
@@ -162,6 +170,11 @@ const Cart = () => {
                                 </span>
                             </p>
                         </div>
+                        <div className="flex justify-end mt-6">
+                            <button onClick={handlePayment} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Thanh toán
+                            </button>
+                        </div>
                     </div>
 
                     {/* Phần voucher */}
@@ -188,12 +201,9 @@ const Cart = () => {
                             </li>
                         </ul>
                     </div>
+
                 </div>
-                <div className="flex justify-end mt-6">
-                    <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Thanh toán
-                    </button>
-                </div>
+
             </div>
         </>
     );

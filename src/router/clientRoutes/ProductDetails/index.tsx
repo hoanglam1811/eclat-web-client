@@ -122,7 +122,7 @@ const ProductDetails = () => {
     return (
         <>
             <section className="bg-gray-100 p-6">
-            <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
+                <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
                         <Breadcrumb className="">
                             <BreadcrumbList className="text-[#000]">
@@ -225,9 +225,6 @@ const ProductDetails = () => {
                                             className="px-8 py-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
                                         >
                                             Thêm vào giỏ
-                                        </button>
-                                        <button className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-105">
-                                            Mua ngay
                                         </button>
                                     </div>
                                 </div>

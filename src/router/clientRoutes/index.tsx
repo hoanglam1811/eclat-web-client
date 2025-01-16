@@ -9,6 +9,7 @@ import Account from "./Account/index.tsx";
 import AccountChangePassword from "./AccountChangePassword/index.tsx";
 import Products from "./Products/index.tsx";
 import AccountOrder from "./AccountOrder/index.tsx";
+import Payment from "./Payment/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -38,6 +39,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.PRODUCTS,
     element: <Products />,
+  },
+  {
+    path: RouteNames.PAYMENT,
+    element: <Payment />,
   }
 ];
 

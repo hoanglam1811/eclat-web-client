@@ -39,6 +39,7 @@ const AccountChangePassword = () => {
                                         Hồ sơ khách hàng
                                     </p>
                                 </BreadcrumbItem>
+                                <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <p className="text-[#000] font-medium md:text-xl text-lg">
                                         Đổi mật khẩu

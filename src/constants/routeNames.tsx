@@ -13,11 +13,14 @@ const RouteNames = {
   BEAUTY_BLOG: "/beauty-blog",
   SKIN_QUIZ: "/skin-quiz",
   CATEGORIES: "/categories",
-  CART:"/cart",
-  ACCOUNT:"/account",
+  CART: "/cart",
+  ACCOUNT: "/account",
   ACCOUNT_ORDERS: "/account/orders",
   ACCOUNT_CHANGE_PASSWORD: "/account/change-password",
-  PAYMENT:"/cart/payment/"
+  PAYMENT: "/cart/payment/",
+  CATEGORIES_MANAGEMENT: "/staff/categories-management",
+  BRANDS_MANAGEMENT: "/staff/brands-management",
+  SKIN_TYPES_MANAGEMENT: "/staff/skin-types-management",
 };
 
 export default RouteNames;

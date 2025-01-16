@@ -10,6 +10,9 @@ import AccountChangePassword from "./AccountChangePassword/index.tsx";
 import Products from "./Products/index.tsx";
 import AccountOrder from "./AccountOrder/index.tsx";
 import Payment from "./Payment/index.tsx";
+import CategoriesManagement from "./CategoriesManagement/index.tsx";
+import BrandsManagement from "./BrandManagement/index.tsx";
+import SkinTypesManagement from "./SkinTypeManagement/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -43,6 +46,14 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.PAYMENT,
     element: <Payment />,
+  },
+  {
+    path: RouteNames.CATEGORIES_MANAGEMENT,
+    element: <CategoriesManagement />,
+  },
+  {
+    path: RouteNames.SKIN_TYPES_MANAGEMENT,
+    element: <SkinTypesManagement />,
   }
 ];
 

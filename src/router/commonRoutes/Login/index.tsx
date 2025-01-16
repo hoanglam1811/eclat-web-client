@@ -49,8 +49,8 @@ const Login = () => {
                         animation: "fadeIn 1s ease-in-out",
                     }}
                 >
-                    <h2 style={{ fontFamily: "Montserrat, sans-serif", color: "#578a3f", marginBottom: "30px" }}>
-                        Chào mừng đến với Éclat
+                    <h2 className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", color: "#578a3f", marginBottom: "30px" }}>
+                        CHÀO MỪNG ĐẾN VỚI ÉCLAT
                     </h2>
 
                     <input
@@ -105,7 +105,7 @@ const Login = () => {
                         Đăng nhập
                     </button>
 
-                    <p style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
+                    <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
                         Bạn chưa có tài khoản?{" "}
                         <Link
                             to="/register"

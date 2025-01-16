@@ -1,9 +1,20 @@
-import { Navigate, RouteObject } from "react-router-dom";
+import { RouteObject } from "react-router-dom";
+import RouteNames from "../../constants/routeNames";
+import Login from "./Login";
+import Register from "./Register";
 
 const publicRoutes: RouteObject[] = [
   {
     // path: RouteNames.HOME,
     // element: <Home />,
+  },
+  {
+    path: RouteNames.LOGIN,
+    element: <Login />,
+  },
+  {
+    path: RouteNames.REGISTER,
+    element: <Register />,
   },
 ];
 

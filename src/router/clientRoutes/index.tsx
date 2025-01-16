@@ -5,16 +5,13 @@ import Register from "../commonRoutes/Register/index.tsx";
 import Home from "./Home/index.tsx";
 import ProductDetails from "./ProductDetails/index.tsx";
 import Cart from "./Cart/index.tsx";
+import Account from "./Account/index.tsx";
+import AccountChangePassword from "./AccountChangePassword/index.tsx";
+import Products from "./Products/index.tsx";
+import AccountOrder from "./AccountOrder/index.tsx";
+import Payment from "./Payment/index.tsx";
 
 const publicRoutes: RouteObject[] = [
-  {
-    path: RouteNames.LOGIN,
-    element: <Login />,
-  },
-  {
-    path: RouteNames.REGISTER,
-    element: <Register />,
-  },
   {
     path: RouteNames.HOME,
     element: <Home />,
@@ -26,6 +23,26 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.CART,
     element: <Cart />,
+  },
+  {
+    path: RouteNames.ACCOUNT,
+    element: <Account />,
+  },
+  {
+    path: RouteNames.ACCOUNT_ORDERS,
+    element: <AccountOrder />,
+  },
+  {
+    path: RouteNames.ACCOUNT_CHANGE_PASSWORD,
+    element: <AccountChangePassword />,
+  },
+  {
+    path: RouteNames.PRODUCTS,
+    element: <Products />,
+  },
+  {
+    path: RouteNames.PAYMENT,
+    element: <Payment />,
   }
 ];
 

@@ -1,9 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
+import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
+import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
+import { useNavigate } from "react-router-dom";
+
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState<any[]>([]);
+    const navigate = useNavigate();
+
+    const handlePayment = () => {
+        navigate("/cart/payment/");
+    };
 
     useEffect(() => {
         const storedCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
@@ -32,10 +41,31 @@ const Cart = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <>
             {/* Nội dung */}
-            <h1 className="text-2xl font-bold text-[#578a3f] flex justify-start ml-40 mt-10">GIỎ HÀNG CỦA BẠN</h1>
-            <div className="max-w-7xl mx-auto p-6">
+            <section className="bg-gray-100 p-6">
+                <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
+                    <div>
+                        <Breadcrumb className="">
+                            <BreadcrumbList className="text-[#000]">
+                                <BreadcrumbItem>
+                                    <Link to="/" className="md:text-xl text-lg">
+                                        Trang chủ
+                                    </Link>
+                                </BreadcrumbItem>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <p className="text-[#000] font-medium md:text-xl text-lg">
+                                        Giỏ hàng
+                                    </p>
+                                </BreadcrumbItem>
+                            </BreadcrumbList>
+                        </Breadcrumb>
+                    </div>
+                </div>
+            </section>
+
+            <div className=" bg-gray-100 pt-5 pl-20 pr-20 pb-10">
                 <div className="flex space-x-2">
                     {/* Phần giỏ hàng */}
                     <div className="w-4/5 bg-white rounded-lg shadow-md p-6 border border-gray-200">
@@ -62,14 +92,15 @@ const Cart = () => {
                                                     alt={item.name}
                                                     className="w-16 h-16 rounded object-cover"
                                                 />
-                                                <div className="flex-1">
+                                                <div className="flex-1 text-left">
                                                     {/* Tên sản phẩm */}
-                                                    <p
-                                                        className="text-sm font-medium text-gray-800 break-words text-left"
+                                                    <a
+                                                        href={`/product/${item.id}`}
+                                                        className="text-sm font-medium text-blue-600 hover:underline break-words text-left "
                                                         style={{ maxWidth: "250px" }}
                                                     >
                                                         {item.name}
-                                                    </p>
+                                                    </a>
                                                     {/* Màu sắc */}
                                                     <p className="text-sm text-gray-500 text-left">{item.color}</p>
                                                 </div>
@@ -139,6 +170,11 @@ const Cart = () => {
                                 </span>
                             </p>
                         </div>
+                        <div className="flex justify-end mt-6">
+                            <button onClick={handlePayment} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Thanh toán
+                            </button>
+                        </div>
                     </div>
 
                     {/* Phần voucher */}
@@ -165,14 +201,11 @@ const Cart = () => {
                             </li>
                         </ul>
                     </div>
+
                 </div>
-                <div className="flex justify-end mt-6">
-                    <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        Thanh toán
-                    </button>
-                </div>
+
             </div>
-        </div>
+        </>
     );
 };
 

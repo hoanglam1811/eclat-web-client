@@ -5,7 +5,6 @@ const RouteNames = {
   REGISTER: "/register",
   GOOGLE: "/login-google",
   NOT_FOUND: "/not-found",
-  PROFILE: "/profile",
   DASHBOARD: "/admin/dashboard",
   PRODUCTS: "/products",
   PRODUCT_DETAIL: "/product/:id",
@@ -14,7 +13,11 @@ const RouteNames = {
   BEAUTY_BLOG: "/beauty-blog",
   SKIN_QUIZ: "/skin-quiz",
   CATEGORIES: "/categories",
-  CART:"/cart"
+  CART:"/cart",
+  ACCOUNT:"/account",
+  ACCOUNT_ORDERS: "/account/orders",
+  ACCOUNT_CHANGE_PASSWORD: "/account/change-password",
+  PAYMENT:"/cart/payment/"
 };
 
 export default RouteNames;

@@ -13,6 +13,8 @@ import Payment from "./Payment/index.tsx";
 import CategoriesManagement from "./CategoriesManagement/index.tsx";
 import BrandsManagement from "./BrandManagement/index.tsx";
 import SkinTypesManagement from "./SkinTypeManagement/index.tsx";
+import ProductsManagement from "./ProductsManagement/index.tsx";
+import FormCreateProduct from "./FormAddProduct/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -54,6 +56,18 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.SKIN_TYPES_MANAGEMENT,
     element: <SkinTypesManagement />,
+  },
+  {
+    path: RouteNames.BRANDS_MANAGEMENT,
+    element: <BrandsManagement />,
+  },
+  {
+    path: RouteNames.PRODUCTS_MANAGEMENT,
+    element: <ProductsManagement />,
+  },
+  {
+    path: RouteNames.PRODUCT_ADDITION,
+    element: <FormCreateProduct />,
   }
 ];
 

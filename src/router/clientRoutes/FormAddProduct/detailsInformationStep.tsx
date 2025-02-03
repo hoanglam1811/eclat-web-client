@@ -9,7 +9,6 @@ import { BASE_URL } from "../../../constants/api";
 import { Label } from "../../../components/ui/label";
 import { Button } from "antd";
 import { Input } from "../../../components/ui/input";
-import { Textarea } from "../../../components/ui/textarea";
 import { DeleteOutlined } from "@ant-design/icons";
 
 interface OptionType {
@@ -49,7 +48,7 @@ const schema = z.object({
     ),
 });
 
-const UcmStep = ({
+const DetailsInformationStep = ({
   formData,
   onSave,
   onBack,
@@ -113,7 +112,6 @@ const UcmStep = ({
       console.error("Validation failed", errors);
       return;
     }
-
 
     const data = getValues();
     if (data) {
@@ -301,4 +299,4 @@ const UcmStep = ({
   );
 };
 
-export default UcmStep;
+export default DetailsInformationStep;

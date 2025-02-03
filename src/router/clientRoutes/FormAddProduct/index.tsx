@@ -7,8 +7,8 @@ import RouteNames from "../../../constants/routeNames";
 import axios from "axios";
 import { BASE_URL } from "../../../constants/api";
 import { uploadFile } from "../../../services/ApiServices/fileUploadService";
-import InformationStep from "./informationStep";
-import UcmStep from "./ucmStep";
+import InformationStep from "./generalInformationStep";
+import UcmStep from "./detailsInformationStep";
 import ViewDataCreated from "./viewDataCreated";
 import { ShoppingOutlined } from "@ant-design/icons";
 

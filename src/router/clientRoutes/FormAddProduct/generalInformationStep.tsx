@@ -21,7 +21,7 @@ const schema = z.object({
   imageUrl: z.string().optional(),
 });
 
-const InformationStep = ({
+const GeneralInformationStep = ({
   formData,
   onSave,
   handleUploadFile,
@@ -335,4 +335,4 @@ const InformationStep = ({
   );
 };
 
-export default InformationStep;
+export default GeneralInformationStep;

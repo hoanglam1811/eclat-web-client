@@ -194,6 +194,10 @@ const ProductsManagement = () => {
         setCurrentPage(page);
     };
 
+    const handleViewDetails = (id:any) => {
+        navigate(`/staff/product-update/${id}`);
+    };
+
     //   const fetchCategories = () => {
     //     setLoading(true);
     //     getAllCategories()
@@ -303,6 +307,7 @@ const ProductsManagement = () => {
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setCurrentProduct(account);
+                                            handleViewDetails(account.id);
                                         }}
                                         sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
                                     >

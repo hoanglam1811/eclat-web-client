@@ -33,24 +33,6 @@ const FormCreateProduct = () => {
         university: "",
         certificate: [],
         major: "",
-        criteria: [{ name: "", description: "", percentage: "" }],
-        reviewMilestones: [
-            { description: "Application Review", fromDate: "", toDate: "" },
-            { description: "Interview", fromDate: "", toDate: "" },
-        ],
-        awardMilestones: [
-            {
-                fromDate: "",
-                toDate: "",
-                amount: "",
-                note: "",
-                awardMilestoneDocuments: [
-                    {
-                        type: "",
-                    },
-                ],
-            },
-        ],
         documents: [
             {
                 type: "",

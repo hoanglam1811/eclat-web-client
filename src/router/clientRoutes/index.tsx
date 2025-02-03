@@ -15,6 +15,7 @@ import BrandsManagement from "./BrandManagement/index.tsx";
 import SkinTypesManagement from "./SkinTypeManagement/index.tsx";
 import ProductsManagement from "./ProductsManagement/index.tsx";
 import FormCreateProduct from "./FormAddProduct/index.tsx";
+import FormViewProduct from "./ProductDetailsManagement/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -68,6 +69,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.PRODUCT_ADDITION,
     element: <FormCreateProduct />,
+  },
+  {
+    path: RouteNames.PRODUCT_VIEW,
+    element: <FormViewProduct />,
   }
 ];
 

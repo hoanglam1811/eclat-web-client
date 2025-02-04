@@ -21,6 +21,9 @@ const RouteNames = {
   CATEGORIES_MANAGEMENT: "/staff/categories-management",
   BRANDS_MANAGEMENT: "/staff/brands-management",
   SKIN_TYPES_MANAGEMENT: "/staff/skin-types-management",
+  PRODUCTS_MANAGEMENT: "/staff/products-management",
+  PRODUCT_ADDITION: "/staff/product-addition",
+  PRODUCT_VIEW:"/staff/product-update/:id"
 };
 
 export default RouteNames;

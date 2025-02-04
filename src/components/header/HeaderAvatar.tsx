@@ -50,15 +50,15 @@ const HeaderAvatar = () => {
   const handleProfileClick = () => {
     if (user) {
       if (user.role.toLowerCase() === RoleNames.ADMIN.toLowerCase()) {
-        navigate(`${RouteNames.PROFILE}`);
+        navigate(`${RouteNames.ACCOUNT}`);
       }
 
       if (user.role.toLowerCase() === RoleNames.CUSTOMER.toLowerCase()) {
-        navigate(`${RouteNames.PROFILE}`);
+        navigate(`${RouteNames.ACCOUNT}`);
       }
 
       if (user.role.toLowerCase() === RoleNames.STAFF.toLowerCase()) {
-        navigate(`${RouteNames.PROFILE}`);
+        navigate(`${RouteNames.ACCOUNT}`);
       }
     }
   };

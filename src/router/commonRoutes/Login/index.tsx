@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import LoginImage from "../../../assets/Login.png";
 import LoginnImage from "../../../assets/Loginn.png";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../../../services/ApiServices/authenticationService';
+import { notification } from 'antd';
 
 const Login = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const images = [LoginImage, LoginnImage];
+    const navigate = useNavigate();
+
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -13,6 +21,37 @@ const Login = () => {
         }, 3000);
         return () => clearInterval(interval);
     }, []);
+
+    const handleLoginSubmit = async () => {
+        setIsLoading(true);
+        setError("");
+        try {
+            const user = await login(username, password);
+            setIsLoading(false);
+            localStorage.setItem("token", user.token);
+            notification.success({ message: "Đăng nhập thành công!" });
+
+            if (user.role === "ADMIN") {
+                navigate("/admin");
+            } else {
+                navigate("/");
+            }
+
+        } catch (error: any) {
+            setIsLoading(false);
+            if (error.response?.data?.message) {
+                if (error.response.data.message === "Email not found") {
+                    setError("Email không tồn tại!");
+                } else if (error.response.data.message === "Wrong password") {
+                    setError("Sai mật khẩu!");
+                } else {
+                    setError("Có lỗi xảy ra. Vui lòng thử lại sau!");
+                }
+            } else {
+                setError("Lỗi kết nối! Hãy kiểm tra lại đường truyền.");
+            }
+        }
+    };
 
     return (
         <div style={{ display: "flex", height: "100vh" }}>
@@ -55,7 +94,9 @@ const Login = () => {
 
                     <input
                         type="email"
-                        placeholder="Nhập email"
+                        placeholder="Nhập tên người dùng"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         style={{
                             width: "80%",
                             padding: "12px 20px",
@@ -71,6 +112,8 @@ const Login = () => {
                     <input
                         type="password"
                         placeholder="Nhập mật khẩu"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                         style={{
                             width: "80%",
                             padding: "12px 20px",
@@ -99,10 +142,10 @@ const Login = () => {
                             transition: "background-color 0.3s ease",
                             marginBottom: "15px",
                         }}
-                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#21618c")}
-                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#578a3f")}
+                        onClick={handleLoginSubmit}
+                        disabled={isLoading}
                     >
-                        Đăng nhập
+                        {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                     </button>
 
                     <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
@@ -117,7 +160,7 @@ const Login = () => {
                             onMouseOver={(e: any) => (e.target.style.color = "#21618c")}
                             onMouseOut={(e: any) => (e.target.style.color = "#578a3f")}
                         >
-                            Đăng ký ngay 
+                            Đăng ký ngay
                         </Link>
                     </p>
 

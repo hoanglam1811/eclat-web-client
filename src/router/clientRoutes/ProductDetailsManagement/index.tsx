@@ -115,81 +115,6 @@ const FormViewProduct = () => {
             status: "Còn hàng",
             imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
             total_reviews: 200
-        },
-        {
-            id: "6",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 50,
-            description: "Beautiful earrings with a unique palm design.",
-            origin_price: 835000,
-            disc_price: 120000,
-            origin_country: "USA",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand A",
-            average_rating: 4.5,
-            status: "Hết hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "7",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 30,
-            description: "Elegant necklace with a red birthstone.",
-            origin_price: 100000,
-            disc_price: 90000,
-            origin_country: "USA",
-            skinTypeId: "Sensitive Skin",
-            brandId: "Brand B",
-            average_rating: 4.8,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/glam_2.11.1_18a5ca6f9b814d9bb11125d8c6d2f704_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "8",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1_b5d9938d4e0d4b71b98a3ac1e059d73e_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "9",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "10",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
         }
     ];
 
@@ -260,7 +185,7 @@ const FormViewProduct = () => {
     };
 
     const handleEditing = () => {
-      setIsEditing(!isEditing);
+        setIsEditing(!isEditing);
     };
 
     const { id } = useParams();
@@ -274,7 +199,7 @@ const FormViewProduct = () => {
         <>
             <div className="bg-white p-[50px]">
                 <div>
-                    <form className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-5xl mx-auto space-y-10">
+                    <form className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-6xl mx-auto space-y-10">
                         {/* Tiêu đề */}
                         <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
                             Thông tin sản phẩm {product.name}
@@ -379,79 +304,92 @@ const FormViewProduct = () => {
                                         <Label htmlFor="" className="block text-sm font-bold text-gray-700 text-left">
                                             Tên sản phẩm <span className="text-red-500">*</span>
                                         </Label>
-                                        {!isEditing ? 
-                                        <p className="text-black-3 text-left">{product.name}</p> :
-                                        <>
-                                          <Input
-                                              {...register("scholarshipName")}
-                                              placeholder="Nhập tên sản phẩm"
-                                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                          />
-                                          {errors.scholarshipName?.message && (
-                                              <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipName?.message)}</p>
-                                          )}
-                                        </> }
+                                        {!isEditing ? (
+                                            <p className="text-black-3 text-left">{product.name}</p>
+                                        ) : (
+                                            <>
+                                                <Input
+                                                    defaultValue={product.name} // Gán giá trị mặc định từ product
+                                                    placeholder="Nhập tên sản phẩm"
+                                                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                                />
+                                            </>
+                                        )}
                                     </div>
+
                                     <div>
-                                        <Label htmlFor="educationalLevel" className="block text-sm font-bold text-gray-700 text-left">
+                                        <Label htmlFor="origin_country" className="block text-sm font-bold text-gray-700 text-left">
                                             Nguồn gốc xuất xứ <span className="text-red-500">*</span>
                                         </Label>
-                                        {!isEditing ? <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
-                                        <><Select
-                                            isSearchable
-                                            placeholder="Chọn nguồn gốc xuất xứ"
-                                            className="mt-1"
-                                        />
-                                        {errors.educationalLevel?.message && (
-                                            <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
-                                        )} </>}
+                                        {!isEditing ? (
+                                            <p className="text-sm text-gray-500 text-left">{product.origin_country}</p>
+                                        ) : (
+                                            <>
+                                                <Select
+                                                    defaultValue={product.origin_country} // Gán giá trị mặc định
+                                                    isSearchable
+                                                    placeholder="Chọn nguồn gốc xuất xứ"
+                                                    className="mt-1"
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 
                                 {/* Các thông tin khác */}
                                 <div className="grid grid-cols-3 gap-6">
                                     <div className="col-span-1">
-                                        <Label htmlFor="educationalLevel" className="block text-sm font-bold text-gray-700 text-left">
+                                        <Label htmlFor="skinTypeId" className="block text-sm font-bold text-gray-700 text-left">
                                             Loại da <span className="text-red-500">*</span>
                                         </Label>
-                                        {!isEditing ? 
-                                       <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
-                                        <><Select
-                                            isSearchable
-                                            placeholder="Chọn loại da"
-                                            className="mt-1"
-                                        />
-                                        {errors.educationalLevel?.message && (
-                                            <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
-                                        )} </>}
+                                        {!isEditing ? (
+                                            <p className="text-sm text-gray-500 text-left">{product.skinTypeId}</p>
+                                        ) : (
+                                            <>
+                                                <Select
+                                                    defaultValue={product.skinTypeId}
+                                                    isSearchable
+                                                    placeholder="Chọn loại da"
+                                                    className="mt-1"
+                                                />
+                                            </>
+                                        )}
                                     </div>
+
                                     <div className="col-span-1">
-                                        <Label htmlFor="category" className="block text-sm font-bold text-gray-700 text-left">
+                                        <Label htmlFor="brandId" className="block text-sm font-bold text-gray-700 text-left">
                                             Thương hiệu <span className="text-red-500">*</span>
                                         </Label>
-                                        {!isEditing ? <p className="text-sm text-gray-500 text-left">{product.brandId}</p> :
-                                        <><Select
-                                            isSearchable
-                                            placeholder="Chọn thương hiệu"
-                                            className="mt-1"
-                                        />
-                                        {errors.deadline?.message && (
-                                            <p className="text-sm text-red-500 mt-1">{String(errors.deadline?.message)}</p>
-                                        )} </>}
+                                        {!isEditing ? (
+                                            <p className="text-sm text-gray-500 text-left">{product.brandId}</p>
+                                        ) : (
+                                            <>
+                                                <Select
+                                                    defaultValue={product.brandId}
+                                                    isSearchable
+                                                    placeholder="Chọn thương hiệu"
+                                                    className="mt-1"
+                                                />
+                                            </>
+                                        )}
                                     </div>
+
                                     <div className="col-span-1">
                                         <Label htmlFor="productType" className="block text-sm font-bold text-gray-700 text-left">
                                             Loại sản phẩm <span className="text-red-500">*</span>
                                         </Label>
-                                        {!isEditing ? <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
-                                        <><Select
-                                            isSearchable
-                                            placeholder="Chọn loại sản phẩm"
-                                            className="mt-1"
-                                        />
-                                        {errors.scholarshipType?.message && (
-                                            <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
-                                        )} </>}
+                                        {!isEditing ? (
+                                            <p className="text-sm text-gray-500 text-left">{product.origin_country}</p>
+                                        ) : (
+                                            <>
+                                                <Select
+                                                    defaultValue={product.origin_country}
+                                                    isSearchable
+                                                    placeholder="Chọn loại sản phẩm"
+                                                    className="mt-1"
+                                                />
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 
@@ -460,141 +398,172 @@ const FormViewProduct = () => {
                                     <Label htmlFor="description" className="block text-sm font-bold text-gray-700 text-left">
                                         Mô tả sản phẩm <span className="text-red-500">*</span>
                                     </Label>
-                                    {!isEditing ? <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
-                                    <><Textarea
-                                        {...register("description")}
-                                        rows={4}
-                                        placeholder="Nhập mô tả sản phẩm"
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                    {errors.description?.message && (
-                                        <p className="text-sm text-red-500 mt-1">{String(errors.description.message)}</p>
-                                    )} </>}
+                                    {!isEditing ? (
+                                        <p className="text-sm text-gray-500 text-left">{product.description}</p>
+                                    ) : (
+                                        <>
+                                            <Textarea
+                                                defaultValue={product.description}
+                                                rows={4}
+                                                placeholder="Nhập mô tả sản phẩm"
+                                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                        </>
+                                    )}
                                 </div>
+
                                 <div className="mt-6">
                                     <Label htmlFor="usageInstructions" className="block text-sm font-bold text-gray-700 text-left">
                                         Hướng dẫn sử dụng <span className="text-red-500">*</span>
                                     </Label>
-                                   {!isEditing ?  <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
-                                    <><Textarea
-                                        {...register("usageInstructions")}
-                                        rows={4}
-                                        placeholder="Nhập hướng dẫn sử dụng"
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                    />
-                                    {errors.usageInstructions?.message && (
-                                        <p className="text-sm text-red-500 mt-1">{String(errors.usageInstructions.message)}</p>
-                                    )} </>}
+                                    {!isEditing ? (
+                                        <p className="text-sm text-gray-500 text-left">{product.description}</p>
+                                    ) : (
+                                        <>
+                                            <Textarea
+                                                defaultValue={product.description} // Gán giá trị mặc định
+                                                rows={4}
+                                                placeholder="Nhập hướng dẫn sử dụng"
+                                                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            />
+                                        </>
+                                    )}
                                 </div>
-                                 <Label htmlFor="quantity" className="block text-sm font-bold text-gray-700 text-left">
-                            Tên tuỳ chọn <span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                            {...register("quantity")}
-                            placeholder="Ví dụ: Phân loại, Size,.."
-                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                        />
-                        {errors.quantity?.message && (
-                            <p className="text-sm text-red-500 mt-1">{String(errors.quantity.message)}</p>
-                        )}
-                        <Label htmlFor="quantity" className="block text-sm font-bold text-gray-700 text-left">
-                            Thêm chi tiết tuỳ chọn <span className="text-red-500">*</span>
-                        </Label>
-                        <div className="space-y-4">
-                            {watch("criteria")?.map((_criteria: any, index: any) => (
-                                <div
-                                    key={index}
-                                    className="relative p-4 border rounded-md bg-white shadow-sm"
-                                >
-                                    {watch("criteria").length > 1 && (
+
+                                <div className="mt-6">
+                                    <Label htmlFor="quantity" className="block text-sm font-bold text-gray-700 text-left">
+                                        Tên tuỳ chọn <span className="text-red-500">*</span>
+                                    </Label>
+                                    {!isEditing ? (
+                                        <p className="text-sm text-gray-500 text-left">{product?.name || "N/A"}</p>
+                                    ) : (
+                                        <Input
+                                            {...register("quantity")}
+                                            defaultValue={product?.name || "N/A"}
+                                            placeholder="Ví dụ: Phân loại, Size,.."
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                        />
+                                    )}
+                                    {errors.quantity?.message && (
+                                        <p className="text-sm text-red-500 mt-1">{String(errors.quantity.message)}</p>
+                                    )}
+                                </div>
+
+                                <div className="mt-6">
+                                    <Label htmlFor="quantity" className="block text-sm font-bold text-gray-700 text-left">
+                                        Chi tiết tuỳ chọn <span className="text-red-500">*</span>
+                                    </Label>
+                                    <div className="space-y-4">
+                                        {watch("criteria")?.map((_criteria: any, index: any) => (
+                                            <div
+                                                key={index}
+                                                className="relative p-4 border rounded-md bg-white shadow-sm"
+                                            >
+                                                {watch("criteria").length > 1 && (
+                                                    <Button
+                                                        onClick={() =>
+                                                            setValue(
+                                                                "criteria",
+                                                                watch("criteria").filter((_: any, i: any) => i !== index),
+                                                                { shouldValidate: true }
+                                                            )
+                                                        }
+                                                        className="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 flex items-center justify-center rounded-full shadow"
+                                                    >
+                                                        <DeleteOutlined className="w-4 h-4" />
+                                                    </Button>
+                                                )}
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="col-span-2">
+                                                        <Input
+                                                            {...register(`criteria.${index}.name`)}
+                                                            defaultValue={_criteria.name || "N/A"}
+                                                            placeholder="Ví dụ: Da dầu, Da khô, 216ml, 348ml.."
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-1">
+                                                        <Input
+                                                            type="number"
+                                                            {...register(`criteria.${index}.quantity`, {
+                                                                valueAsNumber: true,
+                                                                onChange: () => updateTotalQuantity(),
+                                                            })}
+                                                            defaultValue={_criteria.quantity || "N/A"}
+                                                            placeholder="Nhập số lượng"
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-3 gap-4 mt-3">
+                                                    <Input
+                                                        {...register(`criteria.${index}.description`)}
+                                                        defaultValue={_criteria.description || "N/A"}
+                                                        placeholder="Nhập giá gốc"
+                                                        className="w-full"
+                                                    />
+                                                    <Input
+                                                        {...register(`criteria.${index}.description`)}
+                                                        defaultValue={_criteria.description || "N/A"}
+                                                        placeholder="Nhập giá khuyến mãi"
+                                                        className="w-full"
+                                                    />
+                                                    <Input
+                                                        type="file"
+                                                        id="imageUrl"
+                                                        onChange={handleFileChange}
+                                                        accept="image/*"
+                                                        className="w-full"
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                        {errors.criteria && errors.criteria.root && <p className="text-red-500 text-sm">{String(errors.criteria.root.message)}</p>}
+                                    </div>
+
+                                    {isEditing && (
                                         <Button
                                             onClick={() =>
-                                                setValue(
-                                                    "criteria",
-                                                    watch("criteria").filter((_: any, i: any) => i !== index),
-                                                    { shouldValidate: true }
-                                                )
+                                                setValue("criteria", [...watch("criteria") ?? [], { name: "", description: "", percentage: "" }])
                                             }
-                                            className="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 flex items-center justify-center rounded-full shadow"
+                                            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition flex items-center space-x-2"
                                         >
-                                            <DeleteOutlined className="w-4 h-4" />
+                                            <FaPlus />
+                                            <span>Thêm mới</span>
                                         </Button>
                                     )}
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="col-span-2">
-                                            <Input
-                                                {...register(`criteria.${index}.name`)}
-                                                placeholder="Ví dụ: Da dầu, Da khô, 216ml, 348ml.."
-                                                className="w-full"
-                                            />
-                                        </div>
-                                        <div className="col-span-1">
-                                            <Input
-                                                type="number"
-                                                {...register(`criteria.${index}.quantity`, {
-                                                    valueAsNumber: true,
-                                                    onChange: () => updateTotalQuantity(),
-                                                })}
-                                                placeholder="Nhập số lượng"
-                                                className="w-full"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-4 mt-3">
-                                        <Input
-                                            {...register(`criteria.${index}.description`)}
-                                            placeholder="Nhập giá gốc"
-                                            className="w-full"
-                                        />
-                                        <Input
-                                            {...register(`criteria.${index}.description`)}
-                                            placeholder="Nhập giá khuyến mãi"
-                                            className="w-full"
-                                        />
-                                        <Input
-                                            type="file"
-                                            id="imageUrl"
-                                            onChange={handleFileChange}
-                                            accept="image/*"
-                                            className="w-full"
-                                        />
-                                    </div>
                                 </div>
-                            ))}
-                            {errors.criteria && errors.criteria.root && <p className="text-red-500 text-sm">{String(errors.criteria.root.message)}</p>}
-                            {/* {JSON.stringify(getValues())} */}
-                            <Button
-                                onClick={() =>
-                                    setValue("criteria", [...watch("criteria") ?? [], { name: "", description: "", percentage: "" }])
-                                }
-                                className="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition flex items-center space-x-2"
-                            >
-                                <FaPlus />
-                                <span>Thêm mới</span>
-                            </Button>
+
+                            </div>
+
                         </div>
 
-                        <div className="mt-6 flex items-center justify-between bg-gray-100 border border-gray-300 rounded-md p-4 shadow">
-                            <h3 className="text-sm font-medium text-gray-700">
-                                Tổng số lượng:
-                            </h3>
-                            <span className="text-xl font-bold text-gray-600">
-                                {totalQuantity}
-                            </span>
-                        </div> 
-                            </div>
-                        </div>
-                        {/* Submit */}
                         <div className="flex justify-end gap-3 mt-6">
-                            {/*JSON.stringify(getValues())*/}
-                            <Button onClick={handleEditing} className="bg-green-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-                                Thay đổi
-                            </Button>
-                            <Button onClick={handleSave} className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-                                Lưu
-                            </Button>
+                            {!isEditing && (
+                                <Button onClick={handleEditing} className="bg-green-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                                    Thay đổi
+                                </Button>
+                            )}
+
+                            {isEditing && (
+                                <>
+                                    <Button
+                                        onClick={() => setIsEditing(false)}
+                                        className="bg-red-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+                                    >
+                                        Hủy
+                                    </Button>
+                                    <Button
+                                        onClick={handleSave}
+                                        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                                    >
+                                        Lưu
+                                    </Button>
+                                </>
+                            )}
                         </div>
+
                     </form>
                 </div>
             </div>

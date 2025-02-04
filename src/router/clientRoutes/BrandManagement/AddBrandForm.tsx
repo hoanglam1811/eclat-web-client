@@ -15,13 +15,13 @@ import { Modal, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 
-interface AddMilestoneModalProps {
+interface AddBrandModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   fetchBrand: () => void;
 }
 
-const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddMilestoneModalProps) => {
+const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) => {
   const { id } = useParams<{ id: string }>();
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | undefined>();

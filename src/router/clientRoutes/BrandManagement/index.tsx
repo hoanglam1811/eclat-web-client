@@ -4,6 +4,7 @@ import {
     Tooltip,
     CircularProgress,
     Paper,
+    Backdrop,
 
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
@@ -13,10 +14,23 @@ import { IoMdAddCircle } from "react-icons/io";
 import { Button } from "../../../components/ui/button";
 import AddBrandModal from "./AddBrandForm";
 import EditBrandForm from "./EditBrandForm";
+import { CloseCircleOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import { Input } from "antd";
 
 const ITEMS_PER_PAGE = 5;
 
 const BrandsManagement = () => {
+    const [openImageModal, setOpenImageModal] = useState(false);
+    const [selectedImage, setSelectedImage] = useState("");
+
+    const handleOpenImage = (imageUrl: any) => {
+        setSelectedImage(imageUrl);
+        setOpenImageModal(true);
+    };
+
+    const handleCloseImage = () => {
+        setOpenImageModal(false);
+    };
     const sampleBrands = [
         {
             id: "1",
@@ -103,85 +117,180 @@ const BrandsManagement = () => {
     //   }, []);
 
     const renderTable = () => (
-        <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
-            {/* Header Row */}
+        <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>
+            {/* Tiêu đề bảng */}
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Input
+                        placeholder="Tìm kiếm theo tên thương hiệu"
+                        //value={searchQuery}
+                        //onChange={(e) => setSearchQuery(e.target.value)}
+                        prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
+                        style={{
+                            width: '400px',
+                            padding: '10px',
+                            borderRadius: "8px",
+                            border: "1px solid #ddd",
+                            backgroundColor: "#f9f9f9"
+                        }}
+                    />
+                    <Button
+                        //onClick={() => setSearchQuery('')}
+                        style={{
+                            backgroundColor: '#f44336',
+                            color: 'white',
+                            padding: '8px 16px',
+                            borderRadius: "8px",
+                        }}
+                    >
+                        <DeleteOutlined />
+                    </Button>
+                </div>
+
+                <Button
+                    onClick={() => setOpenAddBrand(true)}
+                    style={{
+                        backgroundColor: "#419f97",
+                        color: "white",
+                        padding: "8px 16px",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                    }}
+                >
+                    <IoMdAddCircle />
+                    Thêm thương hiệu
+                </Button>
+            </div>
             <div
                 style={{
-                    display: 'flex',
-                    fontWeight: 'bold',
-                    backgroundColor: '#f1f1f1',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    marginBottom: '10px',
+                    display: "flex",
+                    fontWeight: "bold",
+                    backgroundColor: "#eeeeee",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    marginBottom: "10px",
+                    borderBottom: "2px solid #ccc"
                 }}
             >
-                <div style={{ flex: 0.5 }}>ID</div>
-                <div style={{ flex: 2 }}>Name</div>
-                <div style={{ flex: 2 }}>Logo</div>
-                <div style={{ flex: 1 }}>Actions</div>
+                <div style={{ flex: 0.5, textAlign: "center" }}>ID</div>
+                <div style={{ flex: 2 }}>Tên thương hiệu</div>
+                <div style={{ flex: 2, textAlign: "center" }}>Logo</div>
+                <div style={{ flex: 1, textAlign: "center" }}>Hành động</div>
             </div>
 
-            {/* Data Rows */}
-            {paginatedbrands?.map((account: any) => (
-                <React.Fragment key={account.id}>
-                    <div
-                        style={{
-                            display: 'flex',
-                            padding: '10px',
-                            cursor: 'pointer',
-                            backgroundColor: '#fff',
-                            borderBottom: '1px solid #ddd',
-                            transition: 'background-color 0.3s',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
-                    >
-                        <div style={{ flex: 0.5 }}>{account.id}</div>
-                        <div style={{ flex: 2 }}>{account.label}</div>
-                        <div style={{ flex: 2 }}>
-                            <img
-                                src={account.logo || "https://github.com/shadcn.png"}
-                                alt="Avatar"
-                                style={{
-                                    height: 70,
-                                    width: 120,
-                                    display: "inline-flex",
-                                    alignItems: "center",
-                                    objectFit: "cover",
-                                }}
-                            /></div>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ flex: 1 }}>
-                                <Tooltip title="Edit Brand">
-                                    <IconButton
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setCurrentBrand(account);
-                                            setOpenEditBrand(true);
-                                        }}
-                                        sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </div>
-                        </div>
+            {/* Hàng dữ liệu */}
+            {paginatedbrands?.map((brand) => (
+                <div
+                    key={brand.id}
+                    style={{
+                        display: "flex",
+                        padding: "12px",
+                        backgroundColor: "#fff",
+                        borderBottom: "1px solid #ddd",
+                        transition: "background-color 0.3s",
+                        borderRadius: "8px",
+                        marginBottom: "5px",
+                        alignItems: "center"
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f5")}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#fff")}
+                >
+                    <div style={{ flex: 0.5, textAlign: "center" }}>{brand.id}</div>
+                    <div style={{ flex: 2 }}>{brand.label}</div>
+                    <div style={{ flex: 2, textAlign: "center" }}>
+                        <img
+                            src={brand.logo || "https://github.com/shadcn.png"}
+                            alt="Logo"
+                            style={{
+                                height: 70,
+                                width: 120,
+                                display: "inline-flex",
+                                alignItems: "center",
+                                borderRadius: "8px",
+                                objectFit: "cover",
+                                boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
+                            }}
+                            onClick={() => handleOpenImage(brand.logo)}
+                        />
                     </div>
-                </React.Fragment>
+                    <div style={{ flex: 1, textAlign: "center" }}>
+                        <Tooltip title="Chỉnh sửa thương hiệu">
+                            <IconButton
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentBrand(brand);
+                                    setOpenEditBrand(true);
+                                }}
+                                sx={{
+                                    color: "#1976d2",
+                                    "&:hover": { color: "#0d47a1", backgroundColor: "#e3f2fd" }
+                                }}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </div>
+                </div>
             ))}
-            <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+
+            <Backdrop open={openImageModal} onClick={handleCloseImage} sx={{ zIndex: 1000 }}>
+                <div
+                    style={{
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        width: "100vw",
+                        height: "100vh",
+                        backgroundColor: "rgba(0, 0, 0, 0.85)",
+                        animation: "fadeIn 0.3s ease-in-out"
+                    }}
+                >
+                    <IconButton
+                        onClick={handleCloseImage}
+                        sx={{
+                            position: "absolute",
+                            top: 20,
+                            right: 20,
+                            color: "white",
+                            backgroundColor: "rgba(0, 0, 0, 0.5)",
+                            "&:hover": { backgroundColor: "rgba(0, 0, 0, 0.8)" }
+                        }}
+                    >
+                        <CloseCircleOutlined style={{ fontSize: 32 }} />
+                    </IconButton>
+                    <img
+                        src={selectedImage}
+                        alt="Full Size Logo"
+                        style={{
+                            maxWidth: "90vw",
+                            maxHeight: "90vh",
+                            borderRadius: "10px",
+                            objectFit: "contain",
+                            boxShadow: "0 4px 10px rgba(255, 255, 255, 0.2)",
+                            animation: "zoomIn 0.3s ease-in-out"
+                        }}
+                    />
+                </div>
+            </Backdrop>
+
+            {/* Thanh phân trang */}
+            <div style={{ marginTop: "20px", marginBottom: "10px", display: "flex", justifyContent: "center", gap: "8px" }}>
                 {Array.from({ length: totalPages }, (_, index) => (
                     <button
                         key={index}
                         onClick={() => handlePageChange(index + 1)}
                         style={{
-                            margin: "0 5px",
-                            padding: "5px 10px",
+                            padding: "8px 12px",
                             backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
                             color: currentPage === index + 1 ? "white" : "black",
                             border: "none",
-                            borderRadius: "5px",
+                            borderRadius: "6px",
                             cursor: "pointer",
+                            fontWeight: currentPage === index + 1 ? "bold" : "normal",
+                            transition: "background-color 0.3s",
                         }}
                     >
                         {index + 1}
@@ -189,52 +298,39 @@ const BrandsManagement = () => {
                 ))}
             </div>
         </Paper>
-
     );
 
     return (
-        <>
-            <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
-                <div className="flex justify-between mb-5 mt-1">
-                    <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
-                        BRANDS MANAGEMENT
-                    </h2>
-
-                    <Button onClick={() => setOpenAddBrand(true)} className="gap-2">
-                        <IoMdAddCircle />
-                        Add Brand
-                    </Button>
-                </div>
-                {loading ? (
-                    <CircularProgress />
-                ) : (
-                    <>
-                        {renderTable()}
-                    </>
-                )}
-
-                {brands && (
-                    <AddBrandModal
-                        isOpen={openAddBrand}
-                        setIsOpen={(open: boolean) => setOpenAddBrand(open)}
-                        fetchBrand={async () => {
-                            //fetchCategories();
-                        }}
-                    />
-                )}
-
-                {brands && (
-                    <EditBrandForm
-                        isOpen={openEditBrand}
-                        setIsOpen={(open: boolean) => setOpenEditBrand(open)}
-                        category={currentBrand}
-                        fetchBrand={async () => {
-                            //fetchCategories();
-                        }}
-                    />
-                )}
+        <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
+            <div className="flex justify-between mb-5 mt-1 items-center">
+                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
+                    QUẢN LÝ THƯƠNG HIỆU
+                </h2>
             </div>
-        </>
+
+            {loading ? <CircularProgress /> : renderTable()}
+
+            {brands && (
+                <AddBrandModal
+                    isOpen={openAddBrand}
+                    setIsOpen={(open) => setOpenAddBrand(open)}
+                    fetchBrand={async () => {
+                        // fetchBrands();
+                    }}
+                />
+            )}
+
+            {brands && (
+                <EditBrandForm
+                    isOpen={openEditBrand}
+                    setIsOpen={(open) => setOpenEditBrand(open)}
+                    brand={currentBrand}
+                    fetchBrand={async () => {
+                        // fetchBrands();
+                    }}
+                />
+            )}
+        </div>
     );
 };
 

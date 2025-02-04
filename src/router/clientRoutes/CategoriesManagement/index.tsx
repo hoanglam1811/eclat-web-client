@@ -13,6 +13,8 @@ import { IoMdAddCircle } from "react-icons/io";
 import { Button } from "../../../components/ui/button";
 import AddCategoryModal from "./AddCategoryForm";
 import EditCategoryModal from "./EditCategoryForm";
+import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import { Input } from "antd";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -70,74 +72,131 @@ const CategoriesManagement = () => {
     //   }, []);
 
     const renderTable = () => (
-        <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
+        <Paper elevation={3} sx={{ padding: 2, borderRadius: 3, backgroundColor: "#fff" }}>
             {/* Header Row */}
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Input
+                        placeholder="Tìm kiếm theo tên loại"
+                        //value={searchQuery}
+                        //onChange={(e) => setSearchQuery(e.target.value)}
+                        prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
+                        style={{
+                            width: '400px',
+                            padding: '10px',
+                            borderRadius: "8px",
+                            border: "1px solid #ddd",
+                            backgroundColor: "#f9f9f9"
+                        }}
+                    />
+                    <Button
+                        //onClick={() => setSearchQuery('')}
+                        style={{
+                            backgroundColor: '#f44336',
+                            color: 'white',
+                            padding: '8px 16px',
+                            borderRadius: "8px",
+                        }}
+                    >
+                        <DeleteOutlined />
+                    </Button>
+                </div>
+
+                <Button
+                    onClick={() => setOpenAddCategory(true)}
+                    style={{
+                        backgroundColor: "#419f97",
+                        color: "white",
+                        padding: "8px 16px",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
+                    }}
+                >
+                    <IoMdAddCircle />
+                    Thêm loại
+                </Button>
+            </div>
             <div
                 style={{
-                    display: 'flex',
-                    fontWeight: 'bold',
-                    backgroundColor: '#f1f1f1',
-                    padding: '10px',
-                    borderRadius: '8px',
-                    marginBottom: '10px',
+                    display: "flex",
+                    fontWeight: "bold",
+                    backgroundColor: "#f1f1f1",
+                    padding: "12px",
+                    borderRadius: "8px",
+                    marginBottom: "12px",
+                    borderBottom: "2px solid #ccc"
                 }}
             >
-                <div style={{ flex: 0.5 }}>ID</div>
-                <div style={{ flex: 2 }}>Name</div>
-                <div style={{ flex: 2 }}>Description</div>
-                <div style={{ flex: 1 }}>Actions</div>
+                <div style={{ flex: 0.5, textAlign: "center" }}>ID</div>
+                <div style={{ flex: 2 }}>Tên</div>
+                <div style={{ flex: 2 }}>Mô tả</div>
+                <div style={{ flex: 1, textAlign: "center" }}>Hành động</div>
             </div>
 
             {/* Data Rows */}
             {paginatedCategories?.map((account) => (
-                <React.Fragment key={account.id}>
-                    <div
-                        style={{
-                            display: 'flex',
-                            padding: '10px',
-                            cursor: 'pointer',
-                            backgroundColor: '#fff',
-                            borderBottom: '1px solid #ddd',
-                            transition: 'background-color 0.3s',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
-                    >
-                        <div style={{ flex: 0.5 }}>{account.id}</div>
-                        <div style={{ flex: 2 }}>{account.name}</div>
-                        <div style={{ flex: 2 }}>{account.description}</div>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ flex: 1 }}>
-                                <Tooltip title="Edit Category">
-                                    <IconButton
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setCurrentCategory(account);
-                                            setOpenEditCategory(true);
-                                        }}
-                                        sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
-                                    >
-                                        <EditIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </div>
-                        </div>
+                <div
+                    key={account.id}
+                    style={{
+                        display: "flex",
+                        padding: "12px",
+                        backgroundColor: "#fff",
+                        borderBottom: "1px solid #ddd",
+                        borderRadius: "8px",
+                        marginBottom: "5px",
+                        alignItems: "center",
+                        transition: "background-color 0.3s, transform 0.2s"
+                    }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#f5f5f5";
+                        e.currentTarget.style.transform = "scale(1.02)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#fff";
+                        e.currentTarget.style.transform = "scale(1)";
+                    }}
+                >
+                    <div style={{ flex: 0.5, textAlign: "center" }}>{account.id}</div>
+                    <div style={{ flex: 2 }}>{account.name}</div>
+                    <div style={{ flex: 2 }}>{account.description}</div>
+                    <div style={{ flex: 1, textAlign: "center" }}>
+                        <Tooltip title="Edit Category">
+                            <IconButton
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentCategory(account);
+                                    setOpenEditCategory(true);
+                                }}
+                                sx={{
+                                    color: "#1976d2",
+                                    "&:hover": { color: "#0d47a1", backgroundColor: "#e3f2fd" }
+                                }}
+                            >
+                                <EditIcon />
+                            </IconButton>
+                        </Tooltip>
                     </div>
-                </React.Fragment>
+                </div>
             ))}
-            <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+
+            {/* Pagination */}
+            <div style={{ marginTop: "20px", display: "flex", justifyContent: "center", gap: "5px" }}>
                 {Array.from({ length: totalPages }, (_, index) => (
                     <button
                         key={index}
                         onClick={() => handlePageChange(index + 1)}
                         style={{
-                            margin: "0 5px",
-                            padding: "5px 10px",
-                            backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                            padding: "6px 12px",
+                            backgroundColor: currentPage === index + 1 ? "#419f97" : "#e0e0e0",
                             color: currentPage === index + 1 ? "white" : "black",
                             border: "none",
-                            borderRadius: "5px",
+                            borderRadius: "6px",
+                            fontWeight: "bold",
                             cursor: "pointer",
+                            transition: "all 0.2s",
+                            boxShadow: currentPage === index + 1 ? "0 2px 6px rgba(0,0,0,0.2)" : "none"
                         }}
                     >
                         {index + 1}
@@ -145,52 +204,36 @@ const CategoriesManagement = () => {
                 ))}
             </div>
         </Paper>
-
     );
 
     return (
-        <>
-            <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
-                <div className="flex justify-between mb-5 mt-1">
-                    <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
-                        CATEGORY MANAGEMENT
-                    </h2>
-
-                    <Button onClick={() => setOpenAddCategory(true)} className="gap-2">
-                        <IoMdAddCircle />
-                        Add Category
-                    </Button>
-                </div>
-                {loading ? (
-                    <CircularProgress />
-                ) : (
-                    <>
-                        {renderTable()}
-                    </>
-                )}
-
-                {categories && (
-                    <AddCategoryModal
-                        isOpen={openAddCategory}
-                        setIsOpen={(open: boolean) => setOpenAddCategory(open)}
-                        fetchCategory={async () => {
-                            //fetchCategories();
-                        }}
-                    />
-                )}
-
-                {categories && (
-                    <EditCategoryModal
-                        isOpen={openEditCategory}
-                        setIsOpen={(open: boolean) => setOpenEditCategory(open)}
-                        category={currentCategory}
-                        fetchCategory={async () => {
-                            //fetchCategories();
-                        }}
-                    />
-                )}
+        <div className="bg-gray-100 pt-5 pb-5 px-5">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-5">
+                <h2 className="text-xl font-bold text-blue-700">CATEGORY MANAGEMENT</h2>
             </div>
-        </>
+
+            {/* Table or Loading */}
+            {loading ? <CircularProgress /> : renderTable()}
+
+            {/* Modals */}
+            {openAddCategory && (
+                <AddCategoryModal
+                    isOpen={openAddCategory}
+                    setIsOpen={setOpenAddCategory}
+                    fetchCategory={() => { }}
+                />
+            )}
+
+            {openEditCategory && (
+                <EditCategoryModal
+                    isOpen={openEditCategory}
+                    setIsOpen={setOpenEditCategory}
+                    category={currentCategory}
+                    fetchCategory={() => { }}
+                />
+            )}
+        </div>
     );
 };
 

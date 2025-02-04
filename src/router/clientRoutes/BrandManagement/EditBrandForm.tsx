@@ -14,14 +14,14 @@ import { Modal, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
 
-interface EditMajorModalProps {
+interface EditBrandModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
-  category: any;
+  brand: any;
   fetchBrand: () => void;
 }
 
-const EditBrandForm = ({ isOpen, setIsOpen, category, fetchBrand }: EditMajorModalProps) => {
+const EditBrandForm = ({ isOpen, setIsOpen, brand, fetchBrand }: EditBrandModalProps) => {
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | undefined>();
   const [fileList, setFileList] = useState<any[]>([]);

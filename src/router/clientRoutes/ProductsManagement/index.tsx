@@ -194,7 +194,7 @@ const ProductsManagement = () => {
         setCurrentPage(page);
     };
 
-    const handleViewDetails = (id:any) => {
+    const handleViewDetails = (id: any) => {
         navigate(`/staff/product-update/${id}`);
     };
 
@@ -217,40 +217,46 @@ const ProductsManagement = () => {
     //   }, []);
 
     const renderTable = () => (
-        <Paper elevation={3} sx={{ padding: 2, borderRadius: 2 }}>
-            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'flex-end' }}>
-                <Input
-                    placeholder="Tìm kiếm theo tên sản phẩm"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    prefix={<SearchOutlined />}
-                    style={{
-                        width: '400px',
-                        marginRight: '10px',
-                        padding: '8px',
-                    }}
-                />
-                <Button
-                    onClick={() => setSearchQuery('')}
-                    style={{
-                        backgroundColor: '#f44336',
-                        color: 'white',
-                        padding: '8px 16px',
-                        border: 'none',
-                    }}
-                >
-                    <DeleteOutlined className="mr-2" />
-                    Xóa tìm kiếm
-                </Button>
+        <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>
+            {/* Thanh tìm kiếm và nút hành động */}
+            <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Input
+                        placeholder="Tìm kiếm theo tên sản phẩm"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
+                        style={{
+                            width: '400px',
+                            padding: '10px',
+                            borderRadius: "8px",
+                            border: "1px solid #ddd",
+                            backgroundColor: "#f9f9f9"
+                        }}
+                    />
+                    <Button
+                        onClick={() => setSearchQuery('')}
+                        style={{
+                            backgroundColor: '#f44336',
+                            color: 'white',
+                            padding: '8px 16px',
+                            borderRadius: "8px",
+                        }}
+                    >
+                        <DeleteOutlined />
+                    </Button>
+                </div>
 
                 <Button
                     onClick={() => navigate(RouteNames.PRODUCT_ADDITION)}
-                    className="ml-2 gap-2"
                     style={{
                         backgroundColor: '#419f97',
                         color: 'white',
                         padding: '8px 16px',
-                        border: 'none',
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "6px",
                     }}
                 >
                     <IoMdAddCircle />
@@ -258,81 +264,82 @@ const ProductsManagement = () => {
                 </Button>
             </div>
 
-
+            {/* Tiêu đề cột */}
             <div
                 style={{
                     display: 'flex',
                     fontWeight: 'bold',
-                    backgroundColor: '#f1f1f1',
-                    padding: '10px',
+                    backgroundColor: '#eeeeee',
+                    padding: '12px',
                     borderRadius: '8px',
                     marginBottom: '10px',
+                    borderBottom: "2px solid #ccc"
                 }}
             >
-                <div style={{ flex: 0.5 }}>ID</div>
+                <div style={{ flex: 0.5, textAlign: "center" }}>ID</div>
                 <div style={{ flex: 2 }}>Tên</div>
-                <div style={{ flex: 1 }}>Số lượng còn lại</div>
+                <div style={{ flex: 1 }}>Số lượng</div>
                 <div style={{ flex: 1 }}>Thương hiệu</div>
                 <div style={{ flex: 1 }}>Trạng thái</div>
-                <div style={{ flex: 1 }}>Hành động</div>
+                <div style={{ flex: 1, textAlign: "center" }}>Hành động</div>
             </div>
 
-            {/* Data Rows */}
+            {/* Hàng dữ liệu */}
             {filteredProducts?.slice(
                 (currentPage - 1) * ITEMS_PER_PAGE,
                 currentPage * ITEMS_PER_PAGE
             ).map((account) => (
-                <React.Fragment key={account.id}>
-                    <div
-                        style={{
-                            display: 'flex',
-                            padding: '10px',
-                            cursor: 'pointer',
-                            backgroundColor: '#fff',
-                            borderBottom: '1px solid #ddd',
-                            transition: 'background-color 0.3s',
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f1f1f1')}
-                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
-                    >
-                        <div style={{ flex: 0.5 }}>{account.id}</div>
-                        <div style={{ flex: 2 }}>{account.name}</div>
-                        <div style={{ flex: 1 }}>{account.quantity}</div>
-                        <div style={{ flex: 1 }}>{account.brandId}</div>
-                        <div style={{ flex: 1 }}>{account.status}</div>
-                        <div style={{ flex: 1 }}>
-                            <div style={{ flex: 1 }}>
-                                <Tooltip title="View Details">
-                                    <IconButton
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setCurrentProduct(account);
-                                            handleViewDetails(account.id);
-                                        }}
-                                        sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
-                                    >
-                                        <EyeOutlined style={{ fontSize: 24 }} />
-                                    </IconButton>
-                                </Tooltip>
-                            </div>
-                        </div>
+                <div
+                    key={account.id}
+                    style={{
+                        display: 'flex',
+                        padding: '12px',
+                        backgroundColor: '#fff',
+                        borderBottom: '1px solid #ddd',
+                        transition: 'background-color 0.3s',
+                        borderRadius: "8px",
+                        marginBottom: "5px"
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#f5f5f5')}
+                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '#fff')}
+                >
+                    <div style={{ flex: 0.5, textAlign: "center" }}>{account.id}</div>
+                    <div style={{ flex: 2 }}>{account.name}</div>
+                    <div style={{ flex: 1 }}>{account.quantity}</div>
+                    <div style={{ flex: 1 }}>{account.brandId}</div>
+                    <div style={{ flex: 1 }}>{account.status}</div>
+                    <div style={{ flex: 1, textAlign: "center" }}>
+                        <Tooltip title="Xem chi tiết">
+                            <IconButton
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentProduct(account);
+                                    handleViewDetails(account.id);
+                                }}
+                                sx={{ color: 'blue', '&:hover': { color: '#1976d2' } }}
+                            >
+                                <EyeOutlined style={{ fontSize: 24 }} />
+                            </IconButton>
+                        </Tooltip>
                     </div>
-                </React.Fragment>
+                </div>
             ))}
 
-            <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "end" }}>
+            {/* Thanh phân trang */}
+            <div style={{ marginTop: "20px", marginBottom: '10px', display: "flex", justifyContent: "center", gap: "8px" }}>
                 {Array.from({ length: totalPages }, (_, index) => (
                     <button
                         key={index}
                         onClick={() => handlePageChange(index + 1)}
                         style={{
-                            margin: "0 5px",
-                            padding: "5px 10px",
+                            padding: "8px 12px",
                             backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
                             color: currentPage === index + 1 ? "white" : "black",
                             border: "none",
-                            borderRadius: "5px",
+                            borderRadius: "6px",
                             cursor: "pointer",
+                            fontWeight: currentPage === index + 1 ? "bold" : "normal",
+                            transition: "background-color 0.3s",
                         }}
                     >
                         {index + 1}
@@ -340,26 +347,23 @@ const ProductsManagement = () => {
                 ))}
             </div>
         </Paper>
-
     );
 
     return (
-        <>
-            <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
-                <div className="flex justify-between mb-5 mt-1">
-                    <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
-                        QUẢN LÝ KHO SẢN PHẨM
-                    </h2>
-                </div>
-                {loading ? (
-                    <CircularProgress />
-                ) : (
-                    <>
-                        {renderTable()}
-                    </>
-                )}
+        <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
+            <div className="flex justify-between mb-5 mt-1">
+                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
+                    QUẢN LÝ KHO SẢN PHẨM
+                </h2>
             </div>
-        </>
+            {loading ? (
+                <CircularProgress />
+            ) : (
+                <>
+                    {renderTable()}
+                </>
+            )}
+        </div>
     );
 };
 

@@ -103,24 +103,8 @@ const Register = () => {
                     />
 
                     <input
-                        type="text"
-                        placeholder="Nhập địa chỉ"
-                        style={{
-                            width: "80%",
-                            padding: "12px 20px",
-                            marginBottom: "20px",
-                            borderRadius: "10px",
-                            border: "1px solid #ddd",
-                            fontSize: "16px",
-                            transition: "all 0.3s",
-                        }}
-                        onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
-                        onBlur={(e) => (e.target.style.borderColor = "#ddd")}
-                    />
-
-                    <input
                         type="password"
-                        placeholder="Type your password"
+                        placeholder="Nhập mật khẩu"
                         style={{
                             width: "80%",
                             padding: "12px 20px",

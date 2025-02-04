@@ -22,16 +22,18 @@ const FormViewProduct = () => {
     const [images, setImages] = useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [totalQuantity, setTotalQuantity] = useState(0);
+    const [isEditing, setIsEditing] = useState(false);
 
-    // const updateTotalQuantity = () => {
-    //     const quantities = watch("criteria")?.map((item: any) => item.quantity || 0) || [];
-    //     setTotalQuantity(quantities.reduce((sum: any, val: any) => sum + val, 0));
-    // };
+    const updateTotalQuantity = () => {
+        const quantities = watch("criteria")?.map((item: any) => item.quantity || 0) || [];
+        setTotalQuantity(quantities.reduce((sum: any, val: any) => sum + val, 0));
+    };
 
     const {
         register,
         formState: { errors },
         trigger,
+        watch,
         setValue,
         getValues,
     } = useForm({
@@ -257,6 +259,10 @@ const FormViewProduct = () => {
         console.log("Form data: ", data);
     };
 
+    const handleEditing = () => {
+      setIsEditing(!isEditing);
+    };
+
     const { id } = useParams();
     const product = products.find((p) => p.id === id);
 
@@ -266,7 +272,7 @@ const FormViewProduct = () => {
 
     return (
         <>
-            <div>
+            <div className="bg-white p-[50px]">
                 <div>
                     <form className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-5xl mx-auto space-y-10">
                         {/* Tiêu đề */}
@@ -373,29 +379,32 @@ const FormViewProduct = () => {
                                         <Label htmlFor="" className="block text-sm font-bold text-gray-700 text-left">
                                             Tên sản phẩm <span className="text-red-500">*</span>
                                         </Label>
-                                        <p className="text-black-3 text-left">{product.name}</p>
-                                        {/* <Input
-                                            {...register("scholarshipName")}
-                                            placeholder="Nhập tên sản phẩm"
-                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                        />
-                                        {errors.scholarshipName?.message && (
-                                            <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipName?.message)}</p>
-                                        )} */}
+                                        {!isEditing ? 
+                                        <p className="text-black-3 text-left">{product.name}</p> :
+                                        <>
+                                          <Input
+                                              {...register("scholarshipName")}
+                                              placeholder="Nhập tên sản phẩm"
+                                              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                          />
+                                          {errors.scholarshipName?.message && (
+                                              <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipName?.message)}</p>
+                                          )}
+                                        </> }
                                     </div>
                                     <div>
                                         <Label htmlFor="educationalLevel" className="block text-sm font-bold text-gray-700 text-left">
                                             Nguồn gốc xuất xứ <span className="text-red-500">*</span>
                                         </Label>
-                                        <p className="text-sm text-gray-500 text-left">{product.origin_country}</p>
-                                        {/* <Select
+                                        {!isEditing ? <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
+                                        <><Select
                                             isSearchable
                                             placeholder="Chọn nguồn gốc xuất xứ"
                                             className="mt-1"
                                         />
                                         {errors.educationalLevel?.message && (
                                             <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
-                                        )} */}
+                                        )} </>}
                                     </div>
                                 </div>
 
@@ -405,43 +414,44 @@ const FormViewProduct = () => {
                                         <Label htmlFor="educationalLevel" className="block text-sm font-bold text-gray-700 text-left">
                                             Loại da <span className="text-red-500">*</span>
                                         </Label>
-                                        <p className="text-sm text-gray-500 text-left">{product.origin_country}</p>
-                                        {/* <Select
+                                        {!isEditing ? 
+                                       <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
+                                        <><Select
                                             isSearchable
                                             placeholder="Chọn loại da"
                                             className="mt-1"
                                         />
                                         {errors.educationalLevel?.message && (
                                             <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
-                                        )} */}
+                                        )} </>}
                                     </div>
                                     <div className="col-span-1">
                                         <Label htmlFor="category" className="block text-sm font-bold text-gray-700 text-left">
                                             Thương hiệu <span className="text-red-500">*</span>
                                         </Label>
-                                        <p className="text-sm text-gray-500 text-left">{product.brandId}</p>
-                                        {/* <Select
+                                        {!isEditing ? <p className="text-sm text-gray-500 text-left">{product.brandId}</p> :
+                                        <><Select
                                             isSearchable
                                             placeholder="Chọn thương hiệu"
                                             className="mt-1"
                                         />
                                         {errors.deadline?.message && (
                                             <p className="text-sm text-red-500 mt-1">{String(errors.deadline?.message)}</p>
-                                        )} */}
+                                        )} </>}
                                     </div>
                                     <div className="col-span-1">
                                         <Label htmlFor="productType" className="block text-sm font-bold text-gray-700 text-left">
                                             Loại sản phẩm <span className="text-red-500">*</span>
                                         </Label>
-                                        <p className="text-sm text-gray-500 text-left">{product.origin_country}</p>
-                                        {/* <Select
+                                        {!isEditing ? <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
+                                        <><Select
                                             isSearchable
                                             placeholder="Chọn loại sản phẩm"
                                             className="mt-1"
                                         />
                                         {errors.scholarshipType?.message && (
                                             <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
-                                        )} */}
+                                        )} </>}
                                     </div>
                                 </div>
 
@@ -450,8 +460,8 @@ const FormViewProduct = () => {
                                     <Label htmlFor="description" className="block text-sm font-bold text-gray-700 text-left">
                                         Mô tả sản phẩm <span className="text-red-500">*</span>
                                     </Label>
-                                    <p className="text-sm text-gray-500 text-left">{product.origin_country}</p>
-                                    {/* <Textarea
+                                    {!isEditing ? <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
+                                    <><Textarea
                                         {...register("description")}
                                         rows={4}
                                         placeholder="Nhập mô tả sản phẩm"
@@ -459,14 +469,14 @@ const FormViewProduct = () => {
                                     />
                                     {errors.description?.message && (
                                         <p className="text-sm text-red-500 mt-1">{String(errors.description.message)}</p>
-                                    )} */}
+                                    )} </>}
                                 </div>
                                 <div className="mt-6">
                                     <Label htmlFor="usageInstructions" className="block text-sm font-bold text-gray-700 text-left">
                                         Hướng dẫn sử dụng <span className="text-red-500">*</span>
                                     </Label>
-                                    <p className="text-sm text-gray-500 text-left">{product.origin_country}</p>
-                                    {/* <Textarea
+                                   {!isEditing ?  <p className="text-sm text-gray-500 text-left">{product.origin_country}</p> :
+                                    <><Textarea
                                         {...register("usageInstructions")}
                                         rows={4}
                                         placeholder="Nhập hướng dẫn sử dụng"
@@ -474,9 +484,9 @@ const FormViewProduct = () => {
                                     />
                                     {errors.usageInstructions?.message && (
                                         <p className="text-sm text-red-500 mt-1">{String(errors.usageInstructions.message)}</p>
-                                    )} */}
+                                    )} </>}
                                 </div>
-                                {/* <Label htmlFor="quantity" className="block text-sm font-bold text-gray-700 text-left">
+                                 <Label htmlFor="quantity" className="block text-sm font-bold text-gray-700 text-left">
                             Tên tuỳ chọn <span className="text-red-500">*</span>
                         </Label>
                         <Input
@@ -553,9 +563,10 @@ const FormViewProduct = () => {
                                 </div>
                             ))}
                             {errors.criteria && errors.criteria.root && <p className="text-red-500 text-sm">{String(errors.criteria.root.message)}</p>}
+                            {/* {JSON.stringify(getValues())} */}
                             <Button
                                 onClick={() =>
-                                    setValue("criteria", [...watch("criteria"), { name: "", description: "", percentage: "" }])
+                                    setValue("criteria", [...watch("criteria") ?? [], { name: "", description: "", percentage: "" }])
                                 }
                                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition flex items-center space-x-2"
                             >
@@ -571,12 +582,15 @@ const FormViewProduct = () => {
                             <span className="text-xl font-bold text-gray-600">
                                 {totalQuantity}
                             </span>
-                        </div> */}
+                        </div> 
                             </div>
                         </div>
-
                         {/* Submit */}
-                        <div className="flex justify-end mt-6">
+                        <div className="flex justify-end gap-3 mt-6">
+                            {/*JSON.stringify(getValues())*/}
+                            <Button onClick={handleEditing} className="bg-green-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                                Thay đổi
+                            </Button>
                             <Button onClick={handleSave} className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
                                 Lưu
                             </Button>

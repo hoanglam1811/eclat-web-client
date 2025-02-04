@@ -273,6 +273,7 @@ const DetailsInformationStep = ({
                 <span>Thêm mới</span>
               </Button>
             </div>
+            {/* {JSON.stringify(getValues())} */}
 
             <div className="mt-6 flex items-center justify-between bg-gray-100 border border-gray-300 rounded-md p-4 shadow">
               <h3 className="text-sm font-medium text-gray-700">

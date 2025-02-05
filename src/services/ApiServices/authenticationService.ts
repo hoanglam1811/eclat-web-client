@@ -30,3 +30,16 @@ export async function register(username:any, email:any, password:any, phoneNum:a
     throw error;
   }
 }
+
+export async function verifyUser(email:any) {
+  try {
+    const response = await axios.get(
+      `${BASE_URL}/auth/verify`,
+      { params: { email } },
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Verification failed:", error);
+    throw error;
+  }
+}

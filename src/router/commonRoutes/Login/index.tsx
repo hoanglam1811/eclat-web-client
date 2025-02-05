@@ -4,6 +4,9 @@ import LoginnImage from "../../../assets/Loginn.png";
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../../../services/ApiServices/authenticationService';
 import { notification } from 'antd';
+import { useDispatch } from 'react-redux';
+import { setToken, setUser } from '../../../reducers/tokenSlice';
+import parseJwt from '../../../services/parseJwt';
 
 const Login = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -14,6 +17,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -28,7 +32,9 @@ const Login = () => {
         try {
             const user = await login(username, password);
             setIsLoading(false);
-            localStorage.setItem("token", user.token);
+            dispatch(setToken(user.result.token));
+            const userInfo = parseJwt(user.result.token);
+            dispatch(setUser(userInfo));
             notification.success({ message: "Đăng nhập thành công!" });
 
             if (user.role === "ADMIN") {

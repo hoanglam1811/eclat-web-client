@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
 import { KeyOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
+import { useSelector } from "react-redux";
 
 const Account = () => {
-
+    const userz = useSelector((state: any) => state.token.user);
+    console.log(userz)
     const user = {
         name: "Lam Nguyen",
         email: "nguyenhoanglam18112003@gmail.com",

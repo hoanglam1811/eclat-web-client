@@ -2,11 +2,55 @@ import React, { useState, useEffect } from 'react';
 import LoginImage from "../../../assets/Login.png";
 import LoginnImage from "../../../assets/Loginn.png";
 import { Link } from 'react-router-dom';
+import { register } from '../../../services/ApiServices/authenticationService';
+import RegisterType from './data';
+import EmailVerify from './emailVerify';
+import { Button } from 'antd';
+import RouteNames from '../../../constants/routeNames';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const Register = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [registerData, setRegisterData] = useState<RegisterType>(
+      { username: "", email: "", password: "", phoneNum: "" }
+    );
     const [isSignUp, setIsSignUp] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isEmailVerify, setIsEmailVerify] = useState(false);
+    const [error, setError] = useState("");
     const images = [LoginImage, LoginnImage];
+
+    const handleRegisterSubmit = async () => {
+        setIsLoading(true);
+        setError("");
+        try {
+            const user = await register(
+              registerData.username,
+              registerData.email, 
+              registerData.password, 
+              registerData.phoneNum
+            );
+            setIsLoading(false);
+            if(user.code == 0){
+              setIsEmailVerify(true);
+            }
+        } catch (error: any) {
+            setIsLoading(false);
+            if (error.response?.data?.message) {
+                if (error.response.data.message === "User Existed") {
+                    setError("Email không tồn tại!");
+                } else if (error.response.data.message === "Invalid key") {
+                    setError("Mật khẩu phải dài hơn 8 ký tự!");
+                } else {
+                    setError("Có lỗi xảy ra. Vui lòng thử lại sau!");
+                }
+            } else {
+                setError("Lỗi kết nối! Hãy kiểm tra lại đường truyền.");
+            }
+        }
+    };
+
+
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -17,6 +61,13 @@ const Register = () => {
 
     return (
         <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
+            <Link
+              to={RouteNames.HOME}
+              className="absolute top-[20px] left-[20px] bg-white/30 backdrop-blur-md text-black font-semibold px-4 py-2 rounded-lg border border-white/50 hover:bg-white/40"
+            >
+              <ArrowLeftOutlined className="mr-2" />
+              Trở về trang chủ
+            </Link>
             <div
                 style={{
                     width: "70%",
@@ -31,6 +82,7 @@ const Register = () => {
 
             <div
                 style={{
+                    minWidth: "500px",
                     width: "30%",
                     display: "flex",
                     justifyContent: "center",
@@ -54,9 +106,10 @@ const Register = () => {
                         ĐĂNG KÍ VỚI ÉCLAT 
                     </h2>
 
-                    <input
+                    {!isEmailVerify && <><input
                         type="text"
                         placeholder="Nhập tên người dùng"
+                        onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
                         style={{
                             width: "80%",
                             padding: "12px 20px",
@@ -73,6 +126,7 @@ const Register = () => {
                     <input
                         type="email"
                         placeholder="Nhập email"
+                        onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                         style={{
                             width: "80%",
                             padding: "12px 20px",
@@ -89,6 +143,7 @@ const Register = () => {
                     <input
                         type="text"
                         placeholder="Nhập số điện thoại"
+                        onChange={(e) => setRegisterData({ ...registerData, phoneNum: e.target.value })}
                         style={{
                             width: "80%",
                             padding: "12px 20px",
@@ -105,6 +160,7 @@ const Register = () => {
                     <input
                         type="password"
                         placeholder="Nhập mật khẩu"
+                        onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                         style={{
                             width: "80%",
                             padding: "12px 20px",
@@ -117,6 +173,7 @@ const Register = () => {
                         onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
                         onBlur={(e) => (e.target.style.borderColor = "#ddd")}
                     />
+                    <div className="text-red-500">{error}</div>
 
                     <button
                         style={{
@@ -133,12 +190,17 @@ const Register = () => {
                             transition: "background-color 0.3s ease",
                             marginBottom: "15px",
                         }}
+                        onClick={handleRegisterSubmit}
                         onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#21618c")}
                         onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#578a3f")}
+                        disabled={isLoading}
                     >
-                        Đăng ký
+                        {isLoading ? "Đang đăng ký..." : "Đăng ký"}
                     </button>
+          </>
+        }
 
+                    {isEmailVerify && <EmailVerify email={registerData.email}/>}
                     <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
                         Bạn đã có tài khoản?{" "}
                         <Link
@@ -148,6 +210,7 @@ const Register = () => {
                             Đăng nhập
                         </Link>
                     </p>
+          
 
                     <div
                         style={{
@@ -173,6 +236,7 @@ const Register = () => {
                             opacity: 0.2,
                         }}
                     ></div>
+        
                 </div>
             </div>
         </div>

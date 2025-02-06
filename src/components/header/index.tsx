@@ -5,7 +5,7 @@ import { RootState } from "../../store/store";
 import LogoImage from "@/assets/Éclat.png";
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
+import { LoginOutlined, ShoppingCartOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 import { useState } from "react";
 import { removeToken, removeUser } from "../../reducers/tokenSlice";
 import RoleNames from "../../constants/roleNames";
@@ -146,7 +146,7 @@ const Header = () => {
               <ShoppingCartOutlined style={{ fontSize: "22px" }} className="mr-2" />
             </Link>
           </li>
-          <li className="mr-5">
+          {user && <li className="mr-5">
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <UserOutlined style={{ fontSize: "22px" }} />
@@ -179,7 +179,16 @@ const Header = () => {
                 </AlertDialog>
               </DropdownMenuContent>
             </DropdownMenu>
-          </li>
+          </li>}
+          {!user && <li className="mr-5 flex gap-3">
+            <Link to={RouteNames.LOGIN} className="flex items-center text-gray-700 hover:text-blue-600 transition">
+              <span className="text-gray-700">Đăng nhập</span>
+            </Link>
+            <span className="text-gray-700">|</span>
+            <Link to={RouteNames.REGISTER} className="flex items-center text-gray-700 hover:text-blue-600 transition">
+              <span className="text-gray-700">Đăng ký</span>
+            </Link>
+          </li>}
         </ul>
       </nav>
     </header>

@@ -4,19 +4,49 @@ import RouteNames from "../../../constants/routeNames";
 import { KeyOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { useSelector } from "react-redux";
+import { getUserById } from "../../../services/ApiServices/userService";
+import { useEffect, useState } from "react";
+import { RootState } from "../../../store/store";
+import ScreenSpinner from "../../../components/ScreenSpinner";
 
 const Account = () => {
-    const userz = useSelector((state: any) => state.token.user);
-    console.log(userz)
-    const user = {
-        name: "Lam Nguyen",
+    const userz = useSelector((state: RootState) => state.token.user);
+    const token = useSelector((state: any) => state.token.token);
+    const [user, setUser] = useState<any>({
+        username: "Lam Nguyen",
         email: "nguyenhoanglam18112003@gmail.com",
-        phone_number: "0902601297"
-    };
+        phone: "0902601297"
+    });
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<any>("");
+
+    const fetchAccount = async () => {
+      try{
+        setIsLoading(true);
+        if(!userz) return;
+        const response = await getUserById(userz.userId, token);
+        if(response.code == 0) {
+          setUser(response.result);
+        }
+      }
+      catch(err:any){
+        setError(err);
+        console.log(err);
+      }
+      finally{
+        setIsLoading(false);
+      }
+    }
+
+    useEffect(() => {
+        fetchAccount();
+    }, []);
 
     return (
         <>
+                {isLoading && <ScreenSpinner/>}
             <section className="bg-gray-100 p-6">
+
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
                         <Breadcrumb className="">
@@ -47,6 +77,7 @@ const Account = () => {
             {/* <div className="flex items-center justify-center max-w-full bg-gray-100"> */}
             <div className="bg-gray-100">
 
+                <div className="text-red-500">{error}</div>
                 {/* Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 p-6">
                     {/* Sidebar */}
@@ -91,18 +122,18 @@ const Account = () => {
                             {/* Name */}
                             <div className="flex justify-between items-center border-b pb-4">
                                 <span className="text-black font-bold">Họ tên:</span>
-                                <span className="font-medium text-black">{user.name}</span>
+                                <span className="font-medium text-black">{user.username}</span>
                             </div>
 
                             {/* Email */}
                             <div className="flex justify-between items-center border-b pb-4">
                                 <span className="text-black font-bold">Email:</span>
-                                <span className="font-medium text-black">{user.email}</span>
+                                <span className="font-medium text-black">{user.email || "N/a"}</span>
                             </div>
 
                             <div className="flex justify-between items-center">
                                 <span className="text-black font-bold">Số điện thoại:</span>
-                                <span className="font-medium text-black">{user.phone_number || "N/a"}</span>
+                                <span className="font-medium text-black">{user.phone || "N/a"}</span>
                             </div>
                         </div>
                     </section>

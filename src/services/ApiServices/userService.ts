@@ -1,7 +1,10 @@
 import axios from "axios";
 import { BASE_URL } from "../../constants/api";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
-const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
+const ngrokSkipWarning:any = { headers: { "bypass-tunnel-reminder": "true" } };
+//const token = useSelector((state: RootState) => state.token.token);
 
 // Tạo tài khoản Staff
 export async function createStaff(userData:any) {
@@ -26,9 +29,15 @@ export async function getAllUsers() {
 }
 
 // Lấy thông tin một user theo ID
-export async function getUserById(userId:any) {
+export async function getUserById(userId:any, token:any) {
   try {
+    if(token)
+      ngrokSkipWarning.headers["Authorization"] = "Bearer " + token;
+    else ngrokSkipWarning.headers["Authorization"] = null;
+
     const response = await axios.get(`${BASE_URL}/users/${userId}`, ngrokSkipWarning);
+
+    ngrokSkipWarning.headers["Authorization"] = null;
     return response.data;
   } catch (error) {
     console.error(`Failed to get user with ID ${userId}:`, error);

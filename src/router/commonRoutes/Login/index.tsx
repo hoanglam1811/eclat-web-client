@@ -7,6 +7,8 @@ import { notification } from 'antd';
 import { useDispatch } from 'react-redux';
 import { setToken, setUser } from '../../../reducers/tokenSlice';
 import parseJwt from '../../../services/parseJwt';
+import RouteNames from '../../../constants/routeNames';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 const Login = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -61,6 +63,13 @@ const Login = () => {
 
     return (
         <div style={{ display: "flex", height: "100vh" }}>
+            <Link
+              to={RouteNames.HOME}
+              className="absolute top-[20px] left-[20px] bg-white/30 backdrop-blur-md text-black font-semibold px-4 py-2 rounded-lg border border-white/50 hover:bg-white/40"
+            >
+              <ArrowLeftOutlined className="mr-2" />
+              Trở về trang chủ
+            </Link>
             <div
                 style={{
                     width: "70%",
@@ -76,6 +85,7 @@ const Login = () => {
             <div
                 style={{
                     width: "30%",
+                    minWidth: "500px",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",

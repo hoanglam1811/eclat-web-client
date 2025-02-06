@@ -1,7 +1,5 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import RouteNames from "../../constants/routeNames";
-import Login from "../commonRoutes/Login/index.tsx";
-import Register from "../commonRoutes/Register/index.tsx";
 import Home from "./Home/index.tsx";
 import ProductDetails from "./ProductDetails/index.tsx";
 import Cart from "./Cart/index.tsx";
@@ -16,6 +14,7 @@ import SkinTypesManagement from "./SkinTypeManagement/index.tsx";
 import ProductsManagement from "./ProductsManagement/index.tsx";
 import FormCreateProduct from "./FormAddProduct/index.tsx";
 import FormViewProduct from "./ProductDetailsManagement/index.tsx";
+import Brands from "./Brands/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -73,6 +72,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.PRODUCT_VIEW,
     element: <FormViewProduct />,
+  },
+  {
+    path: RouteNames.BRANDS,
+    element: <Brands />,
   }
 ];
 

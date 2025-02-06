@@ -41,7 +41,10 @@ const Login = () => {
 
             if (user.role === "ADMIN") {
                 navigate("/admin");
-            } else {
+            } if (user.role === "STAFF") {
+                navigate("/staff/products-management")
+            }
+            else {
                 navigate("/");
             }
 
@@ -49,11 +52,13 @@ const Login = () => {
             setIsLoading(false);
             if (error.response?.data?.message) {
                 if (error.response.data.message === "Email not found") {
-                    setError("Email không tồn tại!");
+                    notification.error({ message: "Email không tồn tại!" });
                 } else if (error.response.data.message === "Wrong password") {
-                    setError("Sai mật khẩu!");
+                    notification.error({ message: "Sai mật khẩu!" });
+                } else if (error.response.data.message === "User Not Existed") {
+                    notification.error({ message: "Người dùng không tồn tại!" });
                 } else {
-                    setError("Có lỗi xảy ra. Vui lòng thử lại sau!");
+                    notification.error({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!" });
                 }
             } else {
                 setError("Lỗi kết nối! Hãy kiểm tra lại đường truyền.");
@@ -64,11 +69,11 @@ const Login = () => {
     return (
         <div style={{ display: "flex", height: "100vh" }}>
             <Link
-              to={RouteNames.HOME}
-              className="absolute top-[20px] left-[20px] bg-white/30 backdrop-blur-md text-black font-semibold px-4 py-2 rounded-lg border border-white/50 hover:bg-white/40"
+                to={RouteNames.HOME}
+                className="absolute top-[20px] left-[20px] bg-white/30 backdrop-blur-md text-black font-semibold px-4 py-2 rounded-lg border border-white/50 hover:bg-white/40"
             >
-              <ArrowLeftOutlined className="mr-2" />
-              Trở về trang chủ
+                <ArrowLeftOutlined className="mr-2" />
+                Trở về trang chủ
             </Link>
             <div
                 style={{

@@ -2,13 +2,12 @@ import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import ProductSkeleton from "./ProductSkeleton";
-import { ProductCard } from "../../../components/footer/components/Home";
 import { Select, Slider } from "antd";
 import { Carousel } from 'antd';
+import BrandSkeleton from "./BrandSkeleton";
+import { BrandCard } from "../../../components/footer/components/Brand";
 
-
-const Products = () => {
+const Brands = () => {
     const [priceRange, setPriceRange] = useState([0, 10000000]);
     const handlePriceChange = (value: any) => {
         setPriceRange(value);
@@ -16,36 +15,43 @@ const Products = () => {
     const [selectedBrands, setSelectedBrands] = useState([]);
     const brands = [
         {
+            id: "1",
             label: 'Cocoon',
             value: 'cocoon',
             logo: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/202667140005381.6239fc9e2048c.png'
         },
         {
+            id: "2",
             label: 'L\'Oreal',
             value: 'loreal',
             logo: 'https://cdn.worldvectorlogo.com/logos/l-oreal-3.svg'
         },
         {
+            id: "3",
             label: 'CeraVe',
             value: 'cerave',
             logo: 'https://i.pinimg.com/originals/01/df/ad/01dfadb784cdcd91ebb730d30592b481.png'
         },
         {
+            id: "4",
             label: 'Cetaphil',
             value: 'cetaphil',
             logo: 'https://www.cetaphil.com.vn/on/demandware.static/-/Sites/default/dwf51c375b/Cetaphil_Logo_285.png'
         },
         {
+            id: "5",
             label: 'The Ordinary',
             value: 'ordinary',
             logo: 'https://logovectordl.com/wp-content/uploads/2020/12/the-ordinary-logo-vector.png'
         },
         {
+            id: "6",
             label: 'Hada Labo',
             value: 'hada_labo',
             logo: 'https://hadalabo.com.vn/wp-content/uploads/2021/03/HDLB_logo_m.png'
         },
         {
+            id: "7",
             label: 'Kiehl\'s',
             value: 'kiehls',
             logo: 'https://cdn.freebiesupply.com/logos/large/2x/kiehls-logo-png-transparent.png'
@@ -241,8 +247,8 @@ const Products = () => {
 
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const totalPages = Math.ceil(products?.length / ITEMS_PER_PAGE);
-    const paginatedmProducts = products?.slice(
+    const totalPages = Math.ceil(brands?.length / ITEMS_PER_PAGE);
+    const paginatedBrands = brands?.slice(
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     );
@@ -269,7 +275,7 @@ const Products = () => {
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
                                     <p className="text-[#333] font-medium md:text-xl text-lg">
-                                        Danh sách sản phẩm
+                                        Danh sách thương hiệu
                                     </p>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
@@ -306,7 +312,7 @@ const Products = () => {
                                         style={{
                                             maxHeight: '80px',
                                             objectFit: 'contain',
-                                            marginTop: '25px', // Khoảng cách giữa các logo
+                                            marginTop: '25px',
                                         }}
                                     />
                                 </div>
@@ -330,7 +336,7 @@ const Products = () => {
                                 value={priceRange}
                                 onChange={handlePriceChange}
                                 tooltipVisible
-                                tipFormatter={(value: any) => `${value / 1000}K VNĐ`} // Hiển thị giá trị bằng triệu đồng
+                                tipFormatter={(value: any) => `${value / 1000}K VNĐ`}
                             />
                             <div className="mt-2 text-sm text-gray-600">
                                 <span>{`Từ: ${priceRange[0] / 1000}K VNĐ`}</span> -
@@ -384,18 +390,18 @@ const Products = () => {
                     <section className="w-full md:w-4/5 p-6 bg-white shadow-md">
                         <menu className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
                             {isLoading ? (
-                                <ProductSkeleton />
+                                <BrandSkeleton />
                             ) : error ? (
                                 <p className="text-center text-2xl font-semibold text-red-600 md:col-span-3 lg:col-span-4">
-                                    Error loading products.
+                                    Error loading brands.
                                 </p>
-                            ) : products.length === 0 ? (
+                            ) : brands.length === 0 ? (
                                 <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
                                     No data found matching your search.
                                 </p>
                             ) : (
-                                paginatedmProducts.map((product: any) => (
-                                    <ProductCard key={product.id} product={product} />
+                                paginatedBrands.map((brands: any) => (
+                                    <BrandCard key={brands.id} brand={brands} />
                                 ))
                             )}
 
@@ -427,5 +433,5 @@ const Products = () => {
     );
 };
 
-export default Products;
+export default Brands;
 

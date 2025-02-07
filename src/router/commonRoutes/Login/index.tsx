@@ -57,7 +57,10 @@ const Login = () => {
                     notification.error({ message: "Sai mật khẩu!" });
                 } else if (error.response.data.message === "User Not Existed") {
                     notification.error({ message: "Người dùng không tồn tại!" });
-                } else {
+                } else if (error.response.data.message === "Email is not verified") {
+                    notification.error({ message: "Email chưa được xác thực!" });
+                } 
+                 else {
                     notification.error({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!" });
                 }
             } else {

@@ -13,8 +13,6 @@ import { CgProfile } from "react-icons/cg";
 import { AlertDialog, AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 import { LogOut } from "lucide-react";
 
-
-
 const Header = () => {
   const user = useSelector((state: RootState) => state.token.user);
   const navigate = useNavigate();
@@ -56,7 +54,7 @@ const Header = () => {
     //   }
     // }
   };
-
+  console.log(user)
   return (
     <header
       style={{
@@ -72,6 +70,7 @@ const Header = () => {
         src={LogoImage}
         alt="Éclat Skincare Logo"
         style={{ height: "80px" }}
+        onClick={() => navigate("/")}
       />
       <nav>
         <ul
@@ -129,23 +128,28 @@ const Header = () => {
               </div>
             )}
           </li>
-          <li className="mr-5">
-            <Link to={RouteNames.SPECIAL_CARE}>{navigation.SPECIAL_CARE}</Link>
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.BRANDS}> {navigation.BRANDS}</Link>
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.BEAUTY_BLOG}>{navigation.BEAUTY_BLOG}</Link>
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.SKIN_QUIZ}>{navigation.SKIN_QUIZ}</Link>
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.CART} className="flex items-center text-gray-700 hover:text-blue-600 transition">
-              <ShoppingCartOutlined style={{ fontSize: "22px" }} className="mr-2" />
-            </Link>
-          </li>
+          {user?.scope === RoleNames.CUSTOMER && (
+            <>
+              <li><Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link></li>
+              <li><Link to={RouteNames.SPECIAL_CARE}>{navigation.SPECIAL_CARE}</Link></li>
+              <li><Link to={RouteNames.BRANDS}>{navigation.BRANDS}</Link></li>
+              <li><Link to={RouteNames.BEAUTY_BLOG}>{navigation.BEAUTY_BLOG}</Link></li>
+              <li><Link to={RouteNames.SKIN_QUIZ}>{navigation.SKIN_QUIZ}</Link></li>
+              <li>
+                <Link to={RouteNames.CART} className="flex items-center text-gray-700 hover:text-blue-600 transition">
+                  <ShoppingCartOutlined style={{ fontSize: "22px" }} className="mr-2" />
+                </Link>
+              </li>
+            </>
+          )}
+          {user?.scope === RoleNames.STAFF && (
+            <>
+              <li><Link to={RouteNames.PRODUCTS_MANAGEMENT}>{navigation.PRODUCTS_MANAGEMENT}</Link></li>
+              <li><Link to={RouteNames.CATEGORIES_MANAGEMENT}>{navigation.CATEGORIES_MANAGEMENT}</Link></li>
+              <li><Link to={RouteNames.BRANDS_MANAGEMENT}>{navigation.BRANDS_MANAGEMENT}</Link></li>
+              <li><Link to={RouteNames.SKIN_TYPES_MANAGEMENT}>{navigation.SKIN_TYPES_MANAGEMENT}</Link></li>
+            </>
+          )}
           {user && <li className="mr-5">
             <DropdownMenu>
               <DropdownMenuTrigger>

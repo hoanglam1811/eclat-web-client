@@ -57,9 +57,9 @@ export async function getMyInfo() {
 }
 
 // Cập nhật thông tin user
-export async function updateUser(userId:any, userData:any) {
+export async function updateUser(userId:any, userData:any, token: string) {
   try {
-    const response = await axios.put(`${BASE_URL}/users/${userId}`, userData, ngrokSkipWarning);
+    const response = await axios.put(`${BASE_URL}/users/${userId}`, userData, {headers:{Authorization: "Bearer " + token}});
     return response.data;
   } catch (error) {
     console.error(`Failed to update user with ID ${userId}:`, error);

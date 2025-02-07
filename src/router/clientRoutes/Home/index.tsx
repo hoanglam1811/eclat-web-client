@@ -10,7 +10,7 @@ import { RootState } from "../../../store/store";
 import { useState } from "react";
 import { removeToken, removeUser } from "../../../reducers/tokenSlice";
 import RoleNames from "../../../constants/roleNames";
-import { Card } from "../../../components/footer/components/Home";
+import { ProductCard } from "../../../components/footer/components/Home";
 import ProductSkeleton from "./ProductSkeleton";
 
 const Home = () => {
@@ -182,7 +182,7 @@ const Home = () => {
                         </p>
                     ) : (
                         products.map((product: any) => (
-                            <Card key={product.id} product={product} />
+                            <ProductCard key={product.id} product={product} />
                         ))
 
                     )}
@@ -205,7 +205,7 @@ const Home = () => {
 
                     <div className="w-full md:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 -mt-8 md:-mt-12">
                         {products.slice(0, 4).map((product: any) => (
-                            <Card key={product.id} product={product} />
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 </div>

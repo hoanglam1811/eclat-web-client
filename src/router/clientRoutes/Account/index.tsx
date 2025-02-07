@@ -30,8 +30,8 @@ const Account = () => {
         }
       }
       catch(err:any){
-        setError(err);
-        console.log(err);
+        setError(err.toString());
+        //console.log(err);
       }
       finally{
         setIsLoading(false);

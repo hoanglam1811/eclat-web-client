@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import ProductSkeleton from "../Home/ProductSkeleton";
-import { Card } from "../../../components/footer/components/Home";
+import { ProductCard } from "../../../components/footer/components/Home";
 import RouteNames from "../../../constants/routeNames";
 import { StarFilled, StarOutlined, UserOutlined, TagsOutlined, DollarOutlined, CalendarOutlined } from '@ant-design/icons';
 
@@ -288,7 +288,7 @@ const ProductDetails = () => {
                         {isLoading ? (
                             <ProductSkeleton />
                         ) : products.length > 0 ? (
-                            products.map((item) => <Card key={item.id} product={item} />)
+                            products.map((item) => <ProductCard key={item.id} product={item} />)
                         ) : (
                             <p className="text-gray-600 col-span-4 text-center">Không có sản phẩm phù hợp.</p>
                         )}

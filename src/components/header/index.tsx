@@ -86,51 +86,51 @@ const Header = () => {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          <li
-            className="mr-5"
-            style={{ position: "relative", cursor: "pointer" }}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link>
-            {isDropdownVisible && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "100%",
-                  left: "-500%",
-                  backgroundColor: "#fff",
-                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
-                  padding: "15px",
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: "30px",
-                  zIndex: 1,
-                  borderRadius: "8px",
-                  minWidth: "300px",
-                  fontSize: "14px",
-                }}
-              >
-                {categories.map((category) => (
-                  <div key={category.name} style={{ minWidth: "120px" }}>
-                    <strong style={{ display: "block", marginBottom: "10px", fontSize: "14px" }}>
-                      {category.name}
-                    </strong>
-                    <ul style={{ paddingLeft: "10px", margin: 0, fontSize: "12px" }}>
-                      {category.items.map((item) => (
-                        <li key={item} style={{ marginBottom: "5px" }}>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            )}
-          </li>
-          {user?.scope === RoleNames.CUSTOMER && (
+
+          {user?.role !== RoleNames.STAFF && (
             <>
-              <li><Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link></li>
+              <li
+                className="mr-5"
+                style={{ position: "relative", cursor: "pointer" }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              >
+                <Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link>
+                {isDropdownVisible && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "100%",
+                      left: "-500%",
+                      backgroundColor: "#fff",
+                      boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
+                      padding: "15px",
+                      display: "flex",
+                      flexDirection: "row",
+                      gap: "30px",
+                      zIndex: 1,
+                      borderRadius: "8px",
+                      minWidth: "300px",
+                      fontSize: "14px",
+                    }}
+                  >
+                    {categories.map((category) => (
+                      <div key={category.name} style={{ minWidth: "120px" }}>
+                        <strong style={{ display: "block", marginBottom: "10px", fontSize: "14px" }}>
+                          {category.name}
+                        </strong>
+                        <ul style={{ paddingLeft: "10px", margin: 0, fontSize: "12px" }}>
+                          {category.items.map((item) => (
+                            <li key={item} style={{ marginBottom: "5px" }}>
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </li>
               <li><Link to={RouteNames.SPECIAL_CARE}>{navigation.SPECIAL_CARE}</Link></li>
               <li><Link to={RouteNames.BRANDS}>{navigation.BRANDS}</Link></li>
               <li><Link to={RouteNames.BEAUTY_BLOG}>{navigation.BEAUTY_BLOG}</Link></li>
@@ -142,7 +142,7 @@ const Header = () => {
               </li>
             </>
           )}
-          {user?.scope === RoleNames.STAFF && (
+          {user?.role === RoleNames.STAFF && (
             <>
               <li><Link to={RouteNames.PRODUCTS_MANAGEMENT}>{navigation.PRODUCTS_MANAGEMENT}</Link></li>
               <li><Link to={RouteNames.CATEGORIES_MANAGEMENT}>{navigation.CATEGORIES_MANAGEMENT}</Link></li>

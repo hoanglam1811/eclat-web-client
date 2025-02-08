@@ -34,20 +34,17 @@ const CategoriesManagement = () => {
     const [categories, setCategories] = useState(sampleCategories);
     //const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-
     const [openAddCategory, setOpenAddCategory] = useState<boolean>(false);
-
     const [openEditCategory, setOpenEditCategory] = useState<boolean>(false);
     const [currentCategory, setCurrentCategory] = useState<any | null>(null);
-
+    const [searchQuery, setSearchQuery] = useState('');
+    const filteredCategories = categories.filter(category =>
+        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
 
-    const totalPages = Math.ceil(categories?.length / ITEMS_PER_PAGE);
-    const paginatedCategories = categories?.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
+    const totalPages = Math.ceil(filteredCategories?.length / ITEMS_PER_PAGE);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -78,8 +75,8 @@ const CategoriesManagement = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Input
                         placeholder="Tìm kiếm theo tên loại"
-                        //value={searchQuery}
-                        //onChange={(e) => setSearchQuery(e.target.value)}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
                         style={{
                             width: '400px',
@@ -90,7 +87,7 @@ const CategoriesManagement = () => {
                         }}
                     />
                     <Button
-                        //onClick={() => setSearchQuery('')}
+                        onClick={() => setSearchQuery('')}
                         style={{
                             backgroundColor: '#f44336',
                             color: 'white',
@@ -136,7 +133,10 @@ const CategoriesManagement = () => {
             </div>
 
             {/* Data Rows */}
-            {paginatedCategories?.map((account) => (
+            {filteredCategories?.slice(
+                (currentPage - 1) * ITEMS_PER_PAGE,
+                currentPage * ITEMS_PER_PAGE
+            ).map((account) => (
                 <div
                     key={account.id}
                     style={{

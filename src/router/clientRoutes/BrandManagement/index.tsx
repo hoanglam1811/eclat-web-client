@@ -84,15 +84,14 @@ const BrandsManagement = () => {
 
     const [openEditBrand, setOpenEditBrand] = useState<boolean>(false);
     const [currentBrand, setCurrentBrand] = useState<any | null>(null);
-
+    const [searchQuery, setSearchQuery] = useState('');
+    const filteredBrands = brands.filter(brand =>
+        brand.label.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
 
     const totalPages = Math.ceil(brands?.length / ITEMS_PER_PAGE);
-    const paginatedbrands = brands?.slice(
-        (currentPage - 1) * ITEMS_PER_PAGE,
-        currentPage * ITEMS_PER_PAGE
-    );
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -123,8 +122,8 @@ const BrandsManagement = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Input
                         placeholder="Tìm kiếm theo tên thương hiệu"
-                        //value={searchQuery}
-                        //onChange={(e) => setSearchQuery(e.target.value)}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
                         style={{
                             width: '400px',
@@ -135,7 +134,7 @@ const BrandsManagement = () => {
                         }}
                     />
                     <Button
-                        //onClick={() => setSearchQuery('')}
+                        onClick={() => setSearchQuery('')}
                         style={{
                             backgroundColor: '#f44336',
                             color: 'white',
@@ -181,7 +180,10 @@ const BrandsManagement = () => {
             </div>
 
             {/* Hàng dữ liệu */}
-            {paginatedbrands?.map((brand) => (
+            {filteredBrands?.slice(
+                (currentPage - 1) * ITEMS_PER_PAGE,
+                currentPage * ITEMS_PER_PAGE
+            ).map((brand) => (
                 <div
                     key={brand.id}
                     style={{

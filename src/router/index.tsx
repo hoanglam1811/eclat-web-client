@@ -5,6 +5,7 @@ import NotFound from "./commonRoutes/404";
 import clientRoutes from "./clientRoutes";
 import adminRoutes from "./adminRoutes";
 import commonRoutes from "./commonRoutes";
+import Main from "../components/layout/Main";
 
 const router = createBrowserRouter([
   {
@@ -15,7 +16,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/admin",
-    // element: <DefaultLayout />,
+    element: <Main/>,
     children: [...adminRoutes],
     errorElement: <NotFound />,
   },

@@ -39,9 +39,9 @@ const Login = () => {
             dispatch(setUser(userInfo));
             notification.success({ message: "Đăng nhập thành công!" });
 
-            if (user.role === "ADMIN") {
-                navigate("/admin");
-            } if (user.role === "STAFF") {
+            if (userInfo.scope.toUpperCase() == "ADMIN") {
+                navigate("/admin/dashboard");
+            } else if (userInfo.scope.toUpperCase() == "STAFF") {
                 navigate("/staff/products-management")
             }
             else {

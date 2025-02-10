@@ -253,9 +253,13 @@ const ProductsManagement = () => {
                         display: "flex",
                         alignItems: "center",
                         gap: "6px",
+                        width: '180px',
+                        height: '60px',
+                        fontSize: '14px', 
+                        fontWeight: 'bold',
                     }}
                 >
-                    <IoMdAddCircle />
+                    <IoMdAddCircle size={"24"} />
                     Tạo sản phẩm mới
                 </Button>
             </div>

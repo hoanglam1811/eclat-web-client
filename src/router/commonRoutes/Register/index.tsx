@@ -12,7 +12,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 const Register = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [registerData, setRegisterData] = useState<RegisterType>(
-        { username: "", email: "", password: "", phoneNum: "" }
+        { username: "", email: "", password: "", phone: "" }
     );
     const [isSignUp, setIsSignUp] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -28,7 +28,7 @@ const Register = () => {
                 registerData.username,
                 registerData.email,
                 registerData.password,
-                registerData.phoneNum
+                registerData.phone
             );
             setIsLoading(false);
             if (user.code == 0) {
@@ -141,7 +141,7 @@ const Register = () => {
                         <input
                             type="text"
                             placeholder="Nhập số điện thoại"
-                            onChange={(e) => setRegisterData({ ...registerData, phoneNum: e.target.value })}
+                            onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
                             style={{
                                 width: "80%",
                                 padding: "12px 20px",

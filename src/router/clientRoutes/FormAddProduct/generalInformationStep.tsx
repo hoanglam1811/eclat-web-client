@@ -166,7 +166,7 @@ const GeneralInformationStep = ({
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
                           <button
                             type="button"
-                            onClick={() => handleReplaceImage(currentIndex)} // Gọi đúng vị trí ảnh cần thay thế
+                            onClick={() => handleReplaceImage(currentIndex)} 
                             className="text-white text-2xl mx-2"
                           >
                             <EditOutlined />

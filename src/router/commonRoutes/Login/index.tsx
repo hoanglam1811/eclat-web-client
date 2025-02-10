@@ -39,9 +39,9 @@ const Login = () => {
             dispatch(setUser(userInfo));
             notification.success({ message: "Đăng nhập thành công!" });
 
-            if (userInfo.scope.toUpperCase() == "ADMIN") {
+            if (userInfo.role.toUpperCase() == "ADMIN") {
                 navigate("/admin/dashboard");
-            } else if (userInfo.scope.toUpperCase() == "STAFF") {
+            } else if (userInfo.role.toUpperCase() == "STAFF") {
                 navigate("/staff/products-management")
             }
             else {
@@ -59,8 +59,8 @@ const Login = () => {
                     notification.error({ message: "Người dùng không tồn tại!" });
                 } else if (error.response.data.message === "Email is not verified") {
                     notification.error({ message: "Email chưa được xác thực!" });
-                } 
-                 else {
+                }
+                else {
                     notification.error({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!" });
                 }
             } else {

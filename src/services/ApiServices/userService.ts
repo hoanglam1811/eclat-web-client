@@ -3,11 +3,11 @@ import { BASE_URL } from "../../constants/api";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 
-const ngrokSkipWarning:any = { headers: { "bypass-tunnel-reminder": "true" } };
+const ngrokSkipWarning: any = { headers: { "bypass-tunnel-reminder": "true" } };
 //const token = useSelector((state: RootState) => state.token.token);
 
 // Tạo tài khoản Staff
-export async function createStaff(userData:any) {
+export async function createStaff(userData: any) {
   try {
     const response = await axios.post(`${BASE_URL}/users`, userData, ngrokSkipWarning);
     return response.data;
@@ -29,9 +29,9 @@ export async function getAllUsers() {
 }
 
 // Lấy thông tin một user theo ID
-export async function getUserById(userId:any, token:any) {
+export async function getUserById(userId: any, token: any) {
   try {
-    if(token)
+    if (token)
       ngrokSkipWarning.headers["Authorization"] = "Bearer " + token;
     else ngrokSkipWarning.headers["Authorization"] = null;
 
@@ -57,9 +57,9 @@ export async function getMyInfo() {
 }
 
 // Cập nhật thông tin user
-export async function updateUser(userId:any, userData:any, token: string) {
+export async function updateUserEmail(userId: any, requestData: any, token: string) {
   try {
-    const response = await axios.put(`${BASE_URL}/users/${userId}`, userData, {headers:{Authorization: "Bearer " + token}});
+    const response = await axios.put(`${BASE_URL}/users/updateEmail/${userId}`, requestData, { headers: { Authorization: "Bearer " + token } });
     return response.data;
   } catch (error) {
     console.error(`Failed to update user with ID ${userId}:`, error);
@@ -67,8 +67,24 @@ export async function updateUser(userId:any, userData:any, token: string) {
   }
 }
 
+export async function updateUserPassword(userId: string, requestData: any, token: string) {
+  try {
+    const response = await axios.put(
+      `${BASE_URL}/users/updatePassword/${userId}`,
+      requestData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to update password for user ${userId}:`, error);
+    throw error;
+  }
+}
+
 // Xóa user theo ID
-export async function deleteUser(userId:any) {
+export async function deleteUser(userId: any) {
   try {
     const response = await axios.delete(`${BASE_URL}/users/${userId}`, ngrokSkipWarning);
     return response.data;

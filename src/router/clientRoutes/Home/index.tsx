@@ -192,7 +192,7 @@ const Home = () => {
             <hr className=" mt-10 w-[50%] mx-auto border-t-2 border-[#578a3f]" />
 
             <section className="p-6">
-                <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f]">DANH MỤC SẢN PHẨM</h2>
+                <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f] ">DANH MỤC SẢN PHẨM</h2>
 
                 <div className="flex flex-col md:flex-row gap-3 items-center mt-10">
                     <div className="w-full md:w-1/4 flex justify-center items-center">

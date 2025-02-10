@@ -4,11 +4,11 @@ import RouteNames from "../../../constants/routeNames";
 import { EditOutlined, KeyOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { useSelector } from "react-redux";
-import { getUserById, updateUser } from "../../../services/ApiServices/userService";
+import { getUserById, updateUserEmail } from "../../../services/ApiServices/userService";
 import { useEffect, useState } from "react";
 import { RootState } from "../../../store/store";
 import ScreenSpinner from "../../../components/ScreenSpinner";
-import { Button, Form, Input, message, Modal } from "antd";
+import { Button, Form, Input, Modal, notification } from "antd";
 
 const Account = () => {
     const users = useSelector((state: RootState) => state.token.user);
@@ -70,20 +70,20 @@ const Account = () => {
             const updatedUser = {
                 ...values,
                 update_at: new Date().toISOString().split("T")[0],
-                roles: ["Staff"],
-                password: user.password,
+                username: user.username,
             };
 
-            const response = await updateUser(users.userId, updatedUser, token);
+            const response = await updateUserEmail(users.userId, updatedUser, token);
+            console.log(response)
             if (response.code === 0) {
                 setUser(updatedUser);
-                message.success("Cập nhật thông tin thành công!");
+                notification.success({ message: "Cập nhật thông tin thành công!" });
                 setIsModalOpen(false);
             } else {
-                message.error(response.message || "Cập nhật thất bại!");
+                notification.error(response.message || "Cập nhật thất bại!");
             }
         } catch (err: any) {
-            message.error("Vui lòng kiểm tra lại thông tin!");
+            notification.error({ message: "Vui lòng kiểm tra lại thông tin!" });
         } finally {
             setIsSubmitting(false);
         }
@@ -206,7 +206,9 @@ const Account = () => {
                             ]}
                         >
                             <Form form={form} layout="vertical">
-
+                                <Form.Item name="email" label="Email" rules={[{ required: true, message: "Vui lòng nhập email!" }]}>
+                                    <Input />
+                                </Form.Item>
                                 <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}>
                                     <Input />
                                 </Form.Item>

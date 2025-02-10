@@ -1,23 +1,62 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, message, notification } from "antd";
 import { Link } from "react-router-dom";
 import { UserOutlined, ShoppingCartOutlined, KeyOutlined, LockOutlined } from "@ant-design/icons";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
+import { updateUserPassword } from "../../../services/ApiServices/userService";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
 
 const AccountChangePassword = () => {
-    const user = {
-        name: "Lam Nguyen",
-        email: "nguyenhoanglam18112003@gmail.com",
-        phone_number: "0902601297"
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [form] = Form.useForm();
+    const users = useSelector((state: RootState) => state.token.user);
+    console.log(users)
+    const token = useSelector((state: any) => state.token.token);
+    const [passwords, setPasswords] = useState({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+
+    const handleInputChange = (e: any) => {
+        setPasswords({ ...passwords, [e.target.id]: e.target.value });
     };
 
-    const onFinish = (values: any) => {
-        console.log("Form Values: ", values);
-        if (values.newPassword !== values.confirmPassword) {
-            notification.error({ message: "Mật khẩu xác nhận không khớp!" })
-        } else {
-            notification.success({ message: "Đổi mật khẩu thành công" });
+    const handleUpdatePassword = async () => {
+        if (!passwords.oldPassword || !passwords.newPassword || !passwords.confirmPassword) {
+            notification.error({ message: "Vui lòng điền đầy đủ thông tin!" });
+            return;
+        }
+
+        if (passwords.newPassword !== passwords.confirmPassword) {
+            notification.error({ message: "Mật khẩu xác nhận không khớp!" });
+            return;
+        }
+
+        if (!users) return null;
+
+        try {
+            setIsLoading(true);
+            const requestData = {
+                oldPassword: passwords.oldPassword,
+                newPassword: passwords.newPassword,
+            };
+
+            const response = await updateUserPassword(users?.userId, requestData, token);
+
+            if (response.code === 0) {
+                notification.success({ message: "Cập nhật mật khẩu thành công!" });
+                setPasswords({ oldPassword: "", newPassword: "", confirmPassword: "" });
+            } else {
+                notification.error({ message: response.message || "Cập nhật thất bại!" });
+            }
+        } catch (err) {
+            message.error("Có lỗi xảy ra! Vui lòng thử lại.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -58,7 +97,7 @@ const AccountChangePassword = () => {
                     <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-2 col-end-5">
                         <h2 className="text-lg font-bold text-gray-800">Trang Tài Khoản</h2>
                         <h2 className="text-md font-semibold text-gray-800 mb-4">
-                            Xin chào, <span className="text-blue-600">{user.name}!</span>
+                            Xin chào, <span className="text-blue-600">{users?.username}!</span>
                         </h2>
                         <ul className="space-y-4 mt-10">
                             <li>
@@ -107,6 +146,8 @@ const AccountChangePassword = () => {
                                     <input
                                         type="password"
                                         id="oldPassword"
+                                        value={passwords.oldPassword}
+                                        onChange={handleInputChange}
                                         placeholder="Nhập mật khẩu cũ"
                                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                     />
@@ -125,6 +166,8 @@ const AccountChangePassword = () => {
                                         <input
                                             type="password"
                                             id="password"
+                                            value={passwords.newPassword}
+                                            onChange={handleInputChange}
                                             placeholder="Nhập mật khẩu mới"
                                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                         />
@@ -141,6 +184,8 @@ const AccountChangePassword = () => {
                                         <input
                                             type="password"
                                             id="confirmPassword"
+                                            value={passwords.confirmPassword}
+                                            onChange={handleInputChange}
                                             placeholder="Xác nhận mật khẩu mới"
                                             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                         />
@@ -150,10 +195,10 @@ const AccountChangePassword = () => {
                                 {/* Save Button */}
                                 <div className="flex justify-end mt-8">
                                     <Button
-                                        onClick={onFinish}
+                                        onClick={handleUpdatePassword}
                                         className="bg-[#f8f7da] text-black px-4 py-2 rounded hover:bg-[#51b8af]"
                                     >
-                                        Lưu
+                                        {isSubmitting ? "Đang lưu..." : "Lưu"}
                                     </Button>
                                 </div>
                             </div>

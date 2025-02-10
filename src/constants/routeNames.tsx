@@ -25,7 +25,6 @@ const RouteNames = {
   PRODUCTS_MANAGEMENT: "/staff/products-management",
   PRODUCT_ADDITION: "/staff/product-addition",
   PRODUCT_VIEW:"/staff/product-update/:id",
-
   BILLING: "/admin/billing",
   ADMIN_HOME: "/admin/dashboard",
   ADMIN_PROFILE: "/admin/profile",

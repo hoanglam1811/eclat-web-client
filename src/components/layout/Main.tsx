@@ -11,11 +11,13 @@
 */
 
 import { useState, useEffect } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Layout, Drawer, Affix } from "antd";
 import Sidenav from "./Sidenav";
 import Header from "./Header";
 import Footer from "./Footer";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 const { Header: AntHeader, Content, Sider } = Layout;
 
@@ -30,6 +32,7 @@ function Main({ children }:any) {
   const handleSidenavType = (type:any) => setSidenavType(type);
   const handleSidenavColor = (color:any) => setSidenavColor(color);
   const handleFixedNavbar = (type:any) => setFixed(type);
+  const role = useSelector((state: RootState) => state.token.user?.role);
 
   let { pathname } = useLocation();
   pathname = pathname.replace("/", "");
@@ -41,6 +44,10 @@ function Main({ children }:any) {
       setPlacement("right");
     }
   }, [pathname]);
+
+  /*if(role != "Admin") {
+    return <Navigate to="/home" />
+  }*/
 
   return (
     <Layout

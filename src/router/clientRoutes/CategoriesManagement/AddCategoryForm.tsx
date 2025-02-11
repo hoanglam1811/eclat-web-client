@@ -5,12 +5,15 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { z } from "zod";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { addCategory } from "../../../services/ApiServices/categoryServicec";
 
 
 interface AddMilestoneModalProps {
@@ -21,9 +24,12 @@ interface AddMilestoneModalProps {
 
 const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModalProps) => {
   const { id } = useParams<{ id: string }>();
+  const token = useSelector((state:RootState) => state.token.token)
+
+  const navigate = useNavigate();
 
   const milestoneFormSchema = z.object({
-    name: z.string().min(1, "Please enter a description"),
+    categoryName: z.string().min(1, "Please enter a name"),
     description: z.string().min(1, "Please enter a description"),
   });
 
@@ -31,22 +37,26 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
     resolver: zodResolver(milestoneFormSchema),
   });
 
-  // useEffect(() => {
+  useEffect(() => {
 
-  // }, [isOpen, id, form]);
+  }, [isOpen, id, form]);
 
-  // const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
-  //     try {
-  //         //console.log(values);
-  //         await addCategory(values);
-  //         form.reset();
-  //         //console.log("Service created successfully:", response.data);
-  //         setIsOpen(false);
-  //         fetchCategory();
-  //     } catch (error) {
-  //         console.error("Error creating service:", error);
-  //     }
-  // };
+  const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
+      try {
+          //console.log(values);
+          if(!token) {
+            navigate("/login");
+            return;
+          }
+          await addCategory(values, token);
+          form.reset();
+          //console.log("Service created successfully:", response.data);
+          setIsOpen(false);
+          fetchCategory();
+      } catch (error) {
+          console.error("Error creating service:", error);
+      }
+  };
 
   return (
     <AnimatePresence>
@@ -70,13 +80,13 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
             </div>
 
             <form
-              //onSubmit={form.handleSubmit(handleSubmit)} 
+              onSubmit={form.handleSubmit(handleSubmit)} 
               className="flex flex-col gap-6">
               <div className="flex flex-col">
                 <Label className="mb-3 text-left">Name</Label>
                 <div className="relative">
                   <Input
-                    {...form.register("name")}
+                    {...form.register("categoryName")}
                     placeholder="Name"
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"

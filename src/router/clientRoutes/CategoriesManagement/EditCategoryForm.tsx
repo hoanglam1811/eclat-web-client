@@ -31,13 +31,13 @@ const EditCategoryModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditM
     resolver: zodResolver(milestoneFormSchema),
   });
 
-  // useEffect(() => {
-  //     if (isOpen) {
-  //         form.setValue("id", Number(category.id));
-  //         form.setValue("name", category.name);
-  //         form.setValue("description", category.description);
-  //     }
-  // }, [isOpen, form]);
+  useEffect(() => {
+      if (isOpen) {
+          form.setValue("id", Number(category.id));
+          form.setValue("name", category.name);
+          form.setValue("description", category.description);
+      }
+  }, [isOpen, form]);
 
   // const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
   //     try {

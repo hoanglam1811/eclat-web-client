@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { RootState } from "../../../store/store";
 import ScreenSpinner from "../../../components/ScreenSpinner";
 import { Button, Form, Input, Modal, notification } from "antd";
+import { CircularProgress } from "@mui/material";
 
 const Account = () => {
     const users = useSelector((state: RootState) => state.token.user);
@@ -24,13 +25,13 @@ const Account = () => {
     const [form] = Form.useForm();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    console.log(users)
+    //console.log(users)
     const fetchAccount = async () => {
         try {
             setIsLoading(true);
             if (!users) return;
             const response = await getUserById(users.userId, token);
-            console.log(response)
+            //console.log(response)
             if (response.code == 0) {
                 setUser(response.result);
             }
@@ -92,7 +93,7 @@ const Account = () => {
 
     return (
         <>
-            {isLoading && <ScreenSpinner />}
+            {isLoading && <CircularProgress/>}
             <section className="bg-gray-100 p-6">
 
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">

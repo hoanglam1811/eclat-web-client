@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
     IconButton,
     Tooltip,
@@ -8,13 +8,16 @@ import {
 } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
 
-import React from "react";
 import { IoMdAddCircle } from "react-icons/io";
 import { Button } from "../../../components/ui/button";
 import AddCategoryModal from "./AddCategoryForm";
 import EditCategoryModal from "./EditCategoryForm";
 import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { Input } from "antd";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { getAllCategories } from "../../../services/ApiServices/categoryServicec";
+import { useNavigate } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -31,6 +34,8 @@ const CategoriesManagement = () => {
         { id: 9, name: "Facial Oil", description: "Dầu dưỡng hỗ trợ giữ ẩm và tái tạo da." },
         { id: 10, name: "Spot Treatment", description: "Sản phẩm đặc trị các vấn đề cụ thể như mụn hoặc sẹo." },
     ];
+    const token = useSelector((state:RootState) => state.token.token)
+    const navigate = useNavigate();
     const [categories, setCategories] = useState(sampleCategories);
     //const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -39,7 +44,7 @@ const CategoriesManagement = () => {
     const [currentCategory, setCurrentCategory] = useState<any | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const filteredCategories = categories.filter(category =>
-        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+      category.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -50,23 +55,31 @@ const CategoriesManagement = () => {
         setCurrentPage(page);
     };
 
-    //   const fetchCategories = () => {
-    //     setLoading(true);
-    //     getAllCategories()
-    //       .then((data) => {
-    //         setCategories(data.data);
-    //       })
-    //       .catch((error) => {
-    //         console.error("Error fetching accounts:", error);
-    //       })
-    //       .finally(() => {
-    //         setLoading(false);
-    //       });
-    //   };
+      const fetchCategories = async () => {
+        setLoading(true);
+        if(!token) {
+          navigate("/login");
+          return;
+        }
+        try{
+          const data = await getAllCategories(token)
+          setCategories(data.map((category: any) => ({ 
+              id: category.categoryId,
+              name: category.categoryName, 
+              description: category.description }))
+          );
+          console.log(data);
+        }catch(error:any) {
+            console.error("Error fetching accounts:", error);
+        }
+        finally {
+          setLoading(false);
+        };
+      };
 
-    //   useEffect(() => {
-    //     fetchCategories();
-    //   }, []);
+      useEffect(() => {
+        fetchCategories();
+      }, []);
 
     const renderTable = () => (
         <Paper elevation={3} sx={{ padding: 2, borderRadius: 3, backgroundColor: "#fff" }}>
@@ -221,7 +234,7 @@ const CategoriesManagement = () => {
                 <AddCategoryModal
                     isOpen={openAddCategory}
                     setIsOpen={setOpenAddCategory}
-                    fetchCategory={() => { }}
+                    fetchCategory={fetchCategories}
                 />
             )}
 
@@ -230,7 +243,7 @@ const CategoriesManagement = () => {
                     isOpen={openEditCategory}
                     setIsOpen={setOpenEditCategory}
                     category={currentCategory}
-                    fetchCategory={() => { }}
+                    fetchCategory={fetchCategories}
                 />
             )}
         </div>

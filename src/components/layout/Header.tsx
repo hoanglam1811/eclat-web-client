@@ -295,13 +295,15 @@ function Header({
       </div>
       <Row gutter={[24, 0]}>
         <Col span={24} md={6}>
-          <Breadcrumb>
+          <Breadcrumb 
+              style={{ textTransform: "capitalize" }}
+          >
             <Breadcrumb.Item>
-              <NavLink to="/">Pages</NavLink>
+              <NavLink to="/admin">Pages</NavLink>
             </Breadcrumb.Item>
-{/* style={{ textTransform: "capitalize" }} */}
-            <Breadcrumb.Item >
-              {name.replace("/", "")}
+            <Breadcrumb.Item 
+            >
+              {name.replace("admin/", "")}
             </Breadcrumb.Item>
           </Breadcrumb>
           <div className="ant-page-header-heading">
@@ -309,7 +311,7 @@ function Header({
               className="ant-page-header-heading-title"
               style={{ textTransform: "capitalize" }}
             >
-              {subName.replace("/", "")}
+              {subName.replace("admin/", "")}
             </span>
           </div>
         </Col>

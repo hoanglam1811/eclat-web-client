@@ -16,6 +16,10 @@ import AddBrandModal from "./AddBrandForm";
 import EditBrandForm from "./EditBrandForm";
 import { CloseCircleOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { Input } from "antd";
+import { RootState } from "../../../store/store";
+import { useSelector } from "react-redux";
+import { getAllBrands } from "../../../services/ApiServices/brandService";
+import { useNavigate } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -77,8 +81,10 @@ const BrandsManagement = () => {
     ];
 
     const [brands, setBrands] = useState(sampleBrands);
+    const token = useSelector((state: RootState) => state.token.token);
     //const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const [openAddBrand, setOpenAddBrand] = useState<boolean>(false);
 
@@ -97,23 +103,32 @@ const BrandsManagement = () => {
         setCurrentPage(page);
     };
 
-    //   const fetchCategories = () => {
-    //     setLoading(true);
-    //     getAllCategories()
-    //       .then((data) => {
-    //         setCategories(data.data);
-    //       })
-    //       .catch((error) => {
-    //         console.error("Error fetching accounts:", error);
-    //       })
-    //       .finally(() => {
-    //         setLoading(false);
-    //       });
-    //   };
+      const fetchBrands = () => {
+        setLoading(true);
+        if(!token){
+          navigate("/login");
+          return;
+        }
+        getAllBrands(token)
+          .then((data:any) => {
+            setBrands(data.map((brand: any) => ({
+              id: brand.brandId,
+              label: brand.brandName,
+              value: brand.brandName,
+              logo: brand.imgUrl
+            })));
+          })
+          .catch((error:any) => {
+            console.error("Error fetching accounts:", error);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      };
 
-    //   useEffect(() => {
-    //     fetchCategories();
-    //   }, []);
+      useEffect(() => {
+        fetchBrands();
+      }, []);
 
     const renderTable = () => (
         <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>

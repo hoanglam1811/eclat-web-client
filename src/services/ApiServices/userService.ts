@@ -1,7 +1,5 @@
 import axios from "axios";
 import { BASE_URL } from "../../constants/api";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
 
 const ngrokSkipWarning: any = { headers: { "bypass-tunnel-reminder": "true" } };
 //const token = useSelector((state: RootState) => state.token.token);

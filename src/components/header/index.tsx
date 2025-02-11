@@ -96,40 +96,6 @@ const Header = () => {
                 onMouseLeave={handleMouseLeave}
               >
                 <Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link>
-                {isDropdownVisible && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "100%",
-                      left: "-500%",
-                      backgroundColor: "#fff",
-                      boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
-                      padding: "15px",
-                      display: "flex",
-                      flexDirection: "row",
-                      gap: "30px",
-                      zIndex: 1,
-                      borderRadius: "8px",
-                      minWidth: "300px",
-                      fontSize: "14px",
-                    }}
-                  >
-                    {categories.map((category) => (
-                      <div key={category.name} style={{ minWidth: "120px" }}>
-                        <strong style={{ display: "block", marginBottom: "10px", fontSize: "14px" }}>
-                          {category.name}
-                        </strong>
-                        <ul style={{ paddingLeft: "10px", margin: 0, fontSize: "12px" }}>
-                          {category.items.map((item) => (
-                            <li key={item} style={{ marginBottom: "5px" }}>
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                )}
               </li>
               <li><Link to={RouteNames.SPECIAL_CARE}>{navigation.SPECIAL_CARE}</Link></li>
               <li><Link to={RouteNames.BRANDS}>{navigation.BRANDS}</Link></li>
@@ -158,7 +124,7 @@ const Header = () => {
 
               <DropdownMenuContent className="bg-white shadow-lg rounded-xl w-48 p-3 z-99">
                 <DropdownMenuLabel className="font-semibold text-lg text-gray-700">
-                  Account
+                  Tài khoản
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
@@ -168,7 +134,7 @@ const Header = () => {
                   className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                 >
                   <CgProfile className="mr-3 text-xl text-gray-600" />
-                  <span className="text-gray-700">Profile</span>
+                  <span className="text-gray-700">Hồ sơ</span>
                 </DropdownMenuItem>
 
                 {/* Log out */}
@@ -177,7 +143,7 @@ const Header = () => {
                   <AlertDialogTrigger onClick={handleLogout} asChild>
                     <div className="flex items-center p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors cursor-pointer">
                       <LogOut className="mr-3 text-xl" />
-                      <span>Log out</span>
+                      <span>Đăng xuất</span>
                     </div>
                   </AlertDialogTrigger>
                 </AlertDialog>

@@ -103,36 +103,32 @@ const BrandsManagement = () => {
         setCurrentPage(page);
     };
 
-      const fetchBrands = () => {
+    const fetchBrands = () => {
         setLoading(true);
-        if(!token){
-          navigate("/login");
-          return;
+        if (!token) {
+            navigate("/login");
+            return;
         }
         getAllBrands(token)
-          .then((data:any) => {
-            setBrands(data.map((brand: any) => ({
-              id: brand.brandId,
-              label: brand.brandName,
-              value: brand.brandName,
-              logo: brand.imgUrl
-            })));
-          })
-          .catch((error:any) => {
-            if(error.status == 401){
-              navigate("/home");
-              return;
-            }
-            console.error("Error fetching accounts:", error);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      };
+            .then((data: any) => {
+                setBrands(data.map((brand: any) => ({
+                    id: brand.brandId,
+                    label: brand.brandName,
+                    value: brand.brandName,
+                    logo: brand.imgUrl
+                })));
+            })
+            .catch((error: any) => {
+                console.error("Error fetching accounts:", error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
 
-      useEffect(() => {
+    useEffect(() => {
         fetchBrands();
-      }, []);
+    }, []);
 
     const renderTable = () => (
         <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>
@@ -193,7 +189,7 @@ const BrandsManagement = () => {
                 }}
             >
                 <div style={{ flex: 0.5, textAlign: "center" }}>ID</div>
-                <div style={{ flex: 2 }}>Tên thương hiệu</div>
+                <div style={{ flex: 2 }}>Tên</div>
                 <div style={{ flex: 2, textAlign: "center" }}>Logo</div>
                 <div style={{ flex: 1, textAlign: "center" }}>Hành động</div>
             </div>
@@ -322,11 +318,10 @@ const BrandsManagement = () => {
     );
 
     return (
-        <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
-            <div className="flex justify-between mb-5 mt-1 items-center">
-                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
-                    QUẢN LÝ THƯƠNG HIỆU
-                </h2>
+        <div className="bg-gray-100 pt-5 pl-5 pb-5 pr-5">
+            {/* Header */}
+            <div className="flex justify-between mb-5 mt-1">
+                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>QUẢN LÝ THƯƠNG HIỆU</h2>
             </div>
 
             {loading ? <CircularProgress /> : renderTable()}

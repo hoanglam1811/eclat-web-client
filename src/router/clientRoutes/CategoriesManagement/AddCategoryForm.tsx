@@ -13,49 +13,49 @@ import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import { addCategory } from "../../../services/ApiServices/categoryServicec";
+import { addCategory } from "../../../services/ApiServices/categoryService";
 
 
-interface AddMilestoneModalProps {
+interface AddCategoryModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   fetchCategory: () => void;
 }
 
-const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModalProps) => {
+const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModalProps) => {
   const { id } = useParams<{ id: string }>();
-  const token = useSelector((state:RootState) => state.token.token)
+  const token = useSelector((state: RootState) => state.token.token)
 
   const navigate = useNavigate();
 
-  const milestoneFormSchema = z.object({
+  const categoryFormSchema = z.object({
     categoryName: z.string().min(1, "Please enter a name"),
     description: z.string().min(1, "Please enter a description"),
   });
 
-  const form = useForm<z.infer<typeof milestoneFormSchema>>({
-    resolver: zodResolver(milestoneFormSchema),
+  const form = useForm<z.infer<typeof categoryFormSchema>>({
+    resolver: zodResolver(categoryFormSchema),
   });
 
   useEffect(() => {
 
   }, [isOpen, id, form]);
 
-  const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
-      try {
-          //console.log(values);
-          if(!token) {
-            navigate("/login");
-            return;
-          }
-          await addCategory(values, token);
-          form.reset();
-          //console.log("Service created successfully:", response.data);
-          setIsOpen(false);
-          fetchCategory();
-      } catch (error) {
-          console.error("Error creating service:", error);
+  const handleSubmit = async (values: z.infer<typeof categoryFormSchema>) => {
+    try {
+      //console.log(values);
+      if (!token) {
+        navigate("/login");
+        return;
       }
+      await addCategory(values, token);
+      form.reset();
+      //console.log("Service created successfully:", response.data);
+      setIsOpen(false);
+      fetchCategory();
+    } catch (error) {
+      console.error("Error creating service:", error);
+    }
   };
 
   return (
@@ -72,7 +72,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
                 <FaPen className="text-sky-500" />
-                {"Add New Category"}
+                {"Add new category"}
               </h3>
               <button onClick={() => { setIsOpen(false); form.reset() }} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
                 <FaTimes />
@@ -80,7 +80,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
             </div>
 
             <form
-              onSubmit={form.handleSubmit(handleSubmit)} 
+              onSubmit={form.handleSubmit(handleSubmit)}
               className="flex flex-col gap-6">
               <div className="flex flex-col">
                 <Label className="mb-3 text-left">Name</Label>
@@ -93,7 +93,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
                   />
                   <FaPen className="absolute left-3 top-3 text-gray-500" />
                 </div>
-                {form.formState.errors.name && <p className="text-red-500 text-sm">{form.formState.errors.name.message}</p>}
+                {form.formState.errors.categoryName && <p className="text-red-500 text-sm">{form.formState.errors.categoryName.message}</p>}
               </div>
               <div className="flex flex-col">
                 <Label className="mb-3 text-left">Description</Label>
@@ -114,7 +114,9 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
                   className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all gap-3 w-[40%]"
                 >
                   <FaCheckCircle className="text-white text-xl" />
+                  <div className="text-white">
                   Add Category
+                  </div>
                 </Button>
               </div>
             </form>

@@ -93,7 +93,7 @@ const Account = () => {
 
     return (
         <>
-            {isLoading && <CircularProgress/>}
+            {isLoading && <CircularProgress />}
             <section className="bg-gray-100 p-6">
 
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
@@ -214,6 +214,9 @@ const Account = () => {
                                     <Input />
                                 </Form.Item>
                             </Form>
+                            <div className="flex justify-between items-center border-b pb-4">
+                                <span className="text-orange-500 font-medium">Khi bạn muốn thay đổi đồng nghĩa với việc bạn sẽ phải xác thực email thêm 1 lần nữa, nếu đồng ý hãy bấm "Lưu thay đổi"</span>
+                            </div>
                         </Modal>
                     </section>
                 </div>

@@ -119,6 +119,10 @@ const BrandsManagement = () => {
             })));
           })
           .catch((error:any) => {
+            if(error.status == 401){
+              navigate("/home");
+              return;
+            }
             console.error("Error fetching accounts:", error);
           })
           .finally(() => {
@@ -332,7 +336,7 @@ const BrandsManagement = () => {
                     isOpen={openAddBrand}
                     setIsOpen={(open) => setOpenAddBrand(open)}
                     fetchBrand={async () => {
-                        // fetchBrands();
+                        fetchBrands();
                     }}
                 />
             )}
@@ -343,7 +347,7 @@ const BrandsManagement = () => {
                     setIsOpen={(open) => setOpenEditBrand(open)}
                     brand={currentBrand}
                     fetchBrand={async () => {
-                        // fetchBrands();
+                        fetchBrands();
                     }}
                 />
             )}

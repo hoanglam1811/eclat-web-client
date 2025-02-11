@@ -10,14 +10,14 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 body {
-  padding: 0 0 30px 0;
-  background-color: #fafafa;
-  letter-spacing: -0.3px;
-  color: rgba(0, 0, 0, 0.65);
-  font-size: 14px;
-  line-height: 1.6;
-  font-weight: 400;
-  font-family: open sans, Helvetica, Arial, sans-serif;
+  /* padding: 0 0 30px 0; */
+  /* background-color: #fafafa; */
+  /* letter-spacing: -0.3px; */
+  /* color: rgba(0, 0, 0, 0.65); */
+  /* font-size: 14px; */
+  /* line-height: 1.6; */
+  /* font-weight: 400; */
+  /* font-family: open sans, Helvetica, Arial, sans-serif; */
 }
 .ant-layout.ant-layout-has-sider {
   flex-direction: row;

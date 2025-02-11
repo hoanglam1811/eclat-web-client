@@ -10,6 +10,10 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
+import { editSkinType } from "../../../services/ApiServices/skinTypeService";
+import { RootState } from "../../../store/store";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 
 interface EditMajorModalProps {
@@ -19,38 +23,44 @@ interface EditMajorModalProps {
   fetchCategory: () => void;
 }
 
-const EditCategoryModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditMajorModalProps) => {
+const EditSkinTypeModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditMajorModalProps) => {
 
   const milestoneFormSchema = z.object({
     id: z.number(),
-    name: z.string().min(1, "Please enter a description"),
+    skinName: z.string().min(1, "Please enter a skin name"),
     description: z.string().min(1, "Please enter a description"),
   });
+  const token = useSelector((state:RootState) => state.token.token)
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof milestoneFormSchema>>({
     resolver: zodResolver(milestoneFormSchema),
   });
 
-  // useEffect(() => {
-  //     if (isOpen) {
-  //         form.setValue("id", Number(category.id));
-  //         form.setValue("name", category.name);
-  //         form.setValue("description", category.description);
-  //     }
-  // }, [isOpen, form]);
+  useEffect(() => {
+      if (isOpen) {
+          form.setValue("id", Number(category.id));
+          form.setValue("skinName", category.label);
+          form.setValue("description", category.description);
+      }
+  }, [isOpen, form]);
 
-  // const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
-  //     try {
-  //         //console.log(values);
-  //         await editCategory(values.id, values);
-  //         form.reset();
-  //         //console.log("Service created successfully:", response.data);
-  //         setIsOpen(false);
-  //         fetchCategory();
-  //     } catch (error) {
-  //         console.error("Error creating service:", error);
-  //     }
-  // };
+  const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
+      try {
+          //console.log(values);
+          if(!token) {
+            navigate("/login");
+            return;
+          }
+          await editSkinType(values, token);
+          form.reset();
+          //console.log("Service created successfully:", response.data);
+          setIsOpen(false);
+          fetchCategory();
+      } catch (error) {
+          console.error("Error creating service:", error);
+      }
+  };
 
 
   return (
@@ -75,20 +85,20 @@ const EditCategoryModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditM
             </div>
 
             <form
-              //onSubmit={form.handleSubmit(handleSubmit)} 
+              onSubmit={form.handleSubmit(handleSubmit)} 
               className="flex flex-col gap-6">
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Name</Label>
+                <Label className="mb-3 text-left">Skin Name</Label>
                 <div className="relative">
                   <Input
-                    {...form.register("name")}
-                    placeholder="Name"
+                    {...form.register("skinName")}
+                    placeholder="Skin name"
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
                   <FaPen className="absolute left-3 top-3 text-gray-500" />
                 </div>
-                {form.formState.errors.name && <p className="text-red-500 text-sm">{form.formState.errors.name.message}</p>}
+                {form.formState.errors.skinName && <p className="text-red-500 text-sm">{form.formState.errors.skinName.message}</p>}
               </div>
               <div className="flex flex-col">
                 <Label className="mb-3 text-left">Description</Label>
@@ -109,7 +119,7 @@ const EditCategoryModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditM
                   className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all gap-3 w-[40%]"
                 >
                   <FaCheckCircle className="text-white text-xl" />
-                  Edit Category
+                  Edit Skin Name
                 </Button>
               </div>
             </form>
@@ -120,4 +130,4 @@ const EditCategoryModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditM
   );
 };
 
-export default EditCategoryModal;
+export default EditSkinTypeModal;

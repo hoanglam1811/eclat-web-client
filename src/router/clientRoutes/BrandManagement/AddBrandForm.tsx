@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { z } from "zod";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
@@ -13,6 +13,9 @@ import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
 import { Modal, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { addBrand } from "../../../services/ApiServices/brandService";
+import { RootState } from "../../../store/store";
+import { useSelector } from "react-redux";
 
 
 interface AddBrandModalProps {
@@ -23,6 +26,9 @@ interface AddBrandModalProps {
 
 const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const token = useSelector((state: RootState) => state.token.token);
+
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | undefined>();
   const [fileList, setFileList] = useState<any[]>([]);
@@ -65,22 +71,26 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
     // setIsOpen(false);
   };
 
-  // useEffect(() => {
+  useEffect(() => {
 
-  // }, [isOpen, id, form]);
+  }, [isOpen, id, form]);
 
-  // const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
-  //     try {
-  //         //console.log(values);
-  //         await addCategory(values);
-  //         form.reset();
-  //         //console.log("Service created successfully:", response.data);
-  //         setIsOpen(false);
-  //         fetchCategory();
-  //     } catch (error) {
-  //         console.error("Error creating service:", error);
-  //     }
-  // };
+  const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
+      try {
+          //console.log(values);
+          if(!token){
+              navigate("/login");
+              return;
+          }
+          await addBrand(values, token);
+          form.reset();
+          //console.log("Service created successfully:", response.data);
+          setIsOpen(false);
+          fetchBrand();
+      } catch (error) {
+          console.error("Error creating service:", error);
+      }
+  };
 
   return (
     <AnimatePresence>

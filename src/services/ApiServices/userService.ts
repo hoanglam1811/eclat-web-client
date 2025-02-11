@@ -91,3 +91,45 @@ export async function deleteUser(userId: any) {
     throw error;
   }
 }
+
+export async function forgotPassword(email: any) {
+  try {
+    const response = await axios.post(`${BASE_URL}/users/forgot-password`, null, {
+      params: { email },
+      ...ngrokSkipWarning,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to send forgot password email to ${email}:`, error);
+    throw error;
+  }
+}
+
+// Xác thực OTP
+export async function verifyOtp(email: any, otp: any) {
+  try {
+    const response = await axios.post(`${BASE_URL}/users/verify-otp`, null, {
+      params: { email, otp },
+      ...ngrokSkipWarning,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to verify OTP for email ${email}:`, error);
+    throw error;
+  }
+}
+
+// Đặt lại mật khẩu
+export async function resetPassword(email: any, otp: any, newPassword: any) {
+  try {
+    const response = await axios.post(`${BASE_URL}/users/reset-password`, null, {
+      params: { email, otp, newPassword },
+      ...ngrokSkipWarning,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to reset password for email ${email}:`, error);
+    throw error;
+  }
+}
+

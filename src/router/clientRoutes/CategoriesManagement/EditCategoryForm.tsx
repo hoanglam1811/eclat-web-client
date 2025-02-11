@@ -67,7 +67,7 @@ const EditCategoryModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditM
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
                 <FaPen className="text-sky-500" />
-                Edit Category
+                Edit 
               </h3>
               <button onClick={() => { setIsOpen(false); form.reset() }} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
                 <FaTimes />
@@ -109,7 +109,9 @@ const EditCategoryModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditM
                   className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all gap-3 w-[40%]"
                 >
                   <FaCheckCircle className="text-white text-xl" />
+                  <div className="text-white">
                   Edit Category
+                  </div>
                 </Button>
               </div>
             </form>

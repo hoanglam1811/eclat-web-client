@@ -16,7 +16,7 @@ import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { Input } from "antd";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import { getAllCategories } from "../../../services/ApiServices/categoryServicec";
+import { getAllCategories } from "../../../services/ApiServices/categoryService";
 import { useNavigate } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 5;
@@ -220,10 +220,10 @@ const CategoriesManagement = () => {
     );
 
     return (
-        <div className="bg-gray-100 pt-5 pb-5 px-5">
+        <div className="bg-gray-100 pt-5 pl-5 pb-5 pr-5">
             {/* Header */}
-            <div className="flex justify-between items-center mb-5">
-                <h2 className="text-xl font-bold text-blue-700">CATEGORY MANAGEMENT</h2>
+            <div className="flex justify-between mb-5 mt-1">
+                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>QUẢN LÝ LOẠI SẢN PHẨM</h2>
             </div>
 
             {/* Table or Loading */}

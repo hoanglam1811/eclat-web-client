@@ -3,6 +3,7 @@ const RouteNames = {
   EVENTS: "/events",
   LOGIN: "/login",
   REGISTER: "/register",
+  FORGOT_PASSWORD: "/forgot-password",
   GOOGLE: "/login-google",
   NOT_FOUND: "/not-found",
   DASHBOARD: "/admin/dashboard",

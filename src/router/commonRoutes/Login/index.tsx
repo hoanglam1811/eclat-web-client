@@ -188,6 +188,21 @@ const Login = () => {
                         </Link>
                     </p>
 
+                    <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
+                        <Link
+                            to="/forgot-password"
+                            style={{
+                                color: "#578a3f",
+                                textDecoration: "none",
+                                transition: "color 0.3s ease",
+                            }}
+                            onMouseOver={(e: any) => (e.target.style.color = "#21618c")}
+                            onMouseOut={(e: any) => (e.target.style.color = "#578a3f")}
+                        >
+                            Quên mật khẩu?
+                        </Link>
+                    </p>
+
                     <div
                         style={{
                             position: "absolute",

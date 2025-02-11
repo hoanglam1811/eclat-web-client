@@ -2,6 +2,7 @@ import { RouteObject } from "react-router-dom";
 import RouteNames from "../../constants/routeNames";
 import Login from "./Login";
 import Register from "./Register";
+import ForgotPassword from "./ForgotPassword";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -15,6 +16,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.REGISTER,
     element: <Register />,
+  },
+  {
+    path: RouteNames.FORGOT_PASSWORD,
+    element: <ForgotPassword />,
   },
 ];
 

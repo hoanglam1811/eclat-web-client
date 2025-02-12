@@ -1,20 +1,101 @@
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import { Link } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
-import { KeyOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
+import { EditOutlined, KeyOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
+import { useSelector } from "react-redux";
+import { getUserById, updateUserEmail } from "../../../services/ApiServices/userService";
+import { useEffect, useState } from "react";
+import { RootState } from "../../../store/store";
+import ScreenSpinner from "../../../components/ScreenSpinner";
+import { Button, Form, Input, Modal, notification } from "antd";
+import { CircularProgress } from "@mui/material";
 
 const Account = () => {
+    const users = useSelector((state: RootState) => state.token.user);
+    const token = useSelector((state: any) => state.token.token);
+    const [user, setUser] = useState<any>({
+        username: "",
+        email: "",
+        phone: ""
+    });
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<any>("");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [form] = Form.useForm();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const user = {
-        name: "Lam Nguyen",
-        email: "nguyenhoanglam18112003@gmail.com",
-        phone_number: "0902601297"
+    //console.log(users)
+    const fetchAccount = async () => {
+        try {
+            setIsLoading(true);
+            if (!users) return;
+            const response = await getUserById(users.userId, token);
+            //console.log(response)
+            if (response.code == 0) {
+                setUser(response.result);
+            }
+        }
+        catch (err: any) {
+            setError(err.toString());
+            //console.log(err);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchAccount();
+    }, []);
+
+    const handleOpenModal = () => {
+        form.setFieldsValue({
+            username: user.username,
+            email: user.email,
+            phone: user.phone,
+        });
+        setIsModalOpen(true);
     };
+
+    // Xử lý đóng modal
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
+
+    const handleUpdate = async () => {
+        if (!users) return;
+        try {
+            setIsSubmitting(true);
+            const values = await form.validateFields();
+            const updatedUser = {
+                ...values,
+                update_at: new Date().toISOString().split("T")[0],
+                username: user.username,
+            };
+
+            const response = await updateUserEmail(users.userId, updatedUser, token);
+            console.log(response)
+            if (response.code === 0) {
+                setUser(updatedUser);
+                notification.success({ message: "Cập nhật thông tin thành công!" });
+                setIsModalOpen(false);
+            } else {
+                notification.error(response.message || "Cập nhật thất bại!");
+            }
+        } catch (err: any) {
+            notification.error({ message: "Vui lòng kiểm tra lại thông tin!" });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
 
     return (
         <>
+            {isLoading && <CircularProgress />}
             <section className="bg-gray-100 p-6">
+
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
                         <Breadcrumb className="">
@@ -45,12 +126,13 @@ const Account = () => {
             {/* <div className="flex items-center justify-center max-w-full bg-gray-100"> */}
             <div className="bg-gray-100">
 
+                <div className="text-red-500">{error}</div>
                 {/* Main Content */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 p-6">
                     {/* Sidebar */}
                     <div className="bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-2 col-end-5">
                         <h2 className="text-lg font-bold text-gray-800">Trang Tài Khoản</h2>
-                        <h2 className="text-md font-semibold text-gray-800 mb-4">Xin chào,<span className="text-blue-600"> {user.name}!</span></h2>
+                        <h2 className="text-md font-semibold text-gray-800 mb-4">Xin chào,<span className="text-blue-600"> {user.username}!</span></h2>
                         <ul className="space-y-4 mt-10">
                             <li>
                                 <Link
@@ -84,25 +166,58 @@ const Account = () => {
 
                     {/* Profile Details */}
                     <section className=" bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-5 col-end-12">
-                        <h2 className="text-lg font-bold text-gray-800 mb-6">Thông Tin Tài Khoản</h2>
-                        <div className="space-y-6">
+                        <div className="flex justify-center items-center gap-2">
+                            <h2 className="text-lg font-bold text-gray-800">Thông Tin Tài Khoản</h2>
+                            <EditOutlined
+                                className="text-blue-500 cursor-pointer text-xl hover:text-blue-700 transition"
+                                onClick={handleOpenModal}
+                            />
+                        </div>
+
+                        <div className="space-y-6 mt-3">
                             {/* Name */}
                             <div className="flex justify-between items-center border-b pb-4">
-                                <span className="text-black font-bold">Họ tên:</span>
-                                <span className="font-medium text-black">{user.name}</span>
+                                <span className="text-black font-bold">Tên người dùng:</span>
+                                <span className="font-medium text-black">{user.username}</span>
                             </div>
 
                             {/* Email */}
                             <div className="flex justify-between items-center border-b pb-4">
                                 <span className="text-black font-bold">Email:</span>
-                                <span className="font-medium text-black">{user.email}</span>
+                                <span className="font-medium text-black">{user.email || "N/a"}</span>
                             </div>
 
                             <div className="flex justify-between items-center">
                                 <span className="text-black font-bold">Số điện thoại:</span>
-                                <span className="font-medium text-black">{user.phone_number || "N/a"}</span>
+                                <span className="font-medium text-black">{user.phone || "N/a"}</span>
                             </div>
                         </div>
+
+                        <Modal
+                            title="Chỉnh sửa thông tin cá nhân"
+                            open={isModalOpen}
+                            onCancel={handleCancel}
+                            footer={[
+                                <Button key="cancel" onClick={handleCancel}>
+                                    Hủy
+                                </Button>,
+                                <Button key="submit" type="primary" loading={isSubmitting} onClick={handleUpdate}>
+                                    Lưu thay đổi
+                                </Button>,
+                            ]}
+                        >
+                            <Form form={form} layout="vertical">
+                                <Form.Item name="email" label="Email" rules={[{ required: true, message: "Vui lòng nhập email!" }]}>
+                                    <Input />
+                                </Form.Item>
+                                <Form.Item name="phone" label="Số điện thoại" rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}>
+                                    <Input />
+                                </Form.Item>
+                            </Form>
+                            <div className="flex justify-between items-center border-b pb-4">
+                                <span className="text-orange-500 font-medium">Khi bạn muốn thay đổi đồng nghĩa với việc bạn sẽ phải xác thực email thêm 1 lần nữa, nếu đồng ý hãy bấm "Lưu thay đổi"</span>
+                            </div>
+                        </Modal>
                     </section>
                 </div>
             </div>

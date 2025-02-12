@@ -5,15 +5,13 @@ import { RootState } from "../../store/store";
 import LogoImage from "@/assets/Éclat.png";
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
-import { ShoppingCartOutlined, UserOutlined } from '@ant-design/icons';
+import { LoginOutlined, ShoppingCartOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
 import { useState } from "react";
 import { removeToken, removeUser } from "../../reducers/tokenSlice";
 import RoleNames from "../../constants/roleNames";
 import { CgProfile } from "react-icons/cg";
 import { AlertDialog, AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 import { LogOut } from "lucide-react";
-
-
 
 const Header = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -56,7 +54,7 @@ const Header = () => {
     //   }
     // }
   };
-
+  console.log(user)
   return (
     <header
       style={{
@@ -72,6 +70,7 @@ const Header = () => {
         src={LogoImage}
         alt="Éclat Skincare Logo"
         style={{ height: "80px" }}
+        onClick={() => navigate("/")}
       />
       <nav>
         <ul
@@ -87,66 +86,38 @@ const Header = () => {
             fontFamily: "Montserrat, sans-serif",
           }}
         >
-          <li
-            className="mr-5"
-            style={{ position: "relative", cursor: "pointer" }}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link>
-            {isDropdownVisible && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "100%",
-                  left: "-500%",
-                  backgroundColor: "#fff",
-                  boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.2)",
-                  padding: "15px",
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: "30px",
-                  zIndex: 1,
-                  borderRadius: "8px",
-                  minWidth: "300px",
-                  fontSize: "14px",
-                }}
+
+          {user?.role !== RoleNames.STAFF && (
+            <>
+              <li
+                className="mr-5"
+                style={{ position: "relative", cursor: "pointer" }}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
-                {categories.map((category) => (
-                  <div key={category.name} style={{ minWidth: "120px" }}>
-                    <strong style={{ display: "block", marginBottom: "10px", fontSize: "14px" }}>
-                      {category.name}
-                    </strong>
-                    <ul style={{ paddingLeft: "10px", margin: 0, fontSize: "12px" }}>
-                      {category.items.map((item) => (
-                        <li key={item} style={{ marginBottom: "5px" }}>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            )}
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.SPECIAL_CARE}>{navigation.SPECIAL_CARE}</Link>
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.BRANDS}> {navigation.BRANDS}</Link>
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.BEAUTY_BLOG}>{navigation.BEAUTY_BLOG}</Link>
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.SKIN_QUIZ}>{navigation.SKIN_QUIZ}</Link>
-          </li>
-          <li className="mr-5">
-            <Link to={RouteNames.CART} className="flex items-center text-gray-700 hover:text-blue-600 transition">
-              <ShoppingCartOutlined style={{ fontSize: "22px" }} className="mr-2" />
-            </Link>
-          </li>
-          <li className="mr-5">
+                <Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link>
+              </li>
+              <li><Link to={RouteNames.SPECIAL_CARE}>{navigation.SPECIAL_CARE}</Link></li>
+              <li><Link to={RouteNames.BRANDS}>{navigation.BRANDS}</Link></li>
+              <li><Link to={RouteNames.BEAUTY_BLOG}>{navigation.BEAUTY_BLOG}</Link></li>
+              <li><Link to={RouteNames.SKIN_QUIZ}>{navigation.SKIN_QUIZ}</Link></li>
+              <li>
+                <Link to={RouteNames.CART} className="flex items-center text-gray-700 hover:text-blue-600 transition">
+                  <ShoppingCartOutlined style={{ fontSize: "22px" }} className="mr-2" />
+                </Link>
+              </li>
+            </>
+          )}
+          {user?.role === RoleNames.STAFF && (
+            <>
+              <li><Link to={RouteNames.PRODUCTS_MANAGEMENT}>{navigation.PRODUCTS_MANAGEMENT}</Link></li>
+              <li><Link to={RouteNames.TAGS_MANAGEMENT}>{navigation.TAGS_MANAGEMENT}</Link></li>
+              <li><Link to={RouteNames.CATEGORIES_MANAGEMENT}>{navigation.CATEGORIES_MANAGEMENT}</Link></li>
+              <li><Link to={RouteNames.BRANDS_MANAGEMENT}>{navigation.BRANDS_MANAGEMENT}</Link></li>
+              <li><Link to={RouteNames.SKIN_TYPES_MANAGEMENT}>{navigation.SKIN_TYPES_MANAGEMENT}</Link></li>
+            </>
+          )}
+          {user && <li className="mr-5">
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <UserOutlined style={{ fontSize: "22px" }} />
@@ -154,32 +125,41 @@ const Header = () => {
 
               <DropdownMenuContent className="bg-white shadow-lg rounded-xl w-48 p-3 z-99">
                 <DropdownMenuLabel className="font-semibold text-lg text-gray-700">
-                  Account
+                  Tài khoản
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
 
                 {/* Profile */}
                 <DropdownMenuItem
                   onClick={handleProfileClick}
-                  className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="flex items-center p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
                 >
                   <CgProfile className="mr-3 text-xl text-gray-600" />
-                  <span className="text-gray-700">Profile</span>
+                  <span className="text-gray-700">Hồ sơ</span>
                 </DropdownMenuItem>
 
                 {/* Log out */}
                 <AlertDialog>
                   {/* Wrap DropdownMenuItem with AlertDialogTrigger */}
                   <AlertDialogTrigger onClick={handleLogout} asChild>
-                    <div className="flex items-center p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors">
+                    <div className="flex items-center p-2 text-red-500 hover:bg-red-100 rounded-lg transition-colors cursor-pointer">
                       <LogOut className="mr-3 text-xl" />
-                      <span>Log out</span>
+                      <span>Đăng xuất</span>
                     </div>
                   </AlertDialogTrigger>
                 </AlertDialog>
               </DropdownMenuContent>
             </DropdownMenu>
-          </li>
+          </li>}
+          {!user && <li className="mr-5 flex gap-3">
+            <Link to={RouteNames.LOGIN} className="flex items-center text-gray-700 hover:text-blue-600 transition">
+              <span className="text-gray-700">Đăng nhập</span>
+            </Link>
+            <span className="text-gray-700">|</span>
+            <Link to={RouteNames.REGISTER} className="flex items-center text-gray-700 hover:text-blue-600 transition">
+              <span className="text-gray-700">Đăng ký</span>
+            </Link>
+          </li>}
         </ul>
       </nav>
     </header>

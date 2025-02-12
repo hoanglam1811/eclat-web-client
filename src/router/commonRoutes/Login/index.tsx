@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import LoginImage from "../../../assets/Login.png";
 import LoginnImage from "../../../assets/Loginn.png";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../../../services/ApiServices/authenticationService';
+import { notification } from 'antd';
+import { useDispatch } from 'react-redux';
+import { setToken, setUser } from '../../../reducers/tokenSlice';
+import parseJwt from '../../../services/parseJwt';
+import RouteNames from '../../../constants/routeNames';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
 const Login = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const images = [LoginImage, LoginnImage];
+    const navigate = useNavigate();
+
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState("");
+    const dispatch = useDispatch();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -14,8 +31,56 @@ const Login = () => {
         return () => clearInterval(interval);
     }, []);
 
+    const handleLoginSubmit = async () => {
+        setIsLoading(true);
+        setError("");
+        try {
+            const user = await login(username, password);
+            setIsLoading(false);
+            dispatch(setToken(user.result.token));
+            const userInfo = parseJwt(user.result.token);
+            dispatch(setUser(userInfo));
+            notification.success({ message: "Đăng nhập thành công!" });
+
+            if (userInfo.role.toUpperCase() == "ADMIN") {
+                navigate("/admin/dashboard");
+            } else if (userInfo.role.toUpperCase() == "STAFF") {
+                navigate("/staff/products-management")
+            }
+            else {
+                navigate("/");
+            }
+
+        } catch (error: any) {
+            setIsLoading(false);
+            if (error.response?.data?.message) {
+                if (error.response.data.message === "Email not found") {
+                    notification.error({ message: "Email không tồn tại!" });
+                } else if (error.response.data.message === "Wrong password") {
+                    notification.error({ message: "Sai mật khẩu!" });
+                } else if (error.response.data.message === "User Not Existed") {
+                    notification.error({ message: "Người dùng không tồn tại!" });
+                } else if (error.response.data.message === "Email is not verified") {
+                    notification.error({ message: "Email chưa được xác thực!" });
+                }
+                else {
+                    notification.error({ message: "Có lỗi xảy ra. Vui lòng thử lại sau!" });
+                }
+            } else {
+                setError("Lỗi kết nối! Hãy kiểm tra lại đường truyền.");
+            }
+        }
+    };
+
     return (
         <div style={{ display: "flex", height: "100vh" }}>
+            <Link
+                to={RouteNames.HOME}
+                className="absolute top-[20px] left-[20px] bg-white/30 backdrop-blur-md text-black font-semibold px-4 py-2 rounded-lg border border-white/50 hover:bg-white/40"
+            >
+                <ArrowLeftOutlined className="mr-2" />
+                Trở về trang chủ
+            </Link>
             <div
                 style={{
                     width: "70%",
@@ -31,6 +96,7 @@ const Login = () => {
             <div
                 style={{
                     width: "30%",
+                    minWidth: "500px",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
@@ -53,36 +119,50 @@ const Login = () => {
                         CHÀO MỪNG ĐẾN VỚI ÉCLAT
                     </h2>
 
-                    <input
-                        type="email"
-                        placeholder="Nhập email"
-                        style={{
-                            width: "80%",
-                            padding: "12px 20px",
-                            marginBottom: "20px",
-                            borderRadius: "10px",
-                            border: "1px solid #ddd",
-                            fontSize: "16px",
-                            transition: "all 0.3s",
-                        }}
-                        onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
-                        onBlur={(e) => (e.target.style.borderColor = "#ddd")}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Nhập mật khẩu"
-                        style={{
-                            width: "80%",
-                            padding: "12px 20px",
-                            marginBottom: "20px",
-                            borderRadius: "10px",
-                            border: "1px solid #ddd",
-                            fontSize: "16px",
-                            transition: "all 0.3s",
-                        }}
-                        onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
-                        onBlur={(e) => (e.target.style.borderColor = "#ddd")}
-                    />
+                    <div className="space-y-2 text-left ml-13">
+                        <input
+                            type="email"
+                            placeholder="Nhập tên người dùng"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            style={{
+                                width: "80%",
+                                padding: "12px 20px",
+                                marginBottom: "20px",
+                                borderRadius: "10px",
+                                border: "1px solid #ddd",
+                                fontSize: "16px",
+                                transition: "all 0.3s",
+                            }}
+                            onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
+                            onBlur={(e) => (e.target.style.borderColor = "#ddd")}
+                        />
+                    </div>
+
+                    <div className="space-y-2 text-left ml-13">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Nhập mật khẩu"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            style={{
+                                width: "80%",
+                                padding: "12px 20px",
+                                marginBottom: "20px",
+                                borderRadius: "10px",
+                                border: "1px solid #ddd",
+                                fontSize: "16px",
+                                transition: "all 0.3s",
+                            }}
+
+                            onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
+                            onBlur={(e) => (e.target.style.borderColor = "#ddd")}
+
+                        />
+                        <button type="button" onClick={togglePasswordVisibility} className="ml-2 text-gray-600">
+                            {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                        </button>
+                    </div>
 
                     <button
                         style={{
@@ -99,10 +179,10 @@ const Login = () => {
                             transition: "background-color 0.3s ease",
                             marginBottom: "15px",
                         }}
-                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#21618c")}
-                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#578a3f")}
+                        onClick={handleLoginSubmit}
+                        disabled={isLoading}
                     >
-                        Đăng nhập
+                        {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                     </button>
 
                     <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
@@ -117,7 +197,22 @@ const Login = () => {
                             onMouseOver={(e: any) => (e.target.style.color = "#21618c")}
                             onMouseOut={(e: any) => (e.target.style.color = "#578a3f")}
                         >
-                            Đăng ký ngay 
+                            Đăng ký ngay
+                        </Link>
+                    </p>
+
+                    <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
+                        <Link
+                            to="/forgot-password"
+                            style={{
+                                color: "#578a3f",
+                                textDecoration: "none",
+                                transition: "color 0.3s ease",
+                            }}
+                            onMouseOver={(e: any) => (e.target.style.color = "#21618c")}
+                            onMouseOut={(e: any) => (e.target.style.color = "#578a3f")}
+                        >
+                            Quên mật khẩu?
                         </Link>
                     </p>
 

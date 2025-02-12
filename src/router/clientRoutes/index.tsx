@@ -1,7 +1,5 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import RouteNames from "../../constants/routeNames";
-import Login from "../commonRoutes/Login/index.tsx";
-import Register from "../commonRoutes/Register/index.tsx";
 import Home from "./Home/index.tsx";
 import ProductDetails from "./ProductDetails/index.tsx";
 import Cart from "./Cart/index.tsx";
@@ -13,6 +11,11 @@ import Payment from "./Payment/index.tsx";
 import CategoriesManagement from "./CategoriesManagement/index.tsx";
 import BrandsManagement from "./BrandManagement/index.tsx";
 import SkinTypesManagement from "./SkinTypeManagement/index.tsx";
+import ProductsManagement from "./ProductsManagement/index.tsx";
+import FormCreateProduct from "./FormAddProduct/index.tsx";
+import FormViewProduct from "./ProductDetailsManagement/index.tsx";
+import Brands from "./Brands/index.tsx";
+import TagsManagement from "./TagManagement/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -54,6 +57,30 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.SKIN_TYPES_MANAGEMENT,
     element: <SkinTypesManagement />,
+  },
+  {
+    path: RouteNames.BRANDS_MANAGEMENT,
+    element: <BrandsManagement />,
+  },
+  {
+    path: RouteNames.PRODUCTS_MANAGEMENT,
+    element: <ProductsManagement />,
+  },
+  {
+    path: RouteNames.PRODUCT_ADDITION,
+    element: <FormCreateProduct />,
+  },
+  {
+    path: RouteNames.PRODUCT_VIEW,
+    element: <FormViewProduct />,
+  },
+  {
+    path: RouteNames.BRANDS,
+    element: <Brands />,
+  },
+  {
+    path: RouteNames.TAGS_MANAGEMENT,
+    element: <TagsManagement />,
   }
 ];
 

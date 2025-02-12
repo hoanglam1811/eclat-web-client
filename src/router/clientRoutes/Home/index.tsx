@@ -10,7 +10,7 @@ import { RootState } from "../../../store/store";
 import { useState } from "react";
 import { removeToken, removeUser } from "../../../reducers/tokenSlice";
 import RoleNames from "../../../constants/roleNames";
-import { Card } from "../../../components/footer/components/Home";
+import { ProductCard } from "../../../components/footer/components/Home";
 import ProductSkeleton from "./ProductSkeleton";
 
 const Home = () => {
@@ -182,7 +182,7 @@ const Home = () => {
                         </p>
                     ) : (
                         products.map((product: any) => (
-                            <Card key={product.id} product={product} />
+                            <ProductCard key={product.id} product={product} />
                         ))
 
                     )}
@@ -192,7 +192,7 @@ const Home = () => {
             <hr className=" mt-10 w-[50%] mx-auto border-t-2 border-[#578a3f]" />
 
             <section className="p-6">
-                <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f]">DANH MỤC SẢN PHẨM</h2>
+                <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f] ">DANH MỤC SẢN PHẨM</h2>
 
                 <div className="flex flex-col md:flex-row gap-3 items-center mt-10">
                     <div className="w-full md:w-1/4 flex justify-center items-center">
@@ -205,7 +205,7 @@ const Home = () => {
 
                     <div className="w-full md:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 -mt-8 md:-mt-12">
                         {products.slice(0, 4).map((product: any) => (
-                            <Card key={product.id} product={product} />
+                            <ProductCard key={product.id} product={product} />
                         ))}
                     </div>
                 </div>

@@ -5,42 +5,49 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { z } from "zod";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
 import { Textarea } from "../../../components/ui/textarea";
-import { Modal, Upload } from "antd";
+import { Modal, notification, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { addBrand } from "../../../services/ApiServices/brandService";
 
 
-interface AddMilestoneModalProps {
+interface AddBrandModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   fetchBrand: () => void;
 }
 
-const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddMilestoneModalProps) => {
+const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) => {
   const { id } = useParams<{ id: string }>();
+
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | undefined>();
   const [fileList, setFileList] = useState<any[]>([]);
+  const token = useSelector((state: RootState) => state.token.token);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
-  const milestoneFormSchema = z.object({
-    name: z.string().min(1, "Please enter a name"),
-    description: z.string().min(1, "Please enter a description"),
-    logo: z.array(
-      z.object({
-        name: z.string(),
-        url: z.string().optional(),
-        thumbUrl: z.string().optional(),
-      })
-    ).min(1, "Please upload a logo"),
+  const brandFormSchema = z.object({
+    brandName: z.string().min(1, "Vui lòng nhập tên"),
+    // logo: z.array(
+    //   z.object({
+    //     name: z.string(),
+    //     url: z.string().optional(),
+    //     thumbUrl: z.string().optional(),
+    //   })
+    // ).min(1, "Please upload a logo"),
+    imgUrl: z.string().url("Vui lòng tải lên logo"),
   });
 
-  const form = useForm<z.infer<typeof milestoneFormSchema>>({
-    resolver: zodResolver(milestoneFormSchema),
+  const form = useForm<z.infer<typeof brandFormSchema>>({
+    resolver: zodResolver(brandFormSchema),
   });
 
   const handleCancel = () => setPreviewVisible(false);
@@ -54,29 +61,50 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddMilestoneModalProps
     setFileList(newFileList);
   };
 
-  const onFinish = (values: any) => {
-    // const brandData = {
-    //   ...values,
-    //   logo: fileList[0]?.originFileObj,
-    // };
-    // console.log("Brand Data Submitted: ", brandData);
-    // form.resetFields();
-    // setFileList([]);
-    // setIsOpen(false);
+  const handleSubmit = async (values: z.infer<typeof brandFormSchema>) => {
+    try {
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+      setLoading(true); // Bắt đầu trạng thái loading
+      await addBrand(values, token);
+      notification.success({
+        message: "Tạo thương hiệu thành công 🎉",
+        description: "Thương hiệu mới đã được thêm vào hệ thống.",
+      });
+
+      form.reset();
+      setIsOpen(false);
+      fetchBrand();
+    } catch (error) {
+      notification.error({
+        message: "Tạo thất bại ❌",
+        description: "Vui lòng thử lại hoặc kiểm tra lại thông tin nhập vào.",
+      });
+      console.error("Error creating brand:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // useEffect(() => {
 
-  // }, [isOpen, id, form]);
+  useEffect(() => {
+
+  }, [isOpen, id, form]);
 
   // const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
   //     try {
   //         //console.log(values);
-  //         await addCategory(values);
+  //         if(!token){
+  //             navigate("/login");
+  //             return;
+  //         }
+  //         await addBrand(values, token);
   //         form.reset();
   //         //console.log("Service created successfully:", response.data);
   //         setIsOpen(false);
-  //         fetchCategory();
+  //         fetchBrand();
   //     } catch (error) {
   //         console.error("Error creating service:", error);
   //     }
@@ -112,48 +140,30 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddMilestoneModalProps
 
             {/* Form */}
             <form
-              onSubmit={form.handleSubmit(onFinish)}
+              onSubmit={form.handleSubmit(handleSubmit)}
               className="flex flex-col gap-6"
             >
               {/* Name Field */}
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Name</Label>
+                <Label className="mb-3 text-left">Tên</Label>
                 <div className="relative">
                   <Input
-                    {...form.register("name")}
-                    placeholder="Enter brand name"
+                    {...form.register("brandName")}
+                    placeholder="Nhập tên"
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
                   <FaPen className="absolute left-3 top-3 text-gray-500" />
                 </div>
-                {form.formState.errors.name && (
+                {form.formState.errors.brandName && (
                   <p className="text-red-500 text-sm">
-                    {form.formState.errors.name.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Description Field */}
-              <div className="flex flex-col">
-                <Label className="mb-3 text-left">Description</Label>
-                <div className="relative">
-                  <Textarea
-                    {...form.register("description")}
-                    placeholder="Enter brand description"
-                    className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                  />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
-                </div>
-                {form.formState.errors.description && (
-                  <p className="text-red-500 text-sm">
-                    {form.formState.errors.description.message}
+                    {form.formState.errors.brandName.message}
                   </p>
                 )}
               </div>
 
               {/* Logo Upload Field */}
-              <div className="flex flex-col">
+              {/* <div className="flex flex-col">
                 <Label className="mb-3 text-left">Logo</Label>
                 <Upload
                   accept="image/*"
@@ -175,26 +185,58 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddMilestoneModalProps
                     {form.formState.errors.logo.message}
                   </p>
                 )}
+              </div> */}
+
+              <div className="flex flex-col">
+                <Label className="mb-3 text-left">Logo URL</Label>
+                <Input
+                  {...form.register("imgUrl")}
+                  placeholder="Enter image URL"
+                  type="url"
+                  className="p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                />
+                {form.formState.errors.imgUrl && (
+                  <p className="text-red-500 text-sm">
+                    {form.formState.errors.imgUrl.message}
+                  </p>
+                )}
               </div>
 
               {/* Preview Modal */}
-              <Modal
+              {/* <Modal
                 visible={previewVisible}
                 footer={null}
                 onCancel={handleCancel}
                 className="rounded-lg"
               >
                 <img alt="Preview" style={{ width: "100%" }} src={previewImage} />
-              </Modal>
+              </Modal> */}
+              {form.watch("imgUrl") && (
+                <div className="mt-4">
+                  <Label className="text-left">Xem trước</Label>
+                  <img
+                    src={form.watch("imgUrl")}
+                    alt="Logo Preview"
+                    className="w-full h-40 object-cover border rounded-md mt-2"
+                  />
+                </div>
+              )}
 
               {/* Submit Button */}
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all gap-3 w-[40%]"
+                  disabled={loading}
+                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all flex items-center gap-3 w-[40%]"
                 >
-                  <FaCheckCircle className="text-white text-xl" />
-                  Add Brand
+                  {loading ? (
+                    <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                  ) : (
+                    <FaCheckCircle className="text-white text-xl" />
+                  )}
+                  <div className="text-white">
+                    {loading ? "Đang tạo.." : "Tạo"}
+                  </div>
                 </Button>
               </div>
             </form>

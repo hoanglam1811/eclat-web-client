@@ -1,10 +1,42 @@
 import { Navigate, RouteObject } from "react-router-dom";
+import RouteNames from "../../constants/routeNames";
+import Billing from "./Billing";
+import Home from "./Home";
+import Profile from "./Profile";
+import Rtl from "./Rtl";
+import SignIn from "./SignIn";
+import SignUp from "./SignUp";
+import Tables from "./Tables";
 
 const publicRoutes: RouteObject[] = [
   {
-    // path: RouteNames.HOME,
-    // element: <Home />,
+    path: RouteNames.BILLING,
+    element: <Billing/>,
   },
+  {
+    path: RouteNames.ADMIN_HOME,
+    element: <Home />,
+  },
+  {
+    path: RouteNames.ADMIN_PROFILE,
+    element: <Profile/>,
+  },
+  {
+    path: RouteNames.ADMIN_RTL,
+    element: <Rtl />,
+  },
+  {
+    path: RouteNames.ADMIN_SIGNIN,
+    element: <SignIn />,
+  },
+  {
+    path: RouteNames.ADMIN_SIGNUP,
+    element: <SignUp />,
+  },
+  {
+    path: RouteNames.ADMIN_TABLES,
+    element: <Tables />,
+  }
 ];
 
 const privateRoutes: RouteObject[] = [
@@ -16,8 +48,8 @@ const privateRoutes: RouteObject[] = [
 
 const adminRoutes: RouteObject[] = [
   {
-    // path: "/",
-    // element: <Navigate to={RouteNames.HOME} replace />,
+     path: "/admin",
+     element: <Navigate to={RouteNames.ADMIN_HOME} replace />,
   },
   ...publicRoutes,
 ];

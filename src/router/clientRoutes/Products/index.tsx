@@ -3,7 +3,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../compon
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import ProductSkeleton from "./ProductSkeleton";
-import { Card } from "../../../components/footer/components/Home";
+import { ProductCard } from "../../../components/footer/components/Home";
 import { Select, Slider } from "antd";
 import { Carousel } from 'antd';
 
@@ -395,7 +395,7 @@ const Products = () => {
                                 </p>
                             ) : (
                                 paginatedmProducts.map((product: any) => (
-                                    <Card key={product.id} product={product} />
+                                    <ProductCard key={product.id} product={product} />
                                 ))
                             )}
 

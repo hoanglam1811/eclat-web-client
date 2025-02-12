@@ -8,23 +8,19 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import Select from "react-select";
 import { Textarea } from "../../../components/ui/textarea";
-import { Button, Carousel } from "antd";
+import { Button, Carousel, notification } from "antd";
 import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, UploadOutlined } from "@ant-design/icons";
+import { verifyOtp } from "../../../services/ApiServices/userService";
 
 
 const schema = z.object({
-  imageUrl: z.string().optional(),
+  otp: z
+    .string()
+    .min(6, { message: "Mã OTP phải có 6 ký tự." })
+    .max(6, { message: "Mã OTP phải có 6 ký tự." }),
 });
 
-const VerifyOtpStep = ({
-  formData,
-  onSave,
-}: {
-  formData: any;
-  onSave: (data: any) => void;
-  onBack: (data: any) => void;
-}) => {
-
+const VerifyOtpStep = ({ formData, setStep, }: { formData: any; setStep: (step: number) => void; onBack: (data: any) => void; }) => {
   const {
     register,
     formState: { errors },
@@ -36,142 +32,69 @@ const VerifyOtpStep = ({
     defaultValues: formData,
   });
 
-  const handleNext = async () => {
+  const handleVerifyOtp = async () => {
     const isValid = await trigger();
-    if (!isValid) {
-      console.error("Validation failed", errors);
-      return;
+    if (!isValid) return;
+
+    try {
+      const otp = getValues("otp");
+      const email = formData.email; // Lấy email từ formData (hoặc state nếu có)
+
+      if (!email || !otp) {
+        notification.error({ message: "Thiếu email hoặc mã OTP." });
+        return;
+      }
+      await verifyOtp(email, otp);
+
+      notification.success({ message: "Xác thực thành công!" });
+      setStep(3);
+    } catch (error: any) {
+      notification.error({
+        message: "Xác thực thất bại",
+        description: error.response?.data?.message || "Mã OTP không hợp lệ.",
+      });
     }
-    const data = getValues();
-    console.log("Form data: ", data);
-    onSave(data);
   };
 
   return (
     <>
       <div>
         <div>
-          <form className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-6xl mx-auto">
-            {/* Tiêu đề */}
-            <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
-              Xác thực OTP
-            </h2>
+          <form className="bg-gray-50 p-10 rounded-2xl shadow-xl max-w-lg mx-auto space-y-6">
+            <div className="space-y-6 overflow-y-auto max-h-[270px]">
+              <h3 className="flex items-center justify-between mb-4">
+                <span className="text-xl font-semibold text-gray-700 flex items-center gap-2">
+                  Nhập mã OTP
+                  <span className="text-red-500 text-sm font-medium">(*)</span>
+                </span>
+              </h3>
 
-            <div className="grid grid-cols-4 gap-6">
-
-
-              {/* Phần thông tin sản phẩm (chiếm 3 cột) */}
-              <div className="col-span-3 space-y-8">
-                {/* Thông tin cơ bản */}
-                <div className="grid grid-cols-3 gap-6">
-                  {/* Tên sản phẩm */}
-                  <div className="col-span-2">
-                    <Label htmlFor="scholarshipName" className="block text-sm font-medium text-gray-700 text-left">
-                      Tên sản phẩm <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      {...register("scholarshipName")}
-                      placeholder="Nhập tên sản phẩm"
-                      className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              <div className="flex justify-center">
+                <div className="space-y-1 w-3/4">
+                  <div className="flex items-center border p-3 rounded-md border-gray-400">
+                    <input
+                      {...register("otp")}
+                      placeholder="Nhập mã OTP"
+                      className="w-full text-gray-800 p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
                     />
-                    {errors.scholarshipName?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipName?.message)}</p>
-                    )}
                   </div>
-                  <div>
-                    <Label htmlFor="educationalLevel" className="block text-sm font-medium text-gray-700 text-left">
-                      Nguồn gốc xuất xứ <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      isSearchable
-                      placeholder="Chọn nguồn gốc xuất xứ"
-                      className="mt-1"
-                    />
-                    {errors.educationalLevel?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Các thông tin khác */}
-                <div className="grid grid-cols-3 gap-6">
-                  <div className="col-span-1">
-                    <Label htmlFor="educationalLevel" className="block text-sm font-medium text-gray-700 text-left">
-                      Loại da <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      isSearchable
-                      placeholder="Chọn loại da"
-                      className="mt-1"
-                    />
-                    {errors.educationalLevel?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
-                    )}
-                  </div>
-                  <div className="col-span-1">
-                    <Label htmlFor="category" className="block text-sm font-medium text-gray-700 text-left">
-                      Thương hiệu <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      isSearchable
-                      placeholder="Chọn thương hiệu"
-                      className="mt-1"
-                    />
-                    {errors.deadline?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.deadline?.message)}</p>
-                    )}
-                  </div>
-                  <div className="col-span-1">
-                    <Label htmlFor="productType" className="block text-sm font-medium text-gray-700 text-left">
-                      Loại sản phẩm <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      isSearchable
-                      placeholder="Chọn loại sản phẩm"
-                      className="mt-1"
-                    />
-                    {errors.scholarshipType?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Mô tả sản phẩm */}
-                <div className="mt-6">
-                  <Label htmlFor="description" className="block text-sm font-medium text-gray-700 text-left">
-                    Mô tả sản phẩm <span className="text-red-500">*</span>
-                  </Label>
-                  <Textarea
-                    {...register("description")}
-                    rows={4}
-                    placeholder="Nhập mô tả sản phẩm"
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  {errors.description?.message && (
-                    <p className="text-sm text-red-500 mt-1">{String(errors.description.message)}</p>
-                  )}
-                </div>
-                <div className="mt-6">
-                  <Label htmlFor="usageInstructions" className="block text-sm font-medium text-gray-700 text-left">
-                    Hướng dẫn sử dụng <span className="text-red-500">*</span>
-                  </Label>
-                  <Textarea
-                    {...register("usageInstructions")}
-                    rows={4}
-                    placeholder="Nhập hướng dẫn sử dụng"
-                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  {errors.usageInstructions?.message && (
-                    <p className="text-sm text-red-500 mt-1">{String(errors.usageInstructions.message)}</p>
-                  )}
+                  {errors.otp && <p className="text-red-500 text-sm">{String(errors.otp.message)}</p>}
                 </div>
               </div>
             </div>
 
-            {/* Submit */}
-            <div className="flex justify-end mt-6">
-              <Button onClick={handleNext} className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-                Tiếp theo
+            <div className="flex justify-between">
+              <Button
+                className="bg-gray-500 text-white p-2 rounded"
+                onClick={() => setStep(1)}
+              >
+                Quay lại
+              </Button>
+              <Button
+                className="bg-blue-600 text-white p-2 rounded"
+                onClick={handleVerifyOtp}
+              >
+                Xác nhận OTP
               </Button>
             </div>
           </form>

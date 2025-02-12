@@ -19,7 +19,7 @@ const schema = z.object({
     .email("Email không hợp lệ."),
 });
 
-const EnterEmailStep = ({ formData, onSave, }: { formData: any; onSave: (data: any) => void; }) => {
+const EnterEmailStep = ({ formData, setStep }: { formData: any; setStep: (step: number) => void; }) => {
   const {
     formState: { errors }, getValues, register,
   } = useForm({
@@ -38,6 +38,7 @@ const EnterEmailStep = ({ formData, onSave, }: { formData: any; onSave: (data: a
     try {
       await forgotPassword(email);
       notification.success({ message: "Mã OTP đã được gửi đến email của bạn." });
+      setStep(2);
     } catch (error: any) {
       notification.error({
         message: "Gửi OTP thất bại",
@@ -50,7 +51,7 @@ const EnterEmailStep = ({ formData, onSave, }: { formData: any; onSave: (data: a
     <>
       <div>
         <div>
-          <form className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-5xl mx-auto space-y-10">
+          <form className="bg-gray-50 p-10 rounded-2xl shadow-xl max-w-lg mx-auto space-y-6">
             <div className="space-y-6 overflow-y-auto max-h-[270px]">
               <h3 className="flex items-center justify-between mb-4">
                 <span className="text-xl font-semibold text-gray-700 flex items-center gap-2">

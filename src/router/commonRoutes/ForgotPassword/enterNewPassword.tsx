@@ -1,34 +1,124 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux"; import axios from "axios";
 import { useEffect, useState } from "react";
 import { BASE_URL } from "../../../constants/api";
 import { Button } from "antd/lib";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { notification } from "antd";
+import { resetPassword } from "../../../services/ApiServices/userService";
+import { AiOutlineLock, AiOutlineCheckCircle } from "react-icons/ai";
 
-const EnterNewPasswordStep = ({ formData }: { formData: any }) => {
-  const user = useSelector((state: any) => state.token.user);
+const schema = z.object({
+  password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự." }),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Mật khẩu xác nhận không khớp.",
+  path: ["confirmPassword"],
+});
+
+const EnterNewPasswordStep = ({
+  formData,
+  setStep,
+}: {
+  formData: any;
+  setStep: (step: number) => void;
+}) => {
+  const {
+    register,
+    formState: { errors },
+    trigger,
+    getValues,
+  } = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      ...formData,
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async () => {
+    const isValid = await trigger();
+    if (!isValid) return;
+
+    try {
+      setLoading(true);
+      const { password } = getValues();
+      const email = formData.email;
+      const otp = formData.otp;
+
+      if (!email || !otp) {
+        notification.error({ message: "Thiếu email hoặc mã OTP." });
+        return;
+      }
+      await resetPassword(email, otp, password);
+      notification.success({ message: "Mật khẩu đã được cập nhật thành công!" });
+      navigate("/");
+    } catch (error: any) {
+      notification.error({
+        message: "Cập nhật mật khẩu thất bại",
+        description: error.response?.data?.message || "Hãy thử lại.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-      <div>
-        <div>
-          <form className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-6xl mx-auto">
-            {/* Tiêu đề */}
-            <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
-              Nhập mật khẩu mới
-            </h2>
+    <form className="bg-white p-10 rounded-2xl shadow-xl max-w-lg mx-auto space-y-6">
+      <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
+        <AiOutlineLock className="text-blue-600 text-3xl" />
+        Đặt mật khẩu mới
+      </h3>
 
-            {/* Submit */}
-            <div className="flex justify-end mt-6">
-              <Button
-                //onClick={handleNext} 
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-                Tiếp theo
-              </Button>
-            </div>
-          </form>
+      {/* Nhập mật khẩu */}
+      <div className="space-y-2 text-left">
+        <div className="flex items-center border p-3 rounded-xl border-gray-300 bg-gray-100">
+          <input
+            type="password"
+            {...register("password")}
+            placeholder="Nhập mật khẩu mới"
+            className="w-full bg-transparent text-gray-800 focus:outline-none"
+          />
         </div>
+        {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
       </div>
-    </>
+
+      {/* Nhập lại mật khẩu */}
+      <div className="space-y-2 text-left">
+        <div className="flex items-center border p-3 rounded-xl border-gray-300 bg-gray-100">
+          <input
+            type="password"
+            {...register("confirmPassword")}
+            placeholder="Xác nhận mật khẩu"
+            className="w-full bg-transparent text-gray-800 focus:outline-none"
+          />
+        </div>
+        {errors.confirmPassword && <p className="text-red-500 text-sm">{String(errors.confirmPassword.message)}</p>}
+      </div>
+
+      {/* Nút "Cập nhật mật khẩu" */}
+      <div className="flex justify-between mt-6">
+        <Button
+          className="bg-gray-500 text-white py-2 px-5 rounded-xl transition-all hover:bg-gray-600"
+          onClick={() => setStep(2)}
+        >
+          Quay lại
+        </Button>
+        <Button
+          className="flex items-center gap-2 bg-blue-600 text-white py-2 px-5 rounded-xl transition-all hover:bg-blue-700"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading ? "Đang xử lý..." : "Cập nhật mật khẩu"}
+        </Button>
+      </div>
+    </form>
   );
 };
 

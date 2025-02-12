@@ -1,15 +1,8 @@
-import Select, { MultiValue } from "react-select";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FaPlus, FaTrash } from "react-icons/fa";
-import { BASE_URL } from "../../../constants/api";
-import { Label } from "../../../components/ui/label";
 import { Button, notification } from "antd";
-import { Input } from "../../../components/ui/input";
-import { DeleteOutlined } from "@ant-design/icons";
 import { forgotPassword } from "../../../services/ApiServices/userService";
 
 const schema = z.object({
@@ -19,7 +12,7 @@ const schema = z.object({
     .email("Email không hợp lệ."),
 });
 
-const EnterEmailStep = ({ formData, setStep }: { formData: any; setStep: (step: number) => void; }) => {
+const EnterEmailStep = ({ formData, setStep, onSave, }: { formData: any; setStep: (step: number) => void; onSave: (data: any) => void; }) => {
   const {
     formState: { errors }, getValues, register,
   } = useForm({
@@ -29,21 +22,25 @@ const EnterEmailStep = ({ formData, setStep }: { formData: any; setStep: (step: 
       email: formData.email || "",
     },
   });
-  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSendOtp = async () => {
     const email = getValues("email");
     if (!email) return notification.error({ message: "Vui lòng nhập email hợp lệ" });
-
+    console.log(formData)
+    setLoading(true);
     try {
+      notification.success({ message: "Mã OTP đang được gửi đến email của bạn. Vui lòng đợi giây lát" });
       await forgotPassword(email);
-      notification.success({ message: "Mã OTP đã được gửi đến email của bạn." });
+      onSave({ ...formData, email });
       setStep(2);
     } catch (error: any) {
       notification.error({
         message: "Gửi OTP thất bại",
         description: error.response?.data?.message || "Hãy thử lại",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,9 +70,9 @@ const EnterEmailStep = ({ formData, setStep }: { formData: any; setStep: (step: 
                   </div>
                   {errors.email && <p className="text-red-500 text-sm">{String(errors.email.message)}</p>}
                 </div>
-                <button type="button" className="bg-blue-600 text-white p-2 rounded ml-5" onClick={handleSendOtp}>
-                  Gửi OTP
-                </button>
+                <Button className="bg-blue-600 text-white p-2 rounded ml-5 mt-3" onClick={handleSendOtp} disabled={loading}>
+                  {loading ? "Đang xử lý.." : "Gửi OTP"}
+                </Button>
               </div>
             </div>
           </form>

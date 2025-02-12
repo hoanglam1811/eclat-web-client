@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { z } from "zod";
@@ -14,23 +14,24 @@ import { Textarea } from "../../../components/ui/textarea";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { addSkinType } from "../../../services/ApiServices/skinTypeService";
+import { notification } from "antd";
 
 
-interface AddMilestoneModalProps {
+interface AddSkinTypeModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   fetchCategory: () => void;
 }
 
-const AddSkinTypeModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModalProps) => {
+const AddSkinTypeModal = ({ isOpen, setIsOpen, fetchCategory }: AddSkinTypeModalProps) => {
   const { id } = useParams<{ id: string }>();
-  const token = useSelector((state:RootState) => state.token.token)
-
+  const token = useSelector((state: RootState) => state.token.token)
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const milestoneFormSchema = z.object({
-    skinName: z.string().min(1, "Please enter a skin name"),
-    description: z.string().min(1, "Please enter a description"),
+    skinName: z.string().min(1, "Vui lòng nhập tên loại da"),
+    description: z.string().min(1, "Vui lòng nhập mô tả"),
   });
 
   const form = useForm<z.infer<typeof milestoneFormSchema>>({
@@ -42,20 +43,23 @@ const AddSkinTypeModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
   }, [isOpen, id, form]);
 
   const handleSubmit = async (values: z.infer<typeof milestoneFormSchema>) => {
-      try {
-          //console.log(values);
-          if(!token) {
-            navigate("/login");
-            return;
-          }
-          await addSkinType(values, token);
-          form.reset();
-          //console.log("Service created successfully:", response.data);
-          setIsOpen(false);
-          fetchCategory();
-      } catch (error) {
-          console.error("Error creating service:", error);
+    try {
+      if (!token) {
+        navigate("/login");
+        return;
       }
+      setLoading(true);
+      await addSkinType(values, token);
+      form.reset();
+      setIsOpen(false);
+      notification.success({ message: "Thêm loại da thành công! 🎉" });
+      fetchCategory();
+    } catch (error) {
+      console.error("Error creating skin type:", error);
+      notification.error({ message: "Thêm loại da thất bại! ❌" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,7 +76,7 @@ const AddSkinTypeModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
                 <FaPen className="text-sky-500" />
-                {"Add New Skin Type"}
+                {"Thêm loại da mới"}
               </h3>
               <button onClick={() => { setIsOpen(false); form.reset() }} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
                 <FaTimes />
@@ -80,14 +84,14 @@ const AddSkinTypeModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
             </div>
 
             <form
-              onSubmit={form.handleSubmit(handleSubmit)} 
+              onSubmit={form.handleSubmit(handleSubmit)}
               className="flex flex-col gap-6">
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Skin Name</Label>
+                <Label className="mb-3 text-left">Tên loại da</Label>
                 <div className="relative">
                   <Input
                     {...form.register("skinName")}
-                    placeholder="Skin Name"
+                    placeholder="Nhập tên loại da"
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
@@ -96,11 +100,11 @@ const AddSkinTypeModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
                 {form.formState.errors.skinName && <p className="text-red-500 text-sm">{form.formState.errors.skinName.message}</p>}
               </div>
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Description</Label>
+                <Label className="mb-3 text-left">Mô tả</Label>
                 <div className="relative">
                   <Textarea
                     {...form.register("description")}
-                    placeholder="Description"
+                    placeholder="Nhập mô tả"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
                   <FaPen className="absolute left-3 top-3 text-gray-500" />
@@ -111,10 +115,17 @@ const AddSkinTypeModal = ({ isOpen, setIsOpen, fetchCategory }: AddMilestoneModa
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all gap-3 w-[40%]"
+                  disabled={loading}
+                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all flex items-center gap-3 w-[40%]"
                 >
-                  <FaCheckCircle className="text-white text-xl" />
-                  Add Skin Type
+                  {loading ? (
+                    <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                  ) : (
+                    <FaCheckCircle className="text-white text-xl" />
+                  )}
+                  <div className="text-white">
+                    {loading ? "Đang tạo.." : "Tạo"}
+                  </div>
                 </Button>
               </div>
             </form>

@@ -15,6 +15,7 @@ import ProductsManagement from "./ProductsManagement/index.tsx";
 import FormCreateProduct from "./FormAddProduct/index.tsx";
 import FormViewProduct from "./ProductDetailsManagement/index.tsx";
 import Brands from "./Brands/index.tsx";
+import TagsManagement from "./TagManagement/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -76,6 +77,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.BRANDS,
     element: <Brands />,
+  },
+  {
+    path: RouteNames.TAGS_MANAGEMENT,
+    element: <TagsManagement />,
   }
 ];
 

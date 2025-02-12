@@ -255,12 +255,12 @@ const ProductsManagement = () => {
                         gap: "6px",
                         width: '180px',
                         height: '60px',
-                        fontSize: '14px', 
+                        fontSize: '14px',
                         fontWeight: 'bold',
                     }}
                 >
                     <IoMdAddCircle size={"24"} />
-                    Tạo sản phẩm mới
+                    Thêm sản phẩm
                 </Button>
             </div>
 

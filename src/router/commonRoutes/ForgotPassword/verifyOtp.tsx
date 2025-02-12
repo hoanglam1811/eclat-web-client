@@ -1,16 +1,9 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
 import { z } from "zod";
-import { BASE_URL } from "../../../constants/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Label } from "../../../components/ui/label";
-import { Input } from "../../../components/ui/input";
-import Select from "react-select";
-import { Textarea } from "../../../components/ui/textarea";
-import { Button, Carousel, notification } from "antd";
-import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, UploadOutlined } from "@ant-design/icons";
+import { Button, notification } from "antd";
 import { verifyOtp } from "../../../services/ApiServices/userService";
+import { useState } from "react";
 
 
 const schema = z.object({
@@ -20,7 +13,7 @@ const schema = z.object({
     .max(6, { message: "Mã OTP phải có 6 ký tự." }),
 });
 
-const VerifyOtpStep = ({ formData, setStep, }: { formData: any; setStep: (step: number) => void; onBack: (data: any) => void; }) => {
+const VerifyOtpStep = ({ formData, setStep, onSave }: { formData: any; setStep: (step: number) => void; onBack: (data: any) => void; onSave: (data: any) => void; }) => {
   const {
     register,
     formState: { errors },
@@ -32,21 +25,25 @@ const VerifyOtpStep = ({ formData, setStep, }: { formData: any; setStep: (step: 
     defaultValues: formData,
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleVerifyOtp = async () => {
     const isValid = await trigger();
     if (!isValid) return;
-
+    setLoading(true);
     try {
       const otp = getValues("otp");
-      const email = formData.email; // Lấy email từ formData (hoặc state nếu có)
+      const email = formData.email;
+      console.log(formData)
 
       if (!email || !otp) {
         notification.error({ message: "Thiếu email hoặc mã OTP." });
         return;
       }
+      notification.success({ message: "Xác thực thành công! Vui lòng đợi giây lát" });
       await verifyOtp(email, otp);
+      onSave({ ...formData, otp });
 
-      notification.success({ message: "Xác thực thành công!" });
       setStep(3);
     } catch (error: any) {
       notification.error({
@@ -93,8 +90,9 @@ const VerifyOtpStep = ({ formData, setStep, }: { formData: any; setStep: (step: 
               <Button
                 className="bg-blue-600 text-white p-2 rounded"
                 onClick={handleVerifyOtp}
+                disabled={loading}
               >
-                Xác nhận OTP
+                {loading ? "Đang xử lý..." : "Xác nhận OTP"}
               </Button>
             </div>
           </form>

@@ -1,14 +1,12 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux"; import axios from "axios";
-import { useEffect, useState } from "react";
-import { BASE_URL } from "../../../constants/api";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "antd/lib";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { notification } from "antd";
 import { resetPassword } from "../../../services/ApiServices/userService";
-import { AiOutlineLock, AiOutlineCheckCircle } from "react-icons/ai";
+import { AiOutlineEye, AiOutlineEyeInvisible, AiOutlineLock } from "react-icons/ai";
 
 const schema = z.object({
   password: z.string().min(6, { message: "Mật khẩu phải có ít nhất 6 ký tự." }),
@@ -41,6 +39,12 @@ const EnterNewPasswordStep = ({
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
+
 
   const handleSubmit = async () => {
     const isValid = await trigger();
@@ -48,7 +52,7 @@ const EnterNewPasswordStep = ({
 
     try {
       setLoading(true);
-      const { password } = getValues();
+      const { password, confirmPassword } = getValues();
       const email = formData.email;
       const otp = formData.otp;
 
@@ -56,8 +60,14 @@ const EnterNewPasswordStep = ({
         notification.error({ message: "Thiếu email hoặc mã OTP." });
         return;
       }
-      await resetPassword(email, otp, password);
+
+      if (password !== confirmPassword) {
+        notification.error({ message: "Mật khẩu xác nhận không khớp." });
+        return;
+      }
       notification.success({ message: "Mật khẩu đã được cập nhật thành công!" });
+      await resetPassword(email, otp, password);
+
       navigate("/");
     } catch (error: any) {
       notification.error({
@@ -80,11 +90,14 @@ const EnterNewPasswordStep = ({
       <div className="space-y-2 text-left">
         <div className="flex items-center border p-3 rounded-xl border-gray-300 bg-gray-100">
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             {...register("password")}
             placeholder="Nhập mật khẩu mới"
             className="w-full bg-transparent text-gray-800 focus:outline-none"
           />
+          <button type="button" onClick={togglePasswordVisibility} className="ml-2 text-gray-600">
+            {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+          </button>
         </div>
         {errors.password && <p className="text-red-500 text-sm">{String(errors.password.message)}</p>}
       </div>
@@ -93,11 +106,14 @@ const EnterNewPasswordStep = ({
       <div className="space-y-2 text-left">
         <div className="flex items-center border p-3 rounded-xl border-gray-300 bg-gray-100">
           <input
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             {...register("confirmPassword")}
             placeholder="Xác nhận mật khẩu"
             className="w-full bg-transparent text-gray-800 focus:outline-none"
           />
+          <button type="button" onClick={toggleConfirmPasswordVisibility} className="ml-2 text-gray-600">
+            {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+          </button>
         </div>
         {errors.confirmPassword && <p className="text-red-500 text-sm">{String(errors.confirmPassword.message)}</p>}
       </div>

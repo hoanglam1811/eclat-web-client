@@ -166,7 +166,7 @@ const GeneralInformationStep = ({
                         <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
                           <button
                             type="button"
-                            onClick={() => handleReplaceImage(currentIndex)} 
+                            onClick={() => handleReplaceImage(currentIndex)}
                             className="text-white text-2xl mx-2"
                           >
                             <EditOutlined />
@@ -247,49 +247,6 @@ const GeneralInformationStep = ({
                   </div>
                 </div>
 
-                {/* Các thông tin khác */}
-                <div className="grid grid-cols-3 gap-6">
-                  <div className="col-span-1">
-                    <Label htmlFor="educationalLevel" className="block text-sm font-medium text-gray-700 text-left">
-                      Loại da <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      isSearchable
-                      placeholder="Chọn loại da"
-                      className="mt-1"
-                    />
-                    {errors.educationalLevel?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
-                    )}
-                  </div>
-                  <div className="col-span-1">
-                    <Label htmlFor="category" className="block text-sm font-medium text-gray-700 text-left">
-                      Thương hiệu <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      isSearchable
-                      placeholder="Chọn thương hiệu"
-                      className="mt-1"
-                    />
-                    {errors.deadline?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.deadline?.message)}</p>
-                    )}
-                  </div>
-                  <div className="col-span-1">
-                    <Label htmlFor="productType" className="block text-sm font-medium text-gray-700 text-left">
-                      Loại sản phẩm <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      isSearchable
-                      placeholder="Chọn loại sản phẩm"
-                      className="mt-1"
-                    />
-                    {errors.scholarshipType?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
-                    )}
-                  </div>
-                </div>
-
                 {/* Mô tả sản phẩm */}
                 <div className="mt-6">
                   <Label htmlFor="description" className="block text-sm font-medium text-gray-700 text-left">
@@ -318,6 +275,62 @@ const GeneralInformationStep = ({
                   {errors.usageInstructions?.message && (
                     <p className="text-sm text-red-500 mt-1">{String(errors.usageInstructions.message)}</p>
                   )}
+                </div>
+
+                {/* Các thông tin khác */}
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="col-span-1">
+                    <Label htmlFor="educationalLevel" className="block text-sm font-medium text-gray-700 text-left">
+                      Loại da <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      isSearchable
+                      placeholder="Chọn loại da"
+                      className="mt-1"
+                    />
+                    {errors.educationalLevel?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
+                    )}
+                  </div>
+                  <div className="col-span-1">
+                    <Label htmlFor="category" className="block text-sm font-medium text-gray-700 text-left">
+                      Thương hiệu <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      isSearchable
+                      placeholder="Chọn thương hiệu"
+                      className="mt-1"
+                    />
+                    {errors.deadline?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.deadline?.message)}</p>
+                    )}
+                  </div>
+                  <div className="col-span-1">
+                    <Label htmlFor="productType" className="block text-sm font-medium text-gray-700 text-left">
+                      Tên thẻ <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      isSearchable
+                      placeholder="Chọn tên thẻ"
+                      className="mt-1"
+                    />
+                    {errors.scholarshipType?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
+                    )}
+                  </div>
+                  <div className="col-span-1">
+                    <Label htmlFor="productType" className="block text-sm font-medium text-gray-700 text-left">
+                      Loại sản phẩm <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      isSearchable
+                      placeholder="Chọn loại sản phẩm"
+                      className="mt-1"
+                    />
+                    {errors.scholarshipType?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

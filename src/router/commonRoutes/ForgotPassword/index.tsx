@@ -37,11 +37,11 @@ const ForgotPassword = () => {
         <>
             <div style={{ display: "flex", height: "100vh" }}>
                 <Link
-                    to={RouteNames.HOME}
+                    to={RouteNames.LOGIN}
                     className="absolute top-[20px] left-[20px] bg-white/30 backdrop-blur-md text-black font-semibold px-4 py-2 rounded-lg border border-white/50 hover:bg-white/40"
                 >
                     <ArrowLeftOutlined className="mr-2" />
-                    Trở về trang chủ
+                    Trở về trang đăng nhập
                 </Link>
                 <div
                     style={{
@@ -116,6 +116,7 @@ const ForgotPassword = () => {
                                 <EnterEmailStep
                                     formData={formData}
                                     setStep={setStep}
+                                    onSave={(data) => setFormData(data)}
                                 />
                             </>
                         )}
@@ -125,6 +126,7 @@ const ForgotPassword = () => {
                                 <VerifyOtpStep
                                     formData={formData}
                                     setStep={setStep}
+                                    onSave={(data) => setFormData(data)}
                                     onBack={handleBack}
                                 />
                             </>

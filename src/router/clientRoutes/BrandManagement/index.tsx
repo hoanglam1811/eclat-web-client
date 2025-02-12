@@ -35,52 +35,52 @@ const BrandsManagement = () => {
     const handleCloseImage = () => {
         setOpenImageModal(false);
     };
-    const sampleBrands = [
-        {
-            id: "1",
-            label: 'Cocoon',
-            value: 'cocoon',
-            logo: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/202667140005381.6239fc9e2048c.png'
-        },
-        {
-            id: "2",
-            label: 'L\'Oreal',
-            value: 'loreal',
-            logo: 'https://cdn.worldvectorlogo.com/logos/l-oreal-3.svg'
-        },
-        {
-            id: "3",
-            label: 'CeraVe',
-            value: 'cerave',
-            logo: 'https://i.pinimg.com/originals/01/df/ad/01dfadb784cdcd91ebb730d30592b481.png'
-        },
-        {
-            id: "4",
-            label: 'Cetaphil',
-            value: 'cetaphil',
-            logo: 'https://www.cetaphil.com.vn/on/demandware.static/-/Sites/default/dwf51c375b/Cetaphil_Logo_285.png'
-        },
-        {
-            id: "5",
-            label: 'The Ordinary',
-            value: 'ordinary',
-            logo: 'https://logovectordl.com/wp-content/uploads/2020/12/the-ordinary-logo-vector.png'
-        },
-        {
-            id: "6",
-            label: 'Hada Labo',
-            value: 'hada_labo',
-            logo: 'https://hadalabo.com.vn/wp-content/uploads/2021/03/HDLB_logo_m.png'
-        },
-        {
-            id: "7",
-            label: 'Kiehl\'s',
-            value: 'kiehls',
-            logo: 'https://cdn.freebiesupply.com/logos/large/2x/kiehls-logo-png-transparent.png'
-        }
-    ];
+    // const sampleBrands = [
+    //     {
+    //         id: "1",
+    //         label: 'Cocoon',
+    //         value: 'cocoon',
+    //         logo: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/202667140005381.6239fc9e2048c.png'
+    //     },
+    //     {
+    //         id: "2",
+    //         label: 'L\'Oreal',
+    //         value: 'loreal',
+    //         logo: 'https://cdn.worldvectorlogo.com/logos/l-oreal-3.svg'
+    //     },
+    //     {
+    //         id: "3",
+    //         label: 'CeraVe',
+    //         value: 'cerave',
+    //         logo: 'https://i.pinimg.com/originals/01/df/ad/01dfadb784cdcd91ebb730d30592b481.png'
+    //     },
+    //     {
+    //         id: "4",
+    //         label: 'Cetaphil',
+    //         value: 'cetaphil',
+    //         logo: 'https://www.cetaphil.com.vn/on/demandware.static/-/Sites/default/dwf51c375b/Cetaphil_Logo_285.png'
+    //     },
+    //     {
+    //         id: "5",
+    //         label: 'The Ordinary',
+    //         value: 'ordinary',
+    //         logo: 'https://logovectordl.com/wp-content/uploads/2020/12/the-ordinary-logo-vector.png'
+    //     },
+    //     {
+    //         id: "6",
+    //         label: 'Hada Labo',
+    //         value: 'hada_labo',
+    //         logo: 'https://hadalabo.com.vn/wp-content/uploads/2021/03/HDLB_logo_m.png'
+    //     },
+    //     {
+    //         id: "7",
+    //         label: 'Kiehl\'s',
+    //         value: 'kiehls',
+    //         logo: 'https://cdn.freebiesupply.com/logos/large/2x/kiehls-logo-png-transparent.png'
+    //     }
+    // ];
 
-    const [brands, setBrands] = useState(sampleBrands);
+    const [brands, setBrands] = useState<any[]>([]);
     const token = useSelector((state: RootState) => state.token.token);
     //const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -132,7 +132,7 @@ const BrandsManagement = () => {
 
     const renderTable = () => (
         <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>
-            {/* Tiêu đề bảng */}
+            {/* Thanh tìm kiếm và nút hành động */}
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Input
@@ -164,16 +164,20 @@ const BrandsManagement = () => {
                 <Button
                     onClick={() => setOpenAddBrand(true)}
                     style={{
-                        backgroundColor: "#419f97",
-                        color: "white",
-                        padding: "8px 16px",
+                        backgroundColor: '#419f97',
+                        color: 'white',
+                        padding: '8px 16px',
                         borderRadius: "8px",
                         display: "flex",
                         alignItems: "center",
                         gap: "6px",
+                        width: '180px',
+                        height: '60px',
+                        fontSize: '14px',
+                        fontWeight: 'bold',
                     }}
                 >
-                    <IoMdAddCircle />
+                    <IoMdAddCircle size={"24"} />
                     Thêm thương hiệu
                 </Button>
             </div>
@@ -318,10 +322,11 @@ const BrandsManagement = () => {
     );
 
     return (
-        <div className="bg-gray-100 pt-5 pl-5 pb-5 pr-5">
-            {/* Header */}
+        <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
             <div className="flex justify-between mb-5 mt-1">
-                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>QUẢN LÝ THƯƠNG HIỆU</h2>
+                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
+                    QUẢN LÝ LOẠI THƯƠNG HIỆU
+                </h2>
             </div>
 
             {loading ? <CircularProgress /> : renderTable()}

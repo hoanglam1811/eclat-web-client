@@ -9,6 +9,7 @@ import { setToken, setUser } from '../../../reducers/tokenSlice';
 import parseJwt from '../../../services/parseJwt';
 import RouteNames from '../../../constants/routeNames';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
 const Login = () => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -17,6 +18,8 @@ const Login = () => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const dispatch = useDispatch();
@@ -116,40 +119,50 @@ const Login = () => {
                         CHÀO MỪNG ĐẾN VỚI ÉCLAT
                     </h2>
 
-                    <input
-                        type="email"
-                        placeholder="Nhập tên người dùng"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        style={{
-                            width: "80%",
-                            padding: "12px 20px",
-                            marginBottom: "20px",
-                            borderRadius: "10px",
-                            border: "1px solid #ddd",
-                            fontSize: "16px",
-                            transition: "all 0.3s",
-                        }}
-                        onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
-                        onBlur={(e) => (e.target.style.borderColor = "#ddd")}
-                    />
-                    <input
-                        type="password"
-                        placeholder="Nhập mật khẩu"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        style={{
-                            width: "80%",
-                            padding: "12px 20px",
-                            marginBottom: "20px",
-                            borderRadius: "10px",
-                            border: "1px solid #ddd",
-                            fontSize: "16px",
-                            transition: "all 0.3s",
-                        }}
-                        onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
-                        onBlur={(e) => (e.target.style.borderColor = "#ddd")}
-                    />
+                    <div className="space-y-2 text-left ml-13">
+                        <input
+                            type="email"
+                            placeholder="Nhập tên người dùng"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            style={{
+                                width: "80%",
+                                padding: "12px 20px",
+                                marginBottom: "20px",
+                                borderRadius: "10px",
+                                border: "1px solid #ddd",
+                                fontSize: "16px",
+                                transition: "all 0.3s",
+                            }}
+                            onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
+                            onBlur={(e) => (e.target.style.borderColor = "#ddd")}
+                        />
+                    </div>
+
+                    <div className="space-y-2 text-left ml-13">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Nhập mật khẩu"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            style={{
+                                width: "80%",
+                                padding: "12px 20px",
+                                marginBottom: "20px",
+                                borderRadius: "10px",
+                                border: "1px solid #ddd",
+                                fontSize: "16px",
+                                transition: "all 0.3s",
+                            }}
+
+                            onFocus={(e) => (e.target.style.borderColor = "#578a3f")}
+                            onBlur={(e) => (e.target.style.borderColor = "#ddd")}
+
+                        />
+                        <button type="button" onClick={togglePasswordVisibility} className="ml-2 text-gray-600">
+                            {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                        </button>
+                    </div>
 
                     <button
                         style={{

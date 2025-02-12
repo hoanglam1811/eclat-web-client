@@ -25,22 +25,22 @@ const EditBrandForm = ({ isOpen, setIsOpen, brand, fetchBrand }: EditBrandModalP
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | undefined>();
   const [fileList, setFileList] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const milestoneFormSchema = z.object({
+  const brandFormSchema = z.object({
     id: z.number(),
-    name: z.string().min(1, "Please enter a name"),
-    description: z.string().min(1, "Please enter a description"),
+    name: z.string().min(1, "Vui lòng nhập tên"),
     logo: z.array(
       z.object({
         name: z.string(),
         url: z.string().optional(),
         thumbUrl: z.string().optional(),
       })
-    ).min(1, "Please upload a logo"),
+    ).min(1, "Vui lòng tải lên logo"),
   });
 
-  const form = useForm<z.infer<typeof milestoneFormSchema>>({
-    resolver: zodResolver(milestoneFormSchema),
+  const form = useForm<z.infer<typeof brandFormSchema>>({
+    resolver: zodResolver(brandFormSchema),
   });
 
   const handleCancel = () => setPreviewVisible(false);
@@ -90,7 +90,7 @@ const EditBrandForm = ({ isOpen, setIsOpen, brand, fetchBrand }: EditBrandModalP
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
                 <FaPen className="text-sky-500" />
-                Edit Brand
+                Chỉnh sửa thương hiệu
               </h3>
               <button onClick={() => { setIsOpen(false); form.reset() }} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
                 <FaTimes />
@@ -101,29 +101,17 @@ const EditBrandForm = ({ isOpen, setIsOpen, brand, fetchBrand }: EditBrandModalP
               //onSubmit={form.handleSubmit(handleSubmit)} 
               className="flex flex-col gap-6">
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Name</Label>
+                <Label className="mb-3 text-left">Tên</Label>
                 <div className="relative">
                   <Input
                     {...form.register("name")}
-                    placeholder="Name"
+                    placeholder="Nhập tên"
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
                   <FaPen className="absolute left-3 top-3 text-gray-500" />
                 </div>
                 {form.formState.errors.name && <p className="text-red-500 text-sm">{form.formState.errors.name.message}</p>}
-              </div>
-              <div className="flex flex-col">
-                <Label className="mb-3 text-left">Description</Label>
-                <div className="relative">
-                  <Textarea
-                    {...form.register("description")}
-                    placeholder="Description"
-                    className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                  />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
-                </div>
-                {form.formState.errors.description && <p className="text-red-500 text-sm">{form.formState.errors.description.message}</p>}
               </div>
 
               {/* Logo Upload Field */}
@@ -164,10 +152,17 @@ const EditBrandForm = ({ isOpen, setIsOpen, brand, fetchBrand }: EditBrandModalP
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all gap-3 w-[40%]"
+                  disabled={loading}
+                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all flex items-center gap-3 w-[40%]"
                 >
-                  <FaCheckCircle className="text-white text-xl" />
-                  Edit Brand
+                  {loading ? (
+                    <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                  ) : (
+                    <FaCheckCircle className="text-white text-xl" />
+                  )}
+                  <div className="text-white">
+                    {loading ? "Đang lưu.." : "Lưu"}
+                  </div>
                 </Button>
               </div>
             </form>

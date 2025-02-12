@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import { z } from "zod";
@@ -14,6 +14,7 @@ import { Textarea } from "../../../components/ui/textarea";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { addCategory } from "../../../services/ApiServices/categoryService";
+import { notification } from "antd";
 
 
 interface AddCategoryModalProps {
@@ -25,12 +26,12 @@ interface AddCategoryModalProps {
 const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModalProps) => {
   const { id } = useParams<{ id: string }>();
   const token = useSelector((state: RootState) => state.token.token)
-
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const categoryFormSchema = z.object({
-    categoryName: z.string().min(1, "Please enter a name"),
-    description: z.string().min(1, "Please enter a description"),
+    categoryName: z.string().min(1, "Vui lòng nhập tên"),
+    description: z.string().min(1, "Vui lòng nhập mô tả"),
   });
 
   const form = useForm<z.infer<typeof categoryFormSchema>>({
@@ -43,18 +44,22 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
 
   const handleSubmit = async (values: z.infer<typeof categoryFormSchema>) => {
     try {
-      //console.log(values);
       if (!token) {
         navigate("/login");
         return;
       }
+      setLoading(true);
       await addCategory(values, token);
       form.reset();
-      //console.log("Service created successfully:", response.data);
       setIsOpen(false);
+      notification.success({ message: "Thêm loại sản phẩm thành công! 🎉" });
       fetchCategory();
     } catch (error) {
-      console.error("Error creating service:", error);
+      console.error("Error creating category:", error);
+
+      notification.error({ message: "Thêm loại sản phẩm thất bại! ❌" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,7 +77,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
                 <FaPen className="text-sky-500" />
-                {"Add new category"}
+                {"Thêm loại sản phẩm mới"}
               </h3>
               <button onClick={() => { setIsOpen(false); form.reset() }} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
                 <FaTimes />
@@ -83,11 +88,11 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
               onSubmit={form.handleSubmit(handleSubmit)}
               className="flex flex-col gap-6">
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Name</Label>
+                <Label className="mb-3 text-left">Tên</Label>
                 <div className="relative">
                   <Input
                     {...form.register("categoryName")}
-                    placeholder="Name"
+                    placeholder="Nhập tên"
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
@@ -96,11 +101,11 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
                 {form.formState.errors.categoryName && <p className="text-red-500 text-sm">{form.formState.errors.categoryName.message}</p>}
               </div>
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Description</Label>
+                <Label className="mb-3 text-left">Mô tả</Label>
                 <div className="relative">
                   <Textarea
                     {...form.register("description")}
-                    placeholder="Description"
+                    placeholder="Nhập mô tả"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
                   <FaPen className="absolute left-3 top-3 text-gray-500" />
@@ -111,11 +116,16 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all gap-3 w-[40%]"
+                  disabled={loading}
+                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all flex items-center gap-3 w-[40%]"
                 >
-                  <FaCheckCircle className="text-white text-xl" />
+                  {loading ? (
+                    <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                  ) : (
+                    <FaCheckCircle className="text-white text-xl" />
+                  )}
                   <div className="text-white">
-                  Add Category
+                    {loading ? "Đang tạo.." : "Tạo"}
                   </div>
                 </Button>
               </div>

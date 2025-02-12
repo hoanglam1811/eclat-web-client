@@ -32,9 +32,10 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
   const [fileList, setFileList] = useState<any[]>([]);
   const token = useSelector((state: RootState) => state.token.token);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const brandFormSchema = z.object({
-    brandName: z.string().min(1, "Please enter a name"),
+    brandName: z.string().min(1, "Vui lòng nhập tên"),
     // logo: z.array(
     //   z.object({
     //     name: z.string(),
@@ -42,7 +43,7 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
     //     thumbUrl: z.string().optional(),
     //   })
     // ).min(1, "Please upload a logo"),
-    imgUrl: z.string().url("Please enter a valid URL"),
+    imgUrl: z.string().url("Vui lòng tải lên logo"),
   });
 
   const form = useForm<z.infer<typeof brandFormSchema>>({
@@ -66,11 +67,11 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
         navigate("/login");
         return;
       }
-
+      setLoading(true); // Bắt đầu trạng thái loading
       await addBrand(values, token);
-
       notification.success({
-        message: "Tạo thành công",
+        message: "Tạo thương hiệu thành công 🎉",
+        description: "Thương hiệu mới đã được thêm vào hệ thống.",
       });
 
       form.reset();
@@ -78,13 +79,15 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
       fetchBrand();
     } catch (error) {
       notification.error({
-        message: "Tạo thất bại",
-        description: "Vui lòng thử lại.",
+        message: "Tạo thất bại ❌",
+        description: "Vui lòng thử lại hoặc kiểm tra lại thông tin nhập vào.",
       });
-
       console.error("Error creating brand:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   useEffect(() => {
 
@@ -142,11 +145,11 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
             >
               {/* Name Field */}
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Name</Label>
+                <Label className="mb-3 text-left">Tên</Label>
                 <div className="relative">
                   <Input
                     {...form.register("brandName")}
-                    placeholder="Enter brand name"
+                    placeholder="Nhập tên"
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
@@ -192,7 +195,7 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
                   type="url"
                   className="p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                 />
-                {form.formState.errors.imgUrl  && (
+                {form.formState.errors.imgUrl && (
                   <p className="text-red-500 text-sm">
                     {form.formState.errors.imgUrl.message}
                   </p>
@@ -210,7 +213,7 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
               </Modal> */}
               {form.watch("imgUrl") && (
                 <div className="mt-4">
-                  <Label className="text-left">Preview</Label>
+                  <Label className="text-left">Xem trước</Label>
                   <img
                     src={form.watch("imgUrl")}
                     alt="Logo Preview"
@@ -223,11 +226,16 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
               <div className="flex justify-end">
                 <Button
                   type="submit"
-                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all gap-3 w-[40%]"
+                  disabled={loading}
+                  className="bg-sky-500 hover:bg-sky-600 text-white py-3 rounded-lg shadow-md hover:shadow-xl transition-all flex items-center gap-3 w-[40%]"
                 >
-                  <FaCheckCircle className="text-white text-xl" />
+                  {loading ? (
+                    <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+                  ) : (
+                    <FaCheckCircle className="text-white text-xl" />
+                  )}
                   <div className="text-white">
-                    Add Brand
+                    {loading ? "Đang tạo.." : "Tạo"}
                   </div>
                 </Button>
               </div>

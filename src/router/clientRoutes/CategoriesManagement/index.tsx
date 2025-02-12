@@ -34,17 +34,16 @@ const CategoriesManagement = () => {
         { id: 9, name: "Facial Oil", description: "Dầu dưỡng hỗ trợ giữ ẩm và tái tạo da." },
         { id: 10, name: "Spot Treatment", description: "Sản phẩm đặc trị các vấn đề cụ thể như mụn hoặc sẹo." },
     ];
-    const token = useSelector((state:RootState) => state.token.token)
+    const token = useSelector((state: RootState) => state.token.token)
     const navigate = useNavigate();
-    const [categories, setCategories] = useState(sampleCategories);
-    //const [categories, setCategories] = useState<any[]>([]);
+    const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [openAddCategory, setOpenAddCategory] = useState<boolean>(false);
     const [openEditCategory, setOpenEditCategory] = useState<boolean>(false);
     const [currentCategory, setCurrentCategory] = useState<any | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const filteredCategories = categories.filter(category =>
-      category.name.toLowerCase().includes(searchQuery.toLowerCase())
+        category.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -55,35 +54,36 @@ const CategoriesManagement = () => {
         setCurrentPage(page);
     };
 
-      const fetchCategories = async () => {
+    const fetchCategories = async () => {
         setLoading(true);
-        if(!token) {
-          navigate("/login");
-          return;
+        if (!token) {
+            navigate("/login");
+            return;
         }
-        try{
-          const data = await getAllCategories(token)
-          setCategories(data.map((category: any) => ({ 
-              id: category.categoryId,
-              name: category.categoryName, 
-              description: category.description }))
-          );
-          console.log(data);
-        }catch(error:any) {
+        try {
+            const data = await getAllCategories(token)
+            setCategories(data.map((category: any) => ({
+                id: category.categoryId,
+                name: category.categoryName,
+                description: category.description
+            }))
+            );
+            console.log(data);
+        } catch (error: any) {
             console.error("Error fetching accounts:", error);
         }
         finally {
-          setLoading(false);
+            setLoading(false);
         };
-      };
+    };
 
-      useEffect(() => {
+    useEffect(() => {
         fetchCategories();
-      }, []);
+    }, []);
 
     const renderTable = () => (
-        <Paper elevation={3} sx={{ padding: 2, borderRadius: 3, backgroundColor: "#fff" }}>
-            {/* Header Row */}
+        <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>
+            {/* Thanh tìm kiếm và nút hành động */}
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Input
@@ -115,17 +115,21 @@ const CategoriesManagement = () => {
                 <Button
                     onClick={() => setOpenAddCategory(true)}
                     style={{
-                        backgroundColor: "#419f97",
-                        color: "white",
-                        padding: "8px 16px",
+                        backgroundColor: '#419f97',
+                        color: 'white',
+                        padding: '8px 16px',
                         borderRadius: "8px",
                         display: "flex",
                         alignItems: "center",
                         gap: "6px",
+                        width: '180px',
+                        height: '60px',
+                        fontSize: '14px',
+                        fontWeight: 'bold',
                     }}
                 >
-                    <IoMdAddCircle />
-                    Thêm loại
+                    <IoMdAddCircle size={"24"} />
+                    Thêm loại mới
                 </Button>
             </div>
             <div
@@ -220,10 +224,11 @@ const CategoriesManagement = () => {
     );
 
     return (
-        <div className="bg-gray-100 pt-5 pl-5 pb-5 pr-5">
-            {/* Header */}
+        <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
             <div className="flex justify-between mb-5 mt-1">
-                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>QUẢN LÝ LOẠI SẢN PHẨM</h2>
+                <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
+                    QUẢN LÝ LOẠI SẢN PHẨM
+                </h2>
             </div>
 
             {/* Table or Loading */}

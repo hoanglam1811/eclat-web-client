@@ -7,73 +7,71 @@ import {
 } from "@mui/material";
 
 import { Edit as EditIcon } from "@mui/icons-material";
-import React from "react";
-import { Button, Input, Tooltip } from "antd";
+import { Button, Input, Tooltip, Typography } from "antd";
 import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { IoMdAddCircle } from "react-icons/io";
-import AddSkinTypeModal from "./AddSkinTypeForm";
-import EditSkinTypeModal from "./EditSkinTypeForm";
 import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
 import { RootState } from "../../../store/store";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import AddTagModal from "./AddTagForm";
+import EditTagModal from "./EditTagForm";
+import { getAllTags } from "../../../services/ApiServices/tagService";
 
 const ITEMS_PER_PAGE = 5;
-const SkinTypesManagement = () => {
-    const sampleSkinTypes = [
-        { id: "1", label: 'Da Dầu', description: 'Oily skin is characterized by excess oil production, leading to shiny skin and often enlarged pores. It is prone to acne and blackheads.' },
-        { id: "2", label: 'Da Khô', description: 'Dry skin can feel tight, rough, and may appear flaky or dull. It lacks natural moisture and can be more sensitive to environmental factors.' },
-        { id: "3", label: 'Da Nhạy Cảm', description: 'Sensitive skin reacts easily to products, weather, or other environmental factors. It may experience redness, itching, or irritation.' },
-        { id: "4", label: 'Da Hỗn Hợp', description: 'Combination skin features a mix of dry and oily areas, typically with an oily T-zone (forehead, nose, chin) and dry or normal cheeks.' },
-        { id: "5", label: 'Da Lão Hóa', description: 'Aging skin tends to show signs of fine lines, wrinkles, and loss of elasticity. It can feel drier and more sensitive due to a decrease in collagen production.' },
-        { id: "6", label: 'Da Mụn', description: 'Acne-prone skin is characterized by frequent breakouts, pimples, and blackheads. It may be oily and prone to clogged pores.' }
-    ];
-    const [skintypes, setSkintypes] = useState(sampleSkinTypes);
-    //const [skintypes, setSkintypes] = useState<any[]>([]);
+const TagsManagement = () => {
+    const [tags, setTags] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [currentSkintypes, setCurrentSkintypes] = useState<any | null>(null);
+    const [currentTags, setCurrentTags] = useState<any | null>(null);
     const navigate = useNavigate();
     const token = useSelector((state: RootState) => state.token.token)
 
-    const [openAddSkintype, setOpenAddSkintype] = useState<boolean>(false);
-    const [openEditSkintype, setOpenEditSkintype] = useState<boolean>(false);
+    const [openAddTag, setOpenAddTag] = useState<boolean>(false);
+    const [openEditTag, setOpenEditTag] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredSkintypes = skintypes.filter(skintype =>
-        skintype.label.toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredTags = tags.filter(tag =>
+        tag.tagName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
 
-    const totalPages = Math.ceil(filteredSkintypes?.length / ITEMS_PER_PAGE);
+    const totalPages = Math.ceil(filteredTags?.length / ITEMS_PER_PAGE);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
 
-    const fetchSkintypes = () => {
-        setLoading(true);
-        if (!token) {
-            navigate("/login");
-            return;
+    const fetchTags = async () => {
+        try {
+            if (!token) {
+                navigate("/login");
+                return;
+            }
+            setLoading(true);
+
+            const data = await getAllTags(token);
+            console.log("Raw data:", data);
+
+            const formattedTags = data.map((tag: any) => ({
+                id: tag.tagId,
+                tagName: tag.tagName,
+                description: tag.description,
+                categoryId: tag.category?.categoryId ?? null,
+                categoryName: tag.category?.categoryName ?? "Không có loại",
+            }));
+
+            console.log("Formatted tags:", formattedTags);
+            setTags(formattedTags);
+        } catch (error) {
+            console.error("Failed to fetch tags:", error);
+        } finally {
+            setLoading(false);
         }
-        getAllSkinTypes(token)
-            .then((data: any) => {
-                setSkintypes(data.result.map((skintype: any) => ({
-                    id: skintype.id,
-                    label: skintype.skinName,
-                    description: skintype.description
-                })));
-            })
-            .catch((error: any) => {
-                console.error("Error fetching accounts:", error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
     };
 
+
     useEffect(() => {
-        fetchSkintypes();
+        fetchTags();
     }, []);
 
     const renderTable = () => (
@@ -82,7 +80,7 @@ const SkinTypesManagement = () => {
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Input
-                        placeholder="Tìm kiếm theo loại da"
+                        placeholder="Tìm kiếm theo thẻ tên"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
@@ -108,7 +106,7 @@ const SkinTypesManagement = () => {
                 </div>
 
                 <Button
-                    onClick={() => setOpenAddSkintype(true)}
+                    onClick={() => setOpenAddTag(true)}
                     style={{
                         backgroundColor: '#419f97',
                         color: 'white',
@@ -124,7 +122,7 @@ const SkinTypesManagement = () => {
                     }}
                 >
                     <IoMdAddCircle size={"24"} />
-                    Thêm loại da
+                    Thêm thẻ mới
                 </Button>
             </div>
             <div
@@ -139,13 +137,14 @@ const SkinTypesManagement = () => {
                 }}
             >
                 <div style={{ flex: 0.5, textAlign: "center" }}>ID</div>
-                <div style={{ flex: 2 }}>Tên</div>
+                <div style={{ flex: 2 }}>Tên thẻ</div>
+                <div style={{ flex: 2 }}>Loại sản phẩm</div>
                 <div style={{ flex: 2 }}>Mô tả</div>
                 <div style={{ flex: 1, textAlign: "center" }}>Hành động</div>
             </div>
 
             {/* Data Rows */}
-            {filteredSkintypes?.slice(
+            {filteredTags?.slice(
                 (currentPage - 1) * ITEMS_PER_PAGE,
                 currentPage * ITEMS_PER_PAGE
             ).map((account) => (
@@ -171,15 +170,20 @@ const SkinTypesManagement = () => {
                     }}
                 >
                     <div style={{ flex: 0.5, textAlign: "center" }}>{account.id}</div>
-                    <div style={{ flex: 2 }}>{account.label}</div>
-                    <div style={{ flex: 2 }}>{account.description}</div>
+                    <div style={{ flex: 2 }}>{account.tagName}</div>
+                    <div style={{ flex: 2 }}>{account.categoryName}</div>
+                    <Tooltip title={account.description}>
+                        <Typography style={{ flex: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            {account.description}
+                        </Typography>
+                    </Tooltip>
                     <div style={{ flex: 1, textAlign: "center" }}>
                         <Tooltip title="Edit Skin Type">
                             <IconButton
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    setCurrentSkintypes(account);
-                                    setOpenEditSkintype(true);
+                                    setCurrentTags(account);
+                                    setOpenEditTag(true);
                                 }}
                                 sx={{
                                     color: "#1976d2",
@@ -224,7 +228,7 @@ const SkinTypesManagement = () => {
             <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
                 <div className="flex justify-between mb-5 mt-1">
                     <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
-                        QUẢN LÝ LOẠI DA
+                        QUẢN LÝ THẺ TÊN
                     </h2>
                 </div>
                 {loading ? (
@@ -235,20 +239,20 @@ const SkinTypesManagement = () => {
                     </>
                 )}
                 {/* Modals */}
-                {openAddSkintype && (
-                    <AddSkinTypeModal
-                        isOpen={openAddSkintype}
-                        setIsOpen={setOpenAddSkintype}
-                        fetchCategory={fetchSkintypes}
+                {openAddTag && (
+                    <AddTagModal
+                        isOpen={openAddTag}
+                        setIsOpen={setOpenAddTag}
+                        fetchTag={fetchTags}
                     />
                 )}
 
-                {openEditSkintype && (
-                    <EditSkinTypeModal
-                        isOpen={openEditSkintype}
-                        setIsOpen={setOpenEditSkintype}
-                        skintype={currentSkintypes}
-                        fetchSkinType={fetchSkintypes}
+                {openEditTag && (
+                    <EditTagModal
+                        isOpen={openEditTag}
+                        setIsOpen={setOpenEditTag}
+                        tag={currentTags}
+                        fetchTag={fetchTags}
                     />
                 )}
             </div>
@@ -256,4 +260,4 @@ const SkinTypesManagement = () => {
     );
 };
 
-export default SkinTypesManagement;
+export default TagsManagement;

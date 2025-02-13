@@ -1,5 +1,5 @@
 import { Button, notification } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaTrophy } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import ScreenSpinner from "../../../components/ScreenSpinner";
@@ -11,35 +11,89 @@ import InformationStep from "./generalInformationStep";
 import UcmStep from "./detailsInformationStep";
 import ViewDataCreated from "./viewDataCreated";
 import { ShoppingOutlined } from "@ant-design/icons";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { getAllBrands } from "../../../services/ApiServices/brandService";
+import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
+import { getAllTags } from "../../../services/ApiServices/tagService";
+import { addProduct } from "../../../services/ApiServices/productService";
 
 const FormCreateProduct = () => {
     const [step, setStep] = useState(1);
     const [imageFile, setImageFile] = useState<File[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
+  const [skinTypes, setSkinTypes] = useState([]);
+
+  const [brands, setBrands] = useState([]);
+  // const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [tagFull, setTagFull] = useState<any>([]);
+
+  const token = useSelector((state: RootState) => state.token.token);
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
-        scholarshipType: "",
-        educationalLevel: "",
-        scholarshipName: "",
-        description: "",
-        value: "",
-        quantity: "",
-        awardProgress: "",
-        imageUrl: "",
-        deadline: "",
-        status: "Draft",
-        university: "",
-        certificate: [],
-        major: "",
-        documents: [
-            {
-                type: "",
-                isRequired: true,
-            },
-        ],
+      "productName": "",
+      "description": "",
+      "usageInstruct": "",
+      "originCountry": "",
+      "attribute": "",
+      "tagId": 0,
+      "brandId": 0,
+      "skinTypeId": 0,
+      "options": [
+        {
+          // "productId": 0,
+          "optionValue": "",
+          "quantity": "",
+          "optionPrice": "",
+          "discPrice": ""
+        }
+      ]
     });
+
+  const fetchOptions = async () => {
+    if(!token) {
+      navigate("/login");
+      return;
+    }
+    try{
+      setLoading(true);
+      const [skinTypes, brands , tags] = await Promise.all([
+        getAllSkinTypes(token),
+        getAllBrands(token),
+        //getAllCategories(token),
+        getAllTags(token)
+      ]);
+      if(skinTypes.code == 0)
+        setSkinTypes(skinTypes.result.map((skinType: any) => ({
+          value: skinType.id, 
+          label: skinType.skinName
+        })));
+      setBrands(brands.map((brand: any) => ({
+        value: brand.brandId, 
+        label: brand.brandName
+      })));
+      // setCategories(categories.map((category: any) => ({
+      //   value: category.categoryId, 
+      //   label: category.categoryName
+      // })))
+      setTagFull(tags);
+      setTags(tags.map((tag: any) => ({
+        value: tag.tagId,
+        label: tag.tagName
+      })))
+    } catch (error:any) {
+      setError(error.toString());
+      console.error("Error fetching skin types", error);
+    }
+  };
+
 
     const handleNext = (data: any) => {
         setFormData({ ...formData, ...data });
@@ -64,34 +118,32 @@ const FormCreateProduct = () => {
         }
     };
 
-    const handleAddNewScholarshipProgram = async () => {
+    const handleAddNewProduct = async () => {
         setIsLoading(true);
         try {
-            const imageUrl = await uploadFile(imageFile);
-            if (!imageUrl) {
-                notification.error({
-                    message: "Error",
-                    description: "Failed to upload image. Please try again.",
-                });
-                setIsLoading(false);
-                return;
+            // const imageUrl = await uploadFile(imageFile);
+            // if (!imageUrl) {
+            //     notification.error({
+            //         message: "Error",
+            //         description: "Failed to upload image. Please try again.",
+            //     });
+            //     setIsLoading(false);
+            //     return;
+
+            // }
+            if(!token) {
+              navigate("/login");
+              return;
             }
 
-            const postData = {
-            };
-            console.log("Post Data:", postData);
-            const response = await axios.post(
-                `${BASE_URL}/api/product`,
-                postData
-            );
-
-            console.log("DATA", response.data);
+            const response = await addProduct(formData, token)
+            console.log("DATA", response);
             setIsLoading(false);
 
-            if (response.status === 200 || response.status === 201) {
+            if (response.status == "ok" || response.status === 201) {
                 notification.success({
-                    message: "Scholarship Program Created",
-                    description: "The program was successfully created.",
+                    message: "Tạo thành công",
+                    description: "Sản phẩm đã được tạo thành công",
                 });
                 navigate(RouteNames.PRODUCTS_MANAGEMENT);
             }
@@ -103,10 +155,14 @@ const FormCreateProduct = () => {
             notification.error({
                 message: "Error",
                 description:
-                    "Failed to create the scholarship program. Please try again.",
+                    "Không thể tạo sản phẩm. Vui lòng thử lại",
             });
         }
     };
+
+    useEffect(() => {
+      fetchOptions()
+    }, [])
 
     return (
         <>
@@ -174,6 +230,10 @@ const FormCreateProduct = () => {
                                 formData={formData}
                                 onSave={handleNext}
                                 handleUploadFile={handleFileChange}
+                                skinTypes={skinTypes}
+                                brands={brands}
+                                tags={tags}
+                                tagFull={tagFull}
                             />
                         </>
                     )}
@@ -191,10 +251,15 @@ const FormCreateProduct = () => {
 
                     {step === 3 && (
                         <>
-                            <ViewDataCreated formData={formData} />
+                            <ViewDataCreated formData={formData}
+                              skinTypes={skinTypes}
+                              brands={brands}
+                              tags={tags}
+                              tagFull={tagFull}
+                            />
                             <div className="flex justify-between">
-                                <Button onClick={() => setStep(4)}>Trở về</Button>
-                                <Button onClick={handleAddNewScholarshipProgram}>
+                                <Button onClick={() => setStep(2)}>Trở về</Button>
+                                <Button onClick={handleAddNewProduct}>
                                     Tạo sản phẩm
                                 </Button>
                             </div>

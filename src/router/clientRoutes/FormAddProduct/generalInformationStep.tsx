@@ -10,6 +10,13 @@ import Select from "react-select";
 import { Textarea } from "../../../components/ui/textarea";
 import { Button, Carousel } from "antd";
 import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, UploadOutlined } from "@ant-design/icons";
+import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { useNavigate } from "react-router-dom";
+import { getAllBrands } from "../../../services/ApiServices/brandService";
+import { getAllTags } from "../../../services/ApiServices/tagService";
+import { originCountries } from "./originCountries";
 
 
 interface OptionType {
@@ -19,16 +26,31 @@ interface OptionType {
 
 const schema = z.object({
   imageUrl: z.string().optional(),
+  productName: z.string().min(1, "Tên sản phẩm là bắt buộc"),
+  description: z.string().min(1, "Mô tả sản phẩm là bắt buộc"),
+  usageInstruct: z.string().min(1, "Hướng dẫn sử dụng là bắt buộc"),
+  originCountry: z.string().min(1, "Nguồn gốc xuất xứ là bắt buộc"),
+  tagId: z.number().min(1, "Tên thẻ là bắt buộc"),
+  brandId: z.number().min(1, "Thương hiệu là bắt buộc"),
+  skinTypeId: z.number().min(1, "Loại da là bắt buộc"),
 });
 
 const GeneralInformationStep = ({
   formData,
   onSave,
   handleUploadFile,
+  skinTypes,
+  brands,
+  tags,
+  tagFull
 }: {
   formData: any;
   onSave: (data: any) => void;
   handleUploadFile: any;
+  skinTypes: any;
+  brands: any;
+  tags: any;
+  tagFull: any;
 }) => {
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -39,9 +61,11 @@ const GeneralInformationStep = ({
     register,
     formState: { errors },
     trigger,
+    watch,
     setValue,
     getValues,
   } = useForm({
+    mode: "onChange",
     resolver: zodResolver(schema),
     defaultValues: formData,
   });
@@ -97,6 +121,7 @@ const GeneralInformationStep = ({
     }
   };
 
+  
   useEffect(() => {
     return () => {
       images.forEach((image) => URL.revokeObjectURL(image));
@@ -220,16 +245,16 @@ const GeneralInformationStep = ({
                 <div className="grid grid-cols-3 gap-6">
                   {/* Tên sản phẩm */}
                   <div className="col-span-2">
-                    <Label htmlFor="scholarshipName" className="block text-sm font-medium text-gray-700 text-left">
+                    <Label htmlFor="productName" className="block text-sm font-medium text-gray-700 text-left">
                       Tên sản phẩm <span className="text-red-500">*</span>
                     </Label>
                     <Input
-                      {...register("scholarshipName")}
+                      {...register("productName")}
                       placeholder="Nhập tên sản phẩm"
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     />
-                    {errors.scholarshipName?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipName?.message)}</p>
+                    {errors.productName?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.productName?.message)}</p>
                     )}
                   </div>
                   <div>
@@ -238,11 +263,15 @@ const GeneralInformationStep = ({
                     </Label>
                     <Select
                       isSearchable
+                      options={originCountries.map((country:any) => ({ value: country, label: country }))}
+                      onChange={(value:any) => setValue("originCountry", value.value)}
+                      value={originCountries.map((country:any) => ({ value: country, label: country }))
+                        .find((country:any) => country.value == watch("originCountry"))}
                       placeholder="Chọn nguồn gốc xuất xứ"
                       className="mt-1"
                     />
-                    {errors.educationalLevel?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
+                    {errors.originCountry?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.originCountry?.message)}</p>
                     )}
                   </div>
                 </div>
@@ -267,13 +296,13 @@ const GeneralInformationStep = ({
                     Hướng dẫn sử dụng <span className="text-red-500">*</span>
                   </Label>
                   <Textarea
-                    {...register("usageInstructions")}
+                    {...register("usageInstruct")}
                     rows={4}
                     placeholder="Nhập hướng dẫn sử dụng"
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                   />
-                  {errors.usageInstructions?.message && (
-                    <p className="text-sm text-red-500 mt-1">{String(errors.usageInstructions.message)}</p>
+                  {errors.usageInstruct?.message && (
+                    <p className="text-sm text-red-500 mt-1">{String(errors.usageInstruct.message)}</p>
                   )}
                 </div>
 
@@ -286,10 +315,13 @@ const GeneralInformationStep = ({
                     <Select
                       isSearchable
                       placeholder="Chọn loại da"
+                      options={skinTypes}
+                      value={skinTypes.find((type:any) => type.value === watch("skinTypeId"))}
+                      onChange={(selected:any) => setValue("skinTypeId", selected?.value)}
                       className="mt-1"
                     />
-                    {errors.educationalLevel?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.educationalLevel?.message)}</p>
+                    {errors.skinTypeId?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.skinTypeId?.message)}</p>
                     )}
                   </div>
                   <div className="col-span-1">
@@ -299,10 +331,13 @@ const GeneralInformationStep = ({
                     <Select
                       isSearchable
                       placeholder="Chọn thương hiệu"
+                      options={brands}
+                      value={brands.find((brand:any) => brand.value === watch("brandId"))}
+                      onChange={(selected:any) => setValue("brandId", selected?.value)}
                       className="mt-1"
                     />
-                    {errors.deadline?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.deadline?.message)}</p>
+                    {errors.brandId?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.brandId?.message)}</p>
                     )}
                   </div>
                   <div className="col-span-1">
@@ -312,10 +347,13 @@ const GeneralInformationStep = ({
                     <Select
                       isSearchable
                       placeholder="Chọn tên thẻ"
+                      options={tags}
+                      value={tags.find((tag:any) => tag.value === watch("tagId"))}
+                      onChange={(selected:any) => setValue("tagId", selected?.value)}
                       className="mt-1"
                     />
-                    {errors.scholarshipType?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
+                    {errors.tagId?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.tagId.message)}</p>
                     )}
                   </div>
                   <div className="col-span-1">
@@ -325,6 +363,11 @@ const GeneralInformationStep = ({
                     <Select
                       isSearchable
                       placeholder="Chọn loại sản phẩm"
+                      value={tagFull.find((tag:any) => tag.tagId == watch("tagId")) &&
+                        tagFull.filter((tag:any) => tag.tagId == watch("tagId")).map((tag:any) => {
+                          return { label: tag.category.categoryName, value: tag.category.categoryId };
+                        })}
+                      isDisabled
                       className="mt-1"
                     />
                     {errors.scholarshipType?.message && (

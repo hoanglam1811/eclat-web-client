@@ -17,35 +17,40 @@ interface OptionType {
 }
 
 const schema = z.object({
-  university: z.string().min(1, "Please choose a university"),
-  certificate: z
-    .array(z.string())
-    .min(1, "Please choose at least one certificate"),
-  major: z.string().min(1, "Please choose a major"),
-  documents: z.array(z.number().or(z.object({}))).min(1, "At least one document is required"),
-  criteria: z
+  // university: z.string().min(1, "Please choose a university"),
+  // certificate: z
+  //   .array(z.string())
+  //   .min(1, "Please choose at least one certificate"),
+  // major: z.string().min(1, "Please choose a major"),
+  // documents: z.array(z.number().or(z.object({}))).min(1, "At least one document is required"),
+  attribute: z.string().min(1, "Attribute is required"),
+  options: z
     .array(
       z.object({
-        name: z.string().min(1, "Criteria name is required"),
-        description: z.string().min(1, "Criteria description is required"),
-        percentage: z.string().min(1, "Percentage of score is required"),
+        optionValue: z.string().min(1, "Tên tùy chọn là bắt buộc"),
+        quantity: z.preprocess((value) => (!value ? 0 : value),
+          z.number().min(1, "Số lượng là bắt buộc")),
+        optionPrice: z.preprocess((value) => (!value ? 0 : value),
+          z.number().min(1, "Giá gốc là bắt buộc")),
+        discPrice: z.preprocess((value) => (!value ? 0 : value), 
+          z.number().min(1, "Giá khuyến mãi là bắt buộc")),
       })
     )
-    .min(1, "Please add at least one criteria")
-    .refine(
-      (data) =>
-        data.every((criterion) => criterion.name && criterion.description),
-      {
-        message: "Each criteria must have both name and description",
-      }
-    )
-    .refine(
-      (data: any) =>
-        data && data.reduce((sum: any, criterion: any) => sum + Number(criterion.percentage), 0) == 100,
-      {
-        message: "The total percentage of all criteria must equal 100",
-      }
-    ),
+    .min(1, "Please add at least one option")
+    // .refine(
+    //   (data) =>
+    //     data.every((criterion) => criterion.optionValue && criterion.quantity),
+    //   {
+    //     message: "Each option must have both name and description",
+    //   }
+    // )
+    // .refine(
+    //   (data: any) =>
+    //     data && data.reduce((sum: any, criterion: any) => sum + Number(criterion.percentage), 0) == 100,
+    //   {
+    //     message: "The total percentage of all criteria must equal 100",
+    //   }
+    // ),
 });
 
 const DetailsInformationStep = ({
@@ -95,19 +100,21 @@ const DetailsInformationStep = ({
     getValues,
     watch,
   } = useForm({
+    mode: "onChange",
     resolver: zodResolver(schema),
     defaultValues: {
       ...formData,
-      university: formData.university || "",
-      certificate: formData.certificate || [],
-      major: formData.major || "",
-      documents: formData.documents || [],
-      criteria: formData.criteria || [{ name: "", description: "", percentage: "" }],
+      // university: formData.university || "",
+      // certificate: formData.certificate || [],
+      // major: formData.major || "",
+      // documents: formData.documents || [],
+      // criteria: formData.criteria || [{ name: "", description: "", percentage: "" }],
     },
   });
 
   const handleNext = async () => {
     const isValid = await trigger();
+    console.log("values", getValues());
     if (!isValid) {
       console.error("Validation failed", errors);
       return;
@@ -116,8 +123,8 @@ const DetailsInformationStep = ({
     const data = getValues();
     if (data) {
 
-      const selectedDocuments = [...documentOptions].filter((doc) => (watch("documents") || []).includes(doc.id)).map((doc) => { return { type: doc.type, isRequired: true } })
-      data.documents = selectedDocuments
+      // const selectedDocuments = [...documentOptions].filter((doc) => (watch("documents") || []).includes(doc.id)).map((doc) => { return { type: doc.type, isRequired: true } })
+      // data.documents = selectedDocuments
       console.log("beforeSave", data);
 
       onSave(data);
@@ -127,7 +134,7 @@ const DetailsInformationStep = ({
   const [totalQuantity, setTotalQuantity] = useState(0);
 
   const updateTotalQuantity = () => {
-    const quantities = watch("criteria")?.map((item: any) => item.quantity || 0) || [];
+    const quantities = watch("options")?.map((item: any) => item.quantity || 0) || [];
     setTotalQuantity(quantities.reduce((sum: any, val: any) => sum + val, 0));
   };
 
@@ -165,14 +172,14 @@ const DetailsInformationStep = ({
 
   useEffect(() => {
     if (formData) {
-      setValue("university", formData.university || "");
-      setValue("certificate", formData.certificate || []);
-      setValue("major", formData.major || "");
-      setValue("documents", formData.documents || []);
-      setValue(
-        "criteria",
-        formData.criteria || [{ name: "", description: "", percentage: "" }]
-      );
+      // setValue("university", formData.university || "");
+      // setValue("certificate", formData.certificate || []);
+      // setValue("major", formData.major || "");
+      // setValue("documents", formData.documents || []);
+      // setValue(
+      //   "criteria",
+      //   formData.criteria || [{ name: "", description: "", percentage: "" }]
+      // );
     }
   }, [formData, setValue]);
   return (
@@ -188,28 +195,28 @@ const DetailsInformationStep = ({
               Nhập tên cho tuỳ chọn <span className="text-red-500">*</span>
             </Label>
             <Input
-              {...register("quantity")}
+              {...register("attribute")}
               placeholder="Ví dụ: Phân loại, Size,.."
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
-            {errors.quantity?.message && (
-              <p className="text-sm text-red-500 mt-1">{String(errors.quantity.message)}</p>
+            {errors.attribute?.message && (
+              <p className="text-sm text-red-500 mt-1">{String(errors.attribute.message)}</p>
             )}
             <Label htmlFor="quantity" className="block text-sm font-medium text-gray-700 text-left">
               Thêm chi tiết tuỳ chọn <span className="text-red-500">*</span>
             </Label>
             <div className="space-y-4">
-              {watch("criteria")?.map((_criteria: any, index: any) => (
+              {watch("options")?.map((_criteria: any, index: any) => (
                 <div
                   key={index}
                   className="relative p-4 border rounded-md bg-white shadow-sm"
                 >
-                  {watch("criteria").length > 1 && (
+                  {watch("options").length > 1 && (
                     <Button
                       onClick={() =>
                         setValue(
-                          "criteria",
-                          watch("criteria").filter((_: any, i: any) => i !== index),
+                          "options",
+                          watch("options").filter((_: any, i: any) => i !== index),
                           { shouldValidate: true }
                         )
                       }
@@ -222,50 +229,93 @@ const DetailsInformationStep = ({
                   <div className="grid grid-cols-3 gap-4">
                     <div className="col-span-2">
                       <Input
-                        {...register(`criteria.${index}.name`)}
+                        {...register(`options.${index}.optionValue`)}
                         placeholder="Ví dụ: Da dầu, Da khô, 216ml, 348ml.."
                         className="w-full"
                       />
+                      {
+                        (errors.options as any) && (errors.options as any)[index]?.optionValue?.message && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {String((errors.options as any)[index].optionValue?.message)}
+                        </p>
+                      )}
                     </div>
                     <div className="col-span-1">
                       <Input
                         type="number"
-                        {...register(`criteria.${index}.quantity`, {
+                        {...register(`options.${index}.quantity`, {
                           valueAsNumber: true,
                           onChange: () => updateTotalQuantity(),
                         })}
                         placeholder="Nhập số lượng"
                         className="w-full"
                       />
+                      {
+                        (errors.options as any) && (errors.options as any)[index]?.quantity?.message && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {String((errors.options as any)[index].quantity?.message)}
+                        </p>
+                      )}
                     </div>
                   </div>
 
                   {/* Dòng thứ hai */}
                   <div className="grid grid-cols-3 gap-4 mt-3">
-                    <Input
-                      {...register(`criteria.${index}.description`)}
-                      placeholder="Nhập giá gốc"
-                      className="w-full"
-                    />
-                    <Input
-                      {...register(`criteria.${index}.description`)}
-                      placeholder="Nhập giá khuyến mãi"
-                      className="w-full"
-                    />
-                    <Input
+
+                    <div className="col-span-1">
+                      <Input
+                        {...register(`options.${index}.optionPrice`, {
+                            valueAsNumber: true,
+                        })}
+                        placeholder="Nhập giá gốc"
+                        type="number"
+                        className="w-full"
+                      />
+                      {
+                        (errors.options as any) && (errors.options as any)[index]?.optionPrice?.message && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {String((errors.options as any)[index].optionPrice?.message)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="col-span-1">
+                      <Input
+                        {...register(`options.${index}.discPrice`, {
+                            valueAsNumber: true,
+                        })}
+                        type="number"
+                        placeholder="Nhập giá khuyến mãi"
+                        className="w-full"
+                      />
+                      {
+                        (errors.options as any) && (errors.options as any)[index]?.discPrice?.message && (
+                        <p className="text-sm text-red-500 mt-1">
+                          {String((errors.options as any)[index].discPrice?.message)}
+                        </p>
+                      )}
+                    </div>
+                    <div className="col-span-1">
+                      <Input
+                        type="text"
+                        {...register(`options.${index}.imageUrl`)}
+                        placeholder="Nhập đường link hình ảnh"
+                        className="w-full"
+                        />
+                    </div>
+                    {/*<Input
                       type="file"
                       id="imageUrl"
                       onChange={handleUploadFile}
                       accept="image/*"
                       className="w-full"
-                    />
+                    />*/}
                   </div>
                 </div>
               ))}
-              {errors.criteria && errors.criteria.root && <p className="text-red-500 text-sm">{String(errors.criteria.root.message)}</p>}
+              {errors.options && errors.options.root && <p className="text-red-500 text-sm">{String(errors.options.root.message)}</p>}
               <Button
                 onClick={() =>
-                  setValue("criteria", [...watch("criteria"), { name: "", description: "", percentage: "" }])
+                  setValue("options", [...watch("options"), { optionValue: "", quantity: "", optionPrice: "", discPrice: ""}])
                 }
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition flex items-center space-x-2"
               >

@@ -15,6 +15,9 @@ import { DeleteOutlined, EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
 import { Input } from "antd";
+import { getAllProducts } from "../../../services/ApiServices/productService";
+import { RootState } from "../../../store/store";
+import { useSelector } from "react-redux";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -176,7 +179,9 @@ const ProductsManagement = () => {
     //const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [currentProduct, setCurrentProduct] = useState<any | null>(null);
+
     const navigate = useNavigate();
+    const token = useSelector((state: RootState) => state.token.token);
     const [searchQuery, setSearchQuery] = useState('');
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -194,23 +199,41 @@ const ProductsManagement = () => {
         navigate(`/staff/product-update/${id}`);
     };
 
-    //   const fetchCategories = () => {
-    //     setLoading(true);
-    //     getAllCategories()
-    //       .then((data) => {
-    //         setCategories(data.data);
-    //       })
-    //       .catch((error) => {
-    //         console.error("Error fetching accounts:", error);
-    //       })
-    //       .finally(() => {
-    //         setLoading(false);
-    //       });
-    //   };
+      const fetchProducts = () => {
+        setLoading(true);
+        if(!token){
+          navigate("/login"); 
+          return;
+        }
+        getAllProducts(token)
+          .then((data) => {
+            setProducts(data.map((product: any) => ({
+              id: product.productId,
+              name: product.productName,
+              quantity: 20,
+              description: product.description,
+              origin_price: 2000,
+              disc_price: 1500,
+              origin_country: product.originCountry,
+              skinTypeId: product.skinType.skinName,
+              brandId: product.brand.brandName,
+              average_rating: 5,
+              status: product.status ? "Còn hàng" : "Hết hàng",
+              imageUrl: "asdasd",
+              total_reviews: 200
+            })));
+          })
+          .catch((error) => {
+            console.error("Error fetching accounts:", error);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      };
 
-    //   useEffect(() => {
-    //     fetchCategories();
-    //   }, []);
+      useEffect(() => {
+        fetchProducts();
+      }, []);
 
     const renderTable = () => (
         <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>

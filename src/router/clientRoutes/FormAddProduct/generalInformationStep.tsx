@@ -121,7 +121,7 @@ const GeneralInformationStep = ({
     }
   };
 
-  
+
   useEffect(() => {
     return () => {
       images.forEach((image) => URL.revokeObjectURL(image));
@@ -143,7 +143,7 @@ const GeneralInformationStep = ({
     <>
       <div>
         <div>
-          <form className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-6xl mx-auto">
+          <form className="bg-gray-50 p-8 rounded-lg shadow-md max-w-6xl mx-auto">
             {/* Tiêu đề */}
             <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
               Thông tin chung
@@ -263,10 +263,10 @@ const GeneralInformationStep = ({
                     </Label>
                     <Select
                       isSearchable
-                      options={originCountries.map((country:any) => ({ value: country, label: country }))}
-                      onChange={(value:any) => setValue("originCountry", value.value)}
-                      value={originCountries.map((country:any) => ({ value: country, label: country }))
-                        .find((country:any) => country.value == watch("originCountry"))}
+                      options={originCountries.map((country: any) => ({ value: country, label: country }))}
+                      onChange={(value: any) => setValue("originCountry", value.value)}
+                      value={originCountries.map((country: any) => ({ value: country, label: country }))
+                        .find((country: any) => country.value == watch("originCountry"))}
                       placeholder="Chọn nguồn gốc xuất xứ"
                       className="mt-1"
                     />
@@ -316,8 +316,8 @@ const GeneralInformationStep = ({
                       isSearchable
                       placeholder="Chọn loại da"
                       options={skinTypes}
-                      value={skinTypes.find((type:any) => type.value === watch("skinTypeId"))}
-                      onChange={(selected:any) => setValue("skinTypeId", selected?.value)}
+                      value={skinTypes.find((type: any) => type.value === watch("skinTypeId"))}
+                      onChange={(selected: any) => setValue("skinTypeId", selected?.value)}
                       className="mt-1"
                     />
                     {errors.skinTypeId?.message && (
@@ -332,8 +332,8 @@ const GeneralInformationStep = ({
                       isSearchable
                       placeholder="Chọn thương hiệu"
                       options={brands}
-                      value={brands.find((brand:any) => brand.value === watch("brandId"))}
-                      onChange={(selected:any) => setValue("brandId", selected?.value)}
+                      value={brands.find((brand: any) => brand.value === watch("brandId"))}
+                      onChange={(selected: any) => setValue("brandId", selected?.value)}
                       className="mt-1"
                     />
                     {errors.brandId?.message && (
@@ -348,8 +348,8 @@ const GeneralInformationStep = ({
                       isSearchable
                       placeholder="Chọn tên thẻ"
                       options={tags}
-                      value={tags.find((tag:any) => tag.value === watch("tagId"))}
-                      onChange={(selected:any) => setValue("tagId", selected?.value)}
+                      value={tags.find((tag: any) => tag.value === watch("tagId"))}
+                      onChange={(selected: any) => setValue("tagId", selected?.value)}
                       className="mt-1"
                     />
                     {errors.tagId?.message && (
@@ -363,8 +363,8 @@ const GeneralInformationStep = ({
                     <Select
                       isSearchable
                       placeholder="Chọn loại sản phẩm"
-                      value={tagFull.find((tag:any) => tag.tagId == watch("tagId")) &&
-                        tagFull.filter((tag:any) => tag.tagId == watch("tagId")).map((tag:any) => {
+                      value={tagFull.find((tag: any) => tag.tagId == watch("tagId")) &&
+                        tagFull.filter((tag: any) => tag.tagId == watch("tagId")).map((tag: any) => {
                           return { label: tag.category.categoryName, value: tag.category.categoryId };
                         })}
                       isDisabled

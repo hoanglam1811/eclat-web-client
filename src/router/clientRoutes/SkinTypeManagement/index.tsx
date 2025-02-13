@@ -21,12 +21,12 @@ import { useNavigate } from "react-router-dom";
 const ITEMS_PER_PAGE = 5;
 const SkinTypesManagement = () => {
     const sampleSkinTypes = [
-        { id: "1", label: 'Da Dầu', description: 'Oily skin is characterized by excess oil production, leading to shiny skin and often enlarged pores. It is prone to acne and blackheads.' },
-        { id: "2", label: 'Da Khô', description: 'Dry skin can feel tight, rough, and may appear flaky or dull. It lacks natural moisture and can be more sensitive to environmental factors.' },
-        { id: "3", label: 'Da Nhạy Cảm', description: 'Sensitive skin reacts easily to products, weather, or other environmental factors. It may experience redness, itching, or irritation.' },
-        { id: "4", label: 'Da Hỗn Hợp', description: 'Combination skin features a mix of dry and oily areas, typically with an oily T-zone (forehead, nose, chin) and dry or normal cheeks.' },
-        { id: "5", label: 'Da Lão Hóa', description: 'Aging skin tends to show signs of fine lines, wrinkles, and loss of elasticity. It can feel drier and more sensitive due to a decrease in collagen production.' },
-        { id: "6", label: 'Da Mụn', description: 'Acne-prone skin is characterized by frequent breakouts, pimples, and blackheads. It may be oily and prone to clogged pores.' }
+        { id: "1", skinName: 'Da Dầu', description: 'Oily skin is characterized by excess oil production, leading to shiny skin and often enlarged pores. It is prone to acne and blackheads.' },
+        { id: "2", skinName: 'Da Khô', description: 'Dry skin can feel tight, rough, and may appear flaky or dull. It lacks natural moisture and can be more sensitive to environmental factors.' },
+        { id: "3", skinName: 'Da Nhạy Cảm', description: 'Sensitive skin reacts easily to products, weather, or other environmental factors. It may experience redness, itching, or irritation.' },
+        { id: "4", skinName: 'Da Hỗn Hợp', description: 'Combination skin features a mix of dry and oily areas, typically with an oily T-zone (forehead, nose, chin) and dry or normal cheeks.' },
+        { id: "5", skinName: 'Da Lão Hóa', description: 'Aging skin tends to show signs of fine lines, wrinkles, and loss of elasticity. It can feel drier and more sensitive due to a decrease in collagen production.' },
+        { id: "6", skinName: 'Da Mụn', description: 'Acne-prone skin is characterized by frequent breakouts, pimples, and blackheads. It may be oily and prone to clogged pores.' }
     ];
     const [skintypes, setSkintypes] = useState(sampleSkinTypes);
     //const [skintypes, setSkintypes] = useState<any[]>([]);
@@ -39,7 +39,7 @@ const SkinTypesManagement = () => {
     const [openEditSkintype, setOpenEditSkintype] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState('');
     const filteredSkintypes = skintypes.filter(skintype =>
-        skintype.label.toLowerCase().includes(searchQuery.toLowerCase())
+        skintype.skinName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -60,7 +60,7 @@ const SkinTypesManagement = () => {
             .then((data: any) => {
                 setSkintypes(data.result.map((skintype: any) => ({
                     id: skintype.id,
-                    label: skintype.skinName,
+                    skinName: skintype.skinName,
                     description: skintype.description
                 })));
             })
@@ -171,7 +171,7 @@ const SkinTypesManagement = () => {
                     }}
                 >
                     <div style={{ flex: 0.5, textAlign: "center" }}>{account.id}</div>
-                    <div style={{ flex: 2 }}>{account.label}</div>
+                    <div style={{ flex: 2 }}>{account.skinName}</div>
                     <div style={{ flex: 2 }}>{account.description}</div>
                     <div style={{ flex: 1, textAlign: "center" }}>
                         <Tooltip title="Edit Skin Type">

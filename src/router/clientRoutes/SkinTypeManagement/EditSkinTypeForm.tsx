@@ -43,7 +43,7 @@ const EditSkinTypeModal = ({ isOpen, setIsOpen, skintype, fetchSkinType }: EditM
   useEffect(() => {
     if (isOpen) {
       form.setValue("id", Number(skintype.id));
-      form.setValue("skinName", skintype.label);
+      form.setValue("skinName", skintype.skinName);
       form.setValue("description", skintype.description);
     }
   }, [isOpen, form]);

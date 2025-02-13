@@ -32,25 +32,25 @@ const schema = z.object({
           z.number().min(1, "Số lượng là bắt buộc")),
         optionPrice: z.preprocess((value) => (!value ? 0 : value),
           z.number().min(1, "Giá gốc là bắt buộc")),
-        discPrice: z.preprocess((value) => (!value ? 0 : value), 
+        discPrice: z.preprocess((value) => (!value ? 0 : value),
           z.number().min(1, "Giá khuyến mãi là bắt buộc")),
       })
     )
     .min(1, "Please add at least one option")
-    // .refine(
-    //   (data) =>
-    //     data.every((criterion) => criterion.optionValue && criterion.quantity),
-    //   {
-    //     message: "Each option must have both name and description",
-    //   }
-    // )
-    // .refine(
-    //   (data: any) =>
-    //     data && data.reduce((sum: any, criterion: any) => sum + Number(criterion.percentage), 0) == 100,
-    //   {
-    //     message: "The total percentage of all criteria must equal 100",
-    //   }
-    // ),
+  // .refine(
+  //   (data) =>
+  //     data.every((criterion) => criterion.optionValue && criterion.quantity),
+  //   {
+  //     message: "Each option must have both name and description",
+  //   }
+  // )
+  // .refine(
+  //   (data: any) =>
+  //     data && data.reduce((sum: any, criterion: any) => sum + Number(criterion.percentage), 0) == 100,
+  //   {
+  //     message: "The total percentage of all criteria must equal 100",
+  //   }
+  // ),
 });
 
 const DetailsInformationStep = ({
@@ -186,7 +186,7 @@ const DetailsInformationStep = ({
     <>
       <div>
         <div>
-          <form className="bg-gray-50 p-8 rounded-lg shadow-lg max-w-5xl mx-auto space-y-10">
+          <form className="bg-gray-50 p-8 rounded-lg shadow-md max-w-5xl mx-auto space-y-10">
             <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
               Thông tin chi tiết
             </h2>
@@ -235,10 +235,10 @@ const DetailsInformationStep = ({
                       />
                       {
                         (errors.options as any) && (errors.options as any)[index]?.optionValue?.message && (
-                        <p className="text-sm text-red-500 mt-1">
-                          {String((errors.options as any)[index].optionValue?.message)}
-                        </p>
-                      )}
+                          <p className="text-sm text-red-500 mt-1">
+                            {String((errors.options as any)[index].optionValue?.message)}
+                          </p>
+                        )}
                     </div>
                     <div className="col-span-1">
                       <Input
@@ -252,10 +252,10 @@ const DetailsInformationStep = ({
                       />
                       {
                         (errors.options as any) && (errors.options as any)[index]?.quantity?.message && (
-                        <p className="text-sm text-red-500 mt-1">
-                          {String((errors.options as any)[index].quantity?.message)}
-                        </p>
-                      )}
+                          <p className="text-sm text-red-500 mt-1">
+                            {String((errors.options as any)[index].quantity?.message)}
+                          </p>
+                        )}
                     </div>
                   </div>
 
@@ -265,7 +265,7 @@ const DetailsInformationStep = ({
                     <div className="col-span-1">
                       <Input
                         {...register(`options.${index}.optionPrice`, {
-                            valueAsNumber: true,
+                          valueAsNumber: true,
                         })}
                         placeholder="Nhập giá gốc"
                         type="number"
@@ -273,15 +273,15 @@ const DetailsInformationStep = ({
                       />
                       {
                         (errors.options as any) && (errors.options as any)[index]?.optionPrice?.message && (
-                        <p className="text-sm text-red-500 mt-1">
-                          {String((errors.options as any)[index].optionPrice?.message)}
-                        </p>
-                      )}
+                          <p className="text-sm text-red-500 mt-1">
+                            {String((errors.options as any)[index].optionPrice?.message)}
+                          </p>
+                        )}
                     </div>
                     <div className="col-span-1">
                       <Input
                         {...register(`options.${index}.discPrice`, {
-                            valueAsNumber: true,
+                          valueAsNumber: true,
                         })}
                         type="number"
                         placeholder="Nhập giá khuyến mãi"
@@ -289,10 +289,10 @@ const DetailsInformationStep = ({
                       />
                       {
                         (errors.options as any) && (errors.options as any)[index]?.discPrice?.message && (
-                        <p className="text-sm text-red-500 mt-1">
-                          {String((errors.options as any)[index].discPrice?.message)}
-                        </p>
-                      )}
+                          <p className="text-sm text-red-500 mt-1">
+                            {String((errors.options as any)[index].discPrice?.message)}
+                          </p>
+                        )}
                     </div>
                     <div className="col-span-1">
                       <Input
@@ -300,7 +300,7 @@ const DetailsInformationStep = ({
                         {...register(`options.${index}.imageUrl`)}
                         placeholder="Nhập đường link hình ảnh"
                         className="w-full"
-                        />
+                      />
                     </div>
                     {/*<Input
                       type="file"
@@ -315,7 +315,7 @@ const DetailsInformationStep = ({
               {errors.options && errors.options.root && <p className="text-red-500 text-sm">{String(errors.options.root.message)}</p>}
               <Button
                 onClick={() =>
-                  setValue("options", [...watch("options"), { optionValue: "", quantity: "", optionPrice: "", discPrice: ""}])
+                  setValue("options", [...watch("options"), { optionValue: "", quantity: "", optionPrice: "", discPrice: "" }])
                 }
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition flex items-center space-x-2"
               >

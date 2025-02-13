@@ -14,6 +14,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { useNavigate } from "react-router-dom";
 import { notification } from "antd";
+import { updateCategory } from "../../../services/ApiServices/categoryService";
 
 
 interface EditCategoryModalProps {
@@ -54,7 +55,7 @@ const EditCategoryModal = ({ isOpen, setIsOpen, category, fetchCategory }: EditC
         return;
       }
       setLoading(true);
-      //await editSkinType(values, token);
+      await updateCategory(values.id, values, token);
       form.reset();
       setIsOpen(false);
       notification.success({ message: "Chỉnh sửa loại sản phẩm thành công! 🎉" });

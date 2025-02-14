@@ -1163,7 +1163,7 @@ span.blue {
 }
 
 .text-xs {
-  color: #8c8c8c;
+  /* color: #8c8c8c; */
 }
 
 .percent-progress span.ant-progress-text {

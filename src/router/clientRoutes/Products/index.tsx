@@ -1,11 +1,17 @@
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import ProductSkeleton from "./ProductSkeleton";
 import { ProductCard } from "../../../components/footer/components/Home";
-import { Select, Slider } from "antd";
+import { Button, Select, Slider } from "antd";
 import { Carousel } from 'antd';
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { getAllProducts } from "../../../services/ApiServices/productService";
+import { getAllBrands } from "../../../services/ApiServices/brandService";
+import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
+import { originCountries } from "../FormAddProduct/originCountries";
 
 
 const Products = () => {
@@ -13,8 +19,8 @@ const Products = () => {
     const handlePriceChange = (value: any) => {
         setPriceRange(value);
     };
-    const [selectedBrands, setSelectedBrands] = useState([]);
-    const brands = [
+    const [selectedBrands, setSelectedBrands] = useState<any>([]);
+    const [brands, setBrands] = useState([
         {
             label: 'Cocoon',
             value: 'cocoon',
@@ -50,43 +56,34 @@ const Products = () => {
             value: 'kiehls',
             logo: 'https://cdn.freebiesupply.com/logos/large/2x/kiehls-logo-png-transparent.png'
         }
-    ];
+    ]);
 
     const handleBrandChange = (selectedValues: any) => {
         setSelectedBrands(selectedValues);
     };
 
-    const [selectedSkinTypes, setSelectedSkinTypes] = useState([]);
-    const skinTypes = [
+    const [selectedSkinTypes, setSelectedSkinTypes] = useState<any>([]);
+    const [skinTypes, setSkinTypes] = useState([
         { label: 'Da Dầu', value: 'oily' },
         { label: 'Da Khô', value: 'dry' },
         { label: 'Da Nhạy Cảm', value: 'sensitive' },
         { label: 'Da Hỗn Hợp', value: 'combination' },
         { label: 'Da Lão Hóa', value: 'aging' },
         { label: 'Da Mụn', value: 'acne' },
-    ];
+    ]);
     const handleSkinTypeChange = (selectedValues: any) => {
         setSelectedSkinTypes(selectedValues);
     };
 
-    const [selectedOriginCountry, setSelectedOriginCountry] = useState([]);
-    const countries = [
-        { label: "Việt Nam", value: "vietnam" },
-        { label: "Hàn Quốc", value: "south_korea" },
-        { label: "Mỹ", value: "usa" },
-        { label: "Nhật Bản", value: "japan" },
-        { label: "Pháp", value: "france" },
-        { label: "Anh", value: "uk" },
-        { label: "Úc", value: "australia" },
-        { label: "Hà Lan", value: "netherlands" },
-        { label: "Đức", value: "germany" },
-        { label: "Thái Lan", value: "thailand" }
-    ];
+    const [selectedOriginCountry, setSelectedOriginCountry] = useState<any>([]);
+    const [countries, setCountries] = useState(originCountries.map((country: any) => (
+      { label: country, value: country }
+    )));
     const handleOriginCountryChange = (selectedValues: any) => {
         setSelectedOriginCountry(selectedValues);
     };
 
-    const products = [
+    const [products, setProducts] = useState([
         {
             id: "1",
             name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
@@ -237,8 +234,11 @@ const Products = () => {
             imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
             total_reviews: 200
         }
-    ];
+    ]);
+    const [productsFull, setProductsFull] = useState(products);
 
+    const token = useSelector((state: RootState) => state.token.token);
+    const navigate = useNavigate();
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState<number>(1);
     const totalPages = Math.ceil(products?.length / ITEMS_PER_PAGE);
@@ -246,6 +246,74 @@ const Products = () => {
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     );
+
+    const handleClearFilters = () => {
+      setSelectedBrands([]);
+      setSelectedSkinTypes([]);
+      setSelectedOriginCountry([]);
+    }
+
+    const fetchProducts = async () => {
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+        try {
+            setIsLoading(true);
+            const [products, brands, skinTypes] = await Promise.all([
+              getAllProducts(token),
+              getAllBrands(token),
+              getAllSkinTypes(token),
+            ]);
+
+            let productsData = products.map((product: any) => ({
+              id: product.productId,
+              name: product.productName,
+              quantity: 20,
+              description: product.description,
+              origin_price: 1200000,
+              disc_price: 600000,
+              origin_country: product.originCountry,
+              skinTypeId: product.skinType.skinName,
+              brandId: product.brand.brandName,
+              average_rating: 4.9,
+              status: product.status ? "Còn hàng" : "Hết hàng",
+              imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
+              total_reviews: 200
+            }));
+            setProducts(productsData);
+            setProductsFull(productsData);
+            setBrands(brands.map((brand: any) => ({
+              label: brand.brandName,
+              value: brand.brandName,
+              logo: brand.imgUrl
+            })));
+            setSkinTypes(skinTypes.result.map((skinType: any) => ({
+              label: skinType.skinName,
+              value: skinType.skinName
+            })));
+        } catch (error: any) {
+            setError(error.toString());
+            console.error("Error fetching skin types", error);
+        }
+        finally{
+          setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    useEffect(() => {
+      setProducts(productsFull.filter((product: any) => 
+        product.brandId.includes(selectedBrands) 
+        && product.skinTypeId.includes(selectedSkinTypes)
+        && product.origin_country.includes(selectedOriginCountry)
+        && priceRange[0] <= product.disc_price && product.disc_price <= priceRange[1]
+      ))
+    }, [selectedBrands, selectedSkinTypes, selectedOriginCountry, priceRange]);
+ 
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -330,11 +398,11 @@ const Products = () => {
                                 value={priceRange}
                                 onChange={handlePriceChange}
                                 tooltipVisible
-                                tipFormatter={(value: any) => `${value / 1000}K VNĐ`} // Hiển thị giá trị bằng triệu đồng
+                                tipFormatter={(value: any) => `${value.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`} // Hiển thị giá trị bằng triệu đồng
                             />
                             <div className="mt-2 text-sm text-gray-600">
-                                <span>{`Từ: ${priceRange[0] / 1000}K VNĐ`}</span> -
-                                <span>{` Đến: ${priceRange[1] / 1000}K VNĐ`}</span>
+                                <span>{`Từ: ${priceRange[0].toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`}</span> -
+                                <span>{` Đến: ${priceRange[1].toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`}</span>
                             </div>
                         </div>
 
@@ -379,6 +447,12 @@ const Products = () => {
                                 placeholder="Chọn quốc gia"
                             />
                         </div>
+                        <Button
+                            danger
+                            className="bg-red-500 w-full mt-4"
+                            size="large"
+                            onClick={handleClearFilters}
+                        >Xoá tìm kiếm</Button>
                     </div>
 
                     <section className="w-full md:w-4/5 p-6 bg-white shadow-md">
@@ -391,7 +465,7 @@ const Products = () => {
                                 </p>
                             ) : products.length === 0 ? (
                                 <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
-                                    No data found matching your search.
+                                  Không có sản phẩm nào giống với mô tả.
                                 </p>
                             ) : (
                                 paginatedmProducts.map((product: any) => (

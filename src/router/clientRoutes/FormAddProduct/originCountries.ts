@@ -1,9 +1,12 @@
 export const originCountries = [
-  "Trung Quốc",
-  "Anh",
-  "Nhật Bản",
-  "Hàn Quốc",
-  "Pháp",
-  "Mỹ",
   "Việt Nam",
+  "Hàn Quốc", 
+  "Mỹ", 
+  "Nhật Bản", 
+  "Pháp", 
+  "Anh", 
+  "Úc", 
+  "Hà Lan",
+  "Đức",
+  "Thái Lan",
 ];

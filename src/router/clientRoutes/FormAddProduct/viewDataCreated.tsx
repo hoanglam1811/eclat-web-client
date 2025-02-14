@@ -22,7 +22,6 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, tagFull }:
     const [isLoading, setIsLoading] = useState(false);
     const token = useSelector((state: RootState) => state.token.token);
     const navigate = useNavigate();
-    const [step, setStep] = useState(1);
 
     const handleAddNewProduct = async () => {
         setIsLoading(true);
@@ -68,7 +67,6 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, tagFull }:
 
     return (
         <>
-
             <form className="bg-gray-50 p-8 rounded-lg shadow-md max-w-5xl">
                 {/* Tiêu đề */}
                 <h2 className="text-3xl font-bold text-blue-700 mb-8 border-b-2 pb-4">
@@ -271,7 +269,6 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, tagFull }:
                     </Button>
                 </div>
             </form>
-
         </>
     );
 };

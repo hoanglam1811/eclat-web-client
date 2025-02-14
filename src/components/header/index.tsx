@@ -97,7 +97,6 @@ const Header = () => {
               >
                 <Link to={RouteNames.PRODUCTS}>{navigation.PRODUCTS}</Link>
               </li>
-              <li><Link to={RouteNames.SPECIAL_CARE}>{navigation.SPECIAL_CARE}</Link></li>
               <li><Link to={RouteNames.BRANDS}>{navigation.BRANDS}</Link></li>
               <li><Link to={RouteNames.BEAUTY_BLOG}>{navigation.BEAUTY_BLOG}</Link></li>
               <li><Link to={RouteNames.SKIN_QUIZ}>{navigation.SKIN_QUIZ}</Link></li>

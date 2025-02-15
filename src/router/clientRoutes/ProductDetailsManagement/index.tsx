@@ -10,11 +10,13 @@ import { originCountries } from "./originCountries";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { getProductById, updateProduct } from "../../../services/ApiServices/productService";
-import { getOptionById } from "../../../services/ApiServices/optionService";
+import { addOption, deleteOption, getOptionById } from "../../../services/ApiServices/optionService";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { getAllCategories } from "../../../services/ApiServices/categoryService";
 import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
 import { getAllTags } from "../../../services/ApiServices/tagService";
+import { DeleteOutlined } from "@ant-design/icons";
+import { FaPlus } from "react-icons/fa";
 
 const FormViewProduct = () => {
     const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -22,7 +24,7 @@ const FormViewProduct = () => {
     const [images, setImages] = useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [totalQuantity, setTotalQuantity] = useState(0);
-    const [isEditing, setIsEditing] = useState(false);
+
 
     const navigate = useNavigate();
 
@@ -88,34 +90,6 @@ const FormViewProduct = () => {
     //     };
     // }, [images]);
 
-    const handleSave = async () => {
-        const isValid = await trigger();
-        if (!isValid) {
-            console.error("Validation failed", errors);
-            return;
-        }
-        const data = getValues();
-        console.log("Form data: ", data);
-        if(!token) {
-          navigate("/login");
-          return;
-        }
-        if(!id) return;
-        try{
-          setLoading(true)
-          const response = await updateProduct(Number(id), data, token);
-          await fetchProduct();
-          setIsEditing(false);
-          notification.success({ message: "Cập nhật sản phẩm thành công! 🎉" })
-        }
-        catch(error:any){
-          notification.error({ message: "Cấp nhật that bai! 🥺" })
-        }
-        finally{
-          setLoading(false);
-        }
-    };
-
     const handleEditing = () => {
         setIsEditing(!isEditing);
     };
@@ -125,11 +99,95 @@ const FormViewProduct = () => {
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [options, setOptions] = useState<any[]>([]);
     const [brands, setBrands] = useState<any[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
     const [tags, setTags] = useState<any[]>([]);
     const [skinTypes, setSkinTypes] = useState<any[]>([]);
+    const [hiddenOptions, setHiddenOptions] = useState<any[]>([]);
+    const [isEditing, setIsEditing] = useState(false);
+    const [undoStack, setUndoStack] = useState<{ index: any; option: any }[]>([]);
+    const [tempOptions, setTempOptions] = useState<any[]>([]);
+
+    const handleAddTempOption = () => {
+        setTempOptions([...tempOptions, {
+            optionValue: "",
+            quantity: 0,
+            optionPrice: 0,
+            discPrice: 0,
+            imgUrl: ""
+        }]);
+    };
+
+    const handleDeleteOption = (index: any) => {
+        const optionToRemove = watch("options")[index];
+        setUndoStack([...undoStack, { index, option: optionToRemove }]);
+        setHiddenOptions([...hiddenOptions, index]);
+    };
+
+    const handleUndoDelete = () => {
+        if (undoStack.length === 0) return;
+
+        const lastDeleted = undoStack[undoStack.length - 1];
+        setUndoStack(undoStack.slice(0, -1));
+        setHiddenOptions(hiddenOptions.filter((idx) => idx !== lastDeleted.index));
+    };
+
+    const handleSave = async () => {
+        const isValid = await trigger();
+        if (!isValid) {
+            console.error("Validation failed", errors);
+            return;
+        }
+
+        let data = getValues();
+        console.log("Form data: ", data);
+
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+        if (!id) return;
+
+        try {
+            setLoading(true);
+
+            if (tempOptions.length > 0) {
+                const newOptionsData = tempOptions.map(option => ({
+                    productId: Number(id),
+                    optionValue: option.optionValue,
+                    quantity: option.quantity,
+                    optionPrice: option.optionPrice,
+                    discPrice: option.discPrice,
+                    imgUrl: option.imgUrl
+                }));
+
+                const newOptions = await Promise.all(newOptionsData.map(opt => addOption(opt, token)));
+
+                data.options = [...data.options, ...newOptions];
+
+                setTempOptions([]);
+            }
+
+            await updateProduct(Number(id), data, token);
+
+            for (const index of hiddenOptions) {
+                const optionId = watch(`options.${index}.id`);
+                if (optionId) {
+                    await deleteOption(optionId, token);
+                }
+            }
+
+            await fetchProduct();
+            setHiddenOptions([]);
+            setIsEditing(false);
+            notification.success({ message: "Cập nhật sản phẩm thành công! 🎉" });
+        } catch (error: any) {
+            console.error("Lỗi khi cập nhật sản phẩm:", error);
+            notification.error({ message: "Cập nhật thất bại! 🥺" });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -154,15 +212,16 @@ const FormViewProduct = () => {
         };
         fetchData();
     }, [token]);
-  const fetchProduct = async () => {
-            try {
-                if (!token) return null;
-                if (!id) return;
-                const productData = await getProductById(Number(id), token);
-                console.log(productData)
-                setProduct(productData.data);
 
-                setValue('productName', productData.data.productName);
+    const fetchProduct = async () => {
+        try {
+            if (!token) return null;
+            if (!id) return;
+            const productData = await getProductById(Number(id), token);
+            console.log(productData)
+            setProduct(productData.data);
+
+            setValue('productName', productData.data.productName);
             setValue('description', productData.data.description);
             setValue('usageInstruct', productData.data.usageInstruct);
             setValue('status', productData.data.status);
@@ -173,31 +232,29 @@ const FormViewProduct = () => {
             setValue('tag.tagId', productData.data.tag.tagId);
             setValue('attribute', productData.data.attribute || "N/A");
             setValue('options', productData.data.options || []);
-            
-                // if (productData.data.options?.length > 0) {
-                //     const optionsData = await Promise.all(
-                //         productData.data.options.map((opt: any) =>
-                //             getOptionById(opt.optionId, token)
-                //         )
-                //     );
-                //     setOptions(optionsData);
-                // }
-            } catch (error) {
-                setError("Không thể tải sản phẩm.");
-            } finally {
-                setLoading(false);
-            }
-        };
+
+            // if (productData.data.options?.length > 0) {
+            //     const optionsData = await Promise.all(
+            //         productData.data.options.map((opt: any) =>
+            //             getOptionById(opt.optionId, token)
+            //         )
+            //     );
+            //     setOptions(optionsData);
+            // }
+        } catch (error) {
+            setError("Không thể tải sản phẩm.");
+        } finally {
+            setLoading(false);
+        }
+    };
     useEffect(() => {
-        
+
         fetchProduct();
     }, [id, token]);
 
     if (loading) return <p>Đang tải...</p>;
     if (error) return <p className="text-red-500">{error}</p>;
     if (!product) return <p className="text-red-500">Sản phẩm không tồn tại!</p>;
-
-
 
     return (
         <>
@@ -323,9 +380,9 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={skinTypes.map((skinType: any) => ({ value: skinType.id, label: skinType.skinName }))}
-                                                onChange={(e:any) => setValue("skinType.id", e.value)}
-                                                value={skinTypes.map((tag: any) => ({ value: tag.id, label: tag.skinName}))
-                                                .find((tag: any) => tag.value == watch("skinType.id"))}
+                                                onChange={(e: any) => setValue("skinType.id", e.value)}
+                                                value={skinTypes.map((tag: any) => ({ value: tag.id, label: tag.skinName }))
+                                                    .find((tag: any) => tag.value == watch("skinType.id"))}
                                                 isSearchable
                                                 isDisabled={!isEditing}
                                                 placeholder="Chọn loại da"
@@ -341,9 +398,9 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={brands.map((brand: any) => ({ value: brand.brandId, label: brand.brandName }))}
-                                                onChange={(e:any) => setValue("brand.brandId", e.value)}
-                                                value={brands.map((tag: any) => ({ value: tag.brandId, label: tag.brandName}))
-                                                .find((tag: any) => tag.value == watch("brand.brandId"))}
+                                                onChange={(e: any) => setValue("brand.brandId", e.value)}
+                                                value={brands.map((tag: any) => ({ value: tag.brandId, label: tag.brandName }))
+                                                    .find((tag: any) => tag.value == watch("brand.brandId"))}
                                                 isSearchable
                                                 isDisabled={!isEditing}
                                                 placeholder="Chọn thương hiệu"
@@ -359,10 +416,10 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={categories.map((category: any) => ({ value: category.categoryId, label: category.categoryName }))}
-                                                onChange={(e:any) => setValue("tag.tagId", e.value)}
+                                                onChange={(e: any) => setValue("tag.tagId", e.value)}
                                                 value={tags.find((tag: any) => tag.tagId == watch("tag.tagId")) &&
                                                     tags.filter((tag: any) => tag.tagId == watch("tag.tagId")).map((tag: any) => {
-                                                      return { label: tag.category.categoryName, value: tag.category.categoryId };
+                                                        return { label: tag.category.categoryName, value: tag.category.categoryId };
                                                     })}
                                                 isSearchable
                                                 isDisabled
@@ -379,10 +436,10 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={tags.map((tag: any) => ({ value: tag.tagId, label: tag.tagName }))}
-                                                onChange={(e:any) => setValue("tag.tagId", e.value)}
+                                                onChange={(e: any) => setValue("tag.tagId", e.value)}
                                                 value={tags.map((tag: any) => ({ value: tag.tagId, label: tag.tagName }))
-                                                .find((tag: any) => tag.value == watch("tag.tagId"))}
-                                                    //{ label: product.tag.tagName, value: product.tag.tagId }}
+                                                    .find((tag: any) => tag.value == watch("tag.tagId"))}
+                                                //{ label: product.tag.tagName, value: product.tag.tagId }}
                                                 isSearchable
                                                 isDisabled={!isEditing}
                                                 placeholder="Chọn loại sản phẩm"
@@ -409,102 +466,257 @@ const FormViewProduct = () => {
                                     <Label htmlFor="quantity" className="block text-sm font-bold text-gray-700 text-left">
                                         Chi tiết tuỳ chọn <span className="text-red-500">*</span>
                                     </Label>
-                                    <div className="space-y-4">
+                                    <div className="space-y-4 ">
                                         {product.options.map((option: any, index: number) => (
-                                            <div key={index} className="p-4 border rounded-md bg-white shadow-sm">
+                                            <div key={index} className={`p-4 border rounded-md bg-white shadow-sm relative ${hiddenOptions.includes(index) ? "opacity-50 pointer-events-none" : ""}`}>
+                                                {!hiddenOptions.includes(index) && watch("options").length > 1 && (
+                                                    <Button
+                                                        disabled={!isEditing}
+                                                        onClick={() => handleDeleteOption(index)}
+                                                        className="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 flex items-center justify-center rounded-full shadow"
+                                                    >
+                                                        <DeleteOutlined className="w-4 h-4" />
+                                                    </Button>
+                                                )}
+
                                                 <div className="grid grid-cols-3 gap-4">
                                                     <div className="col-span-2">
-                                                      <Input
-                                                        {...register(`options.${index}.optionValue`)}
-                                                        placeholder="Ví dụ: Da dầu, Da khô, 216ml, 348ml.."
-                                                        disabled={!isEditing}
-                                                        className="w-full"
-                                                      />
-                                                      {
-                                                        (errors.options as any) && (errors.options as any)[index]?.optionValue?.message && (
-                                                          <p className="text-sm text-red-500 mt-1">
-                                                            {String((errors.options as any)[index].optionValue?.message)}
-                                                          </p>
-                                                        )}
+                                                        <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Ví dụ: Da dầu, Da khô, 216ml, 348ml.. <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            {...register(`options.${index}.optionValue`)}
+                                                            placeholder="Ví dụ: Da dầu, Da khô, 216ml, 348ml.."
+                                                            disabled={hiddenOptions.includes(index) || !isEditing}
+                                                            className="w-full"
+                                                        />
+                                                        {
+                                                            (errors.options as any) && (errors.options as any)[index]?.optionValue?.message && (
+                                                                <p className="text-sm text-red-500 mt-1">
+                                                                    {String((errors.options as any)[index].optionValue?.message)}
+                                                                </p>
+                                                            )}
                                                     </div>
+
                                                     <div className="col-span-1">
-                                                      <Input
-                                                        type="number"
-                                                        {...register(`options.${index}.quantity`, {
-                                                          valueAsNumber: true,
-                                                        })}
-                                                        disabled={!isEditing}
-                                                        placeholder="Nhập số lượng"
-                                                        className="w-full"
-                                                      />
-                                                      {
-                                                        (errors.options as any) && (errors.options as any)[index]?.quantity?.message && (
-                                                          <p className="text-sm text-red-500 mt-1">
-                                                            {String((errors.options as any)[index].quantity?.message)}
-                                                          </p>
-                                                        )}
+                                                        <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Số lượng <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            type="number"
+                                                            {...register(`options.${index}.quantity`, {
+                                                                valueAsNumber: true,
+                                                            })}
+                                                            disabled={hiddenOptions.includes(index) || !isEditing}
+                                                            placeholder="Nhập số lượng"
+                                                            className="w-full"
+                                                        />
+                                                        {
+                                                            (errors.options as any) && (errors.options as any)[index]?.quantity?.message && (
+                                                                <p className="text-sm text-red-500 mt-1">
+                                                                    {String((errors.options as any)[index].quantity?.message)}
+                                                                </p>
+                                                            )}
                                                     </div>
                                                 </div>
 
                                                 {/* Dòng thứ hai */}
                                                 <div className="grid grid-cols-3 gap-4 mt-3">
+                                                    <div className="col-span-1">
+                                                        <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Giá gốc <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            {...register(`options.${index}.optionPrice`, {
+                                                                valueAsNumber: true,
+                                                            })}
+                                                            placeholder="Nhập giá gốc"
+                                                            disabled={hiddenOptions.includes(index) || !isEditing}
+                                                            type="number"
+                                                            className="w-full"
+                                                        />
+                                                        {
+                                                            (errors.options as any) && (errors.options as any)[index]?.optionPrice?.message && (
+                                                                <p className="text-sm text-red-500 mt-1">
+                                                                    {String((errors.options as any)[index].optionPrice?.message)}
+                                                                </p>
+                                                            )}
+                                                    </div>
 
-                                                  <div className="col-span-1">
-                                                    <Input
-                                                      {...register(`options.${index}.optionPrice`, {
-                                                        valueAsNumber: true,
-                                                      })}
-                                                      placeholder="Nhập giá gốc"
-                                                      disabled={!isEditing}
-                                                      type="number"
-                                                      className="w-full"
-                                                    />
-                                                    {
-                                                      (errors.options as any) && (errors.options as any)[index]?.optionPrice?.message && (
-                                                        <p className="text-sm text-red-500 mt-1">
-                                                          {String((errors.options as any)[index].optionPrice?.message)}
-                                                        </p>
-                                                      )}
-                                                  </div>
-                                                  <div className="col-span-1">
-                                                    <Input
-                                                      {...register(`options.${index}.discPrice`, {
-                                                        valueAsNumber: true,
-                                                      })}
-                                                      type="number"
-                                                      placeholder="Nhập giá khuyến mãi"
-                                                      disabled={!isEditing}
-                                                      className="w-full"
-                                                    />
-                                                    {
-                                                      (errors.options as any) && (errors.options as any)[index]?.discPrice?.message && (
-                                                        <p className="text-sm text-red-500 mt-1">
-                                                          {String((errors.options as any)[index].discPrice?.message)}
-                                                        </p>
-                                                      )}
-                                                  </div>
-                                                  <div className="col-span-1">
-                                                    <Input
-                                                      type="text"
-                                                      {...register(`options.${index}.imageUrl`)}
-                                                      placeholder="Nhập đường link hình ảnh"
-                                                      disabled={!isEditing}
-                                                      className="w-full"
-                                                    />
-                                                  </div>
-                                                  <div className="mt-3">
-                                                    <img src={option.imageUrl} className="w-12 h-12 rounded-md" alt="Option" />
-                                                  </div>
-                                              </div>
+                                                    <div className="col-span-1">
+                                                        <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Giá khuyến mãi <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            {...register(`options.${index}.discPrice`, {
+                                                                valueAsNumber: true,
+                                                            })}
+                                                            type="number"
+                                                            placeholder="Nhập giá khuyến mãi"
+                                                            disabled={hiddenOptions.includes(index) || !isEditing}
+                                                            className="w-full"
+                                                        />
+                                                        {
+                                                            (errors.options as any) && (errors.options as any)[index]?.discPrice?.message && (
+                                                                <p className="text-sm text-red-500 mt-1">
+                                                                    {String((errors.options as any)[index].discPrice?.message)}
+                                                                </p>
+                                                            )}
+                                                    </div>
 
-                                                
+                                                    <div className="col-span-1">
+                                                        <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Hình ảnh <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            value={watch(`options.${index}.imgUrl`)}
+                                                            disabled={hiddenOptions.includes(index) || !isEditing}
+                                                            //{...register("imgUrl")}
+                                                            onChange={(e: any) => setValue(`options.${index}.imgUrl`, e.target.value)}
+                                                            placeholder="Upload hình ảnh"
+                                                            type="url"
+                                                            className="p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                                                        />
+                                                    </div>
+                                                    <div className="mt-3 flex justify-center col-span-3">
+                                                        {watch(`options.${index}.imgUrl`) && (
+                                                            <div className="mt-4">
+                                                                <Label className="text-left">Xem trước</Label>
+                                                                <img
+                                                                    src={watch(`options.${index}.imgUrl`)}
+                                                                    alt="Logo Preview"
+                                                                    className="w-full h-40 object-cover border rounded-md mt-2"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
                                         ))}
+                                        {tempOptions.map((option, index) => (
+                                            <div key={index} className="p-4 border rounded-md bg-white shadow-sm mt-4">
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    <div className="col-span-2">
+                                                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Ví dụ: Da dầu, Da khô, 216ml, 348ml.. <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            value={option.optionValue}
+                                                            onChange={(e) => {
+                                                                const newOptions = [...tempOptions];
+                                                                newOptions[index].optionValue = e.target.value;
+                                                                setTempOptions(newOptions);
+                                                            }}
+                                                            placeholder="Ví dụ: Da dầu, Da khô, 216ml, 348ml.."
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-1">
+                                                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Số lượng <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={option.quantity}
+                                                            onChange={(e) => {
+                                                                const newOptions = [...tempOptions];
+                                                                newOptions[index].quantity = Number(e.target.value);
+                                                                setTempOptions(newOptions);
+                                                            }}
+                                                            placeholder="Nhập số lượng"
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-3 gap-4 mt-3">
+                                                    <div className="col-span-1">
+                                                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Giá gốc <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={option.optionPrice}
+                                                            onChange={(e) => {
+                                                                const newOptions = [...tempOptions];
+                                                                newOptions[index].optionPrice = Number(e.target.value);
+                                                                setTempOptions(newOptions);
+                                                            }}
+                                                            placeholder="Nhập giá gốc"
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-1">
+                                                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Giá khuyến mãi <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            type="number"
+                                                            value={option.discPrice}
+                                                            onChange={(e) => {
+                                                                const newOptions = [...tempOptions];
+                                                                newOptions[index].discPrice = Number(e.target.value);
+                                                                setTempOptions(newOptions);
+                                                            }}
+                                                            placeholder="Nhập giá khuyến mãi"
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                    <div className="col-span-1">
+                                                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                            Hình ảnh <span className="text-red-500">*</span>
+                                                        </Label>
+                                                        <Input
+                                                            type="url"
+                                                            value={option.imgUrl}
+                                                            onChange={(e) => {
+                                                                const newOptions = [...tempOptions];
+                                                                newOptions[index].imgUrl = e.target.value;
+                                                                setTempOptions(newOptions);
+                                                            }}
+                                                            placeholder="Upload hình ảnh"
+                                                            className="w-full"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-4 flex justify-end space-x-4">
+                                                    <Button
+                                                        disabled={!isEditing}
+                                                        onClick={() => {
+                                                            const newOptions = tempOptions.filter((_, i) => i !== index);
+                                                            setTempOptions(newOptions);
+                                                        }}
+                                                        className="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600 transition"
+                                                    >
+                                                        Xoá
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+
+                                        <Button
+                                            disabled={!isEditing}
+                                            onClick={handleAddTempOption}
+                                            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition flex items-center space-x-2"
+                                        >
+                                            <FaPlus />
+                                            <span>Thêm mới</span>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className="flex justify-end gap-3 mt-6">
+                            {undoStack.length > 0 && (
+                                <Button
+                                    onClick={handleUndoDelete}
+                                    className="bg-yellow-500 text-white py-2 px-4 rounded hover:bg-yellow-600 transition"
+                                >
+                                    Hoàn tác
+                                </Button>
+                            )}
+
                             {!isEditing && (
                                 <Button onClick={handleEditing} className="bg-green-500 text-white py-2 px-4 rounded hover:bg-blue-600">
                                     Thay đổi
@@ -514,7 +726,7 @@ const FormViewProduct = () => {
                             {isEditing && (
                                 <>
                                     <Button
-                                        onClick={() => setIsEditing(false)}
+                                        onClick={() => { setIsEditing(false); fetchProduct(); setTempOptions([]); setHiddenOptions([]); setUndoStack([]) }}
                                         className="bg-red-500 text-white py-2 px-4 rounded hover:bg-gray-600"
                                     >
                                         Hủy

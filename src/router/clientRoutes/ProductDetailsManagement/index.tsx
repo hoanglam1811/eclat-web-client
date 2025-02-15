@@ -5,11 +5,11 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import Select from "react-select";
 import { Textarea } from "../../../components/ui/textarea";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { originCountries } from "./originCountries";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import { getProductById } from "../../../services/ApiServices/productService";
+import { getProductById, updateProduct } from "../../../services/ApiServices/productService";
 import { getOptionById } from "../../../services/ApiServices/optionService";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { getAllCategories } from "../../../services/ApiServices/categoryService";
@@ -23,6 +23,8 @@ const FormViewProduct = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [totalQuantity, setTotalQuantity] = useState(0);
     const [isEditing, setIsEditing] = useState(false);
+
+    const navigate = useNavigate();
 
     const {
         register,
@@ -88,13 +90,30 @@ const FormViewProduct = () => {
 
     const handleSave = async () => {
         const isValid = await trigger();
-        notification.success({ message: "Cập nhật sản phẩm thành công! 🎉" })
         if (!isValid) {
             console.error("Validation failed", errors);
             return;
         }
         const data = getValues();
         console.log("Form data: ", data);
+        if(!token) {
+          navigate("/login");
+          return;
+        }
+        if(!id) return;
+        try{
+          setLoading(true)
+          const response = await updateProduct(Number(id), data, token);
+          await fetchProduct();
+          setIsEditing(false);
+          notification.success({ message: "Cập nhật sản phẩm thành công! 🎉" })
+        }
+        catch(error:any){
+          notification.error({ message: "Cấp nhật that bai! 🥺" })
+        }
+        finally{
+          setLoading(false);
+        }
     };
 
     const handleEditing = () => {
@@ -135,9 +154,7 @@ const FormViewProduct = () => {
         };
         fetchData();
     }, [token]);
-
-    useEffect(() => {
-        const fetchProduct = async () => {
+  const fetchProduct = async () => {
             try {
                 if (!token) return null;
                 if (!id) return;
@@ -150,26 +167,29 @@ const FormViewProduct = () => {
             setValue('usageInstruct', productData.data.usageInstruct);
             setValue('status', productData.data.status);
             setValue('originCountry', productData.data.originCountry);
-            setValue('skinTypeId', productData.data.skinType.id);
-            setValue('brandId', productData.data.brand.brandId);
+            setValue('skinType.id', productData.data.skinType.id);
+            setValue('brand.brandId', productData.data.brand.brandId);
             setValue('productType', productData.data.tag.category.categoryId);
-            setValue('tagId', productData.data.tag.tagId);
+            setValue('tag.tagId', productData.data.tag.tagId);
             setValue('attribute', productData.data.attribute || "N/A");
+            setValue('options', productData.data.options || []);
             
-                if (productData.data.options?.length > 0) {
-                    const optionsData = await Promise.all(
-                        productData.data.options.map((opt: any) =>
-                            getOptionById(opt.id, token)
-                        )
-                    );
-                    setOptions(optionsData);
-                }
+                // if (productData.data.options?.length > 0) {
+                //     const optionsData = await Promise.all(
+                //         productData.data.options.map((opt: any) =>
+                //             getOptionById(opt.optionId, token)
+                //         )
+                //     );
+                //     setOptions(optionsData);
+                // }
             } catch (error) {
                 setError("Không thể tải sản phẩm.");
             } finally {
                 setLoading(false);
             }
         };
+    useEffect(() => {
+        
         fetchProduct();
     }, [id, token]);
 
@@ -217,6 +237,7 @@ const FormViewProduct = () => {
                                         </Label>
                                         <Input
                                             defaultValue={product.productName} // Gán giá trị mặc định từ product
+                                            {...register("productName")}
                                             disabled={!isEditing}
                                             placeholder="Nhập tên sản phẩm"
                                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
@@ -237,6 +258,7 @@ const FormViewProduct = () => {
                                             defaultValue={product.description}
                                             rows={4}
                                             disabled={!isEditing}
+                                            {...register("description")}
                                             placeholder="Nhập mô tả sản phẩm"
                                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                         />
@@ -252,6 +274,7 @@ const FormViewProduct = () => {
                                             defaultValue={product.usageInstruct}
                                             rows={4}
                                             disabled={!isEditing}
+                                            {...register("usageInstruct")}
                                             placeholder="Nhập hướng dẫn sử dụng"
                                             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                         />
@@ -283,7 +306,8 @@ const FormViewProduct = () => {
                                             value={originCountries.map((country) => ({
                                                 value: country,
                                                 label: country,
-                                            })).find((country) => country.value === product.originCountry)}
+                                            })).find((country) => country.value === watch("originCountry"))}
+                                            onChange={(e: any) => setValue("originCountry", e.value)}
                                             isDisabled={!isEditing}
                                             options={originCountries.map((country: any) => ({ value: country, label: country }))}
                                             isSearchable
@@ -299,7 +323,9 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={skinTypes.map((skinType: any) => ({ value: skinType.id, label: skinType.skinName }))}
-                                                value={{ label: product.skinType.skinName, value: product.skinType.id }}
+                                                onChange={(e:any) => setValue("skinType.id", e.value)}
+                                                value={skinTypes.map((tag: any) => ({ value: tag.id, label: tag.skinName}))
+                                                .find((tag: any) => tag.value == watch("skinType.id"))}
                                                 isSearchable
                                                 isDisabled={!isEditing}
                                                 placeholder="Chọn loại da"
@@ -315,7 +341,9 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={brands.map((brand: any) => ({ value: brand.brandId, label: brand.brandName }))}
-                                                value={{ label: product.brand.brandName, value: product.skinType.brandId }}
+                                                onChange={(e:any) => setValue("brand.brandId", e.value)}
+                                                value={brands.map((tag: any) => ({ value: tag.brandId, label: tag.brandName}))
+                                                .find((tag: any) => tag.value == watch("brand.brandId"))}
                                                 isSearchable
                                                 isDisabled={!isEditing}
                                                 placeholder="Chọn thương hiệu"
@@ -331,8 +359,9 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={categories.map((category: any) => ({ value: category.categoryId, label: category.categoryName }))}
-                                                value={tags.find((tag: any) => tag.tagId == watch("tagId")) &&
-                                                    tags.filter((tag: any) => tag.tagId == watch("tagId")).map((tag: any) => {
+                                                onChange={(e:any) => setValue("tag.tagId", e.value)}
+                                                value={tags.find((tag: any) => tag.tagId == watch("tag.tagId")) &&
+                                                    tags.filter((tag: any) => tag.tagId == watch("tag.tagId")).map((tag: any) => {
                                                       return { label: tag.category.categoryName, value: tag.category.categoryId };
                                                     })}
                                                 isSearchable
@@ -350,9 +379,9 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={tags.map((tag: any) => ({ value: tag.tagId, label: tag.tagName }))}
-                                                onChange={(e:any) => setValue("tagId", e.value)}
+                                                onChange={(e:any) => setValue("tag.tagId", e.value)}
                                                 value={tags.map((tag: any) => ({ value: tag.tagId, label: tag.tagName }))
-                                                .find((tag: any) => tag.value == watch("tagId"))}
+                                                .find((tag: any) => tag.value == watch("tag.tagId"))}
                                                     //{ label: product.tag.tagName, value: product.tag.tagId }}
                                                 isSearchable
                                                 isDisabled={!isEditing}
@@ -369,7 +398,8 @@ const FormViewProduct = () => {
                                     </Label>
                                     <Input
                                         defaultValue={product?.attribute || "N/A"}
-                                        disabled
+                                        {...register("attribute")}
+                                        disabled={!isEditing}
                                         placeholder="Ví dụ: Phân loại, Size,.."
                                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                     />
@@ -380,33 +410,94 @@ const FormViewProduct = () => {
                                         Chi tiết tuỳ chọn <span className="text-red-500">*</span>
                                     </Label>
                                     <div className="space-y-4">
-                                        {options.map((option: any, index: number) => (
+                                        {product.options.map((option: any, index: number) => (
                                             <div key={index} className="p-4 border rounded-md bg-white shadow-sm">
                                                 <div className="grid grid-cols-3 gap-4">
-                                                    <Input
-                                                        defaultValue={option.optionValue || "N/A"}
-                                                        disabled={!isEditing}
+                                                    <div className="col-span-2">
+                                                      <Input
+                                                        {...register(`options.${index}.optionValue`)}
                                                         placeholder="Ví dụ: Da dầu, Da khô, 216ml, 348ml.."
+                                                        disabled={!isEditing}
                                                         className="w-full"
-                                                    />
-                                                    <Input
+                                                      />
+                                                      {
+                                                        (errors.options as any) && (errors.options as any)[index]?.optionValue?.message && (
+                                                          <p className="text-sm text-red-500 mt-1">
+                                                            {String((errors.options as any)[index].optionValue?.message)}
+                                                          </p>
+                                                        )}
+                                                    </div>
+                                                    <div className="col-span-1">
+                                                      <Input
                                                         type="number"
-                                                        defaultValue={option.quantity || "N/A"}
+                                                        {...register(`options.${index}.quantity`, {
+                                                          valueAsNumber: true,
+                                                        })}
                                                         disabled={!isEditing}
                                                         placeholder="Nhập số lượng"
                                                         className="w-full"
-                                                    />
-                                                    <Input
-                                                        defaultValue={option.optionPrice || "N/A"}
-                                                        disabled={!isEditing}
-                                                        placeholder="Nhập giá gốc"
-                                                        className="w-full"
-                                                    />
+                                                      />
+                                                      {
+                                                        (errors.options as any) && (errors.options as any)[index]?.quantity?.message && (
+                                                          <p className="text-sm text-red-500 mt-1">
+                                                            {String((errors.options as any)[index].quantity?.message)}
+                                                          </p>
+                                                        )}
+                                                    </div>
                                                 </div>
 
-                                                <div className="mt-3">
+                                                {/* Dòng thứ hai */}
+                                                <div className="grid grid-cols-3 gap-4 mt-3">
+
+                                                  <div className="col-span-1">
+                                                    <Input
+                                                      {...register(`options.${index}.optionPrice`, {
+                                                        valueAsNumber: true,
+                                                      })}
+                                                      placeholder="Nhập giá gốc"
+                                                      disabled={!isEditing}
+                                                      type="number"
+                                                      className="w-full"
+                                                    />
+                                                    {
+                                                      (errors.options as any) && (errors.options as any)[index]?.optionPrice?.message && (
+                                                        <p className="text-sm text-red-500 mt-1">
+                                                          {String((errors.options as any)[index].optionPrice?.message)}
+                                                        </p>
+                                                      )}
+                                                  </div>
+                                                  <div className="col-span-1">
+                                                    <Input
+                                                      {...register(`options.${index}.discPrice`, {
+                                                        valueAsNumber: true,
+                                                      })}
+                                                      type="number"
+                                                      placeholder="Nhập giá khuyến mãi"
+                                                      disabled={!isEditing}
+                                                      className="w-full"
+                                                    />
+                                                    {
+                                                      (errors.options as any) && (errors.options as any)[index]?.discPrice?.message && (
+                                                        <p className="text-sm text-red-500 mt-1">
+                                                          {String((errors.options as any)[index].discPrice?.message)}
+                                                        </p>
+                                                      )}
+                                                  </div>
+                                                  <div className="col-span-1">
+                                                    <Input
+                                                      type="text"
+                                                      {...register(`options.${index}.imageUrl`)}
+                                                      placeholder="Nhập đường link hình ảnh"
+                                                      disabled={!isEditing}
+                                                      className="w-full"
+                                                    />
+                                                  </div>
+                                                  <div className="mt-3">
                                                     <img src={option.imageUrl} className="w-12 h-12 rounded-md" alt="Option" />
-                                                </div>
+                                                  </div>
+                                              </div>
+
+                                                
                                             </div>
                                         ))}
                                     </div>

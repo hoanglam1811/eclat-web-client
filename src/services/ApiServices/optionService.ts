@@ -4,7 +4,7 @@ import { BASE_URL } from "../../constants/api";
 // Lấy option theo ID
 export async function getOptionById(id: number, token: string) {
     try {
-        const response = await axios.get(`${BASE_URL}/api/options/${id}`, {
+        const response = await axios.get(`${BASE_URL}/api/Options/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

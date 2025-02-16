@@ -10,13 +10,14 @@ import { originCountries } from "./originCountries";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { getProductById, updateProduct } from "../../../services/ApiServices/productService";
-import { addOption, deleteOption, getOptionById } from "../../../services/ApiServices/optionService";
+import { addOption, deleteOption, getOptionById, updateOption } from "../../../services/ApiServices/optionService";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { getAllCategories } from "../../../services/ApiServices/categoryService";
 import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
 import { getAllTags } from "../../../services/ApiServices/tagService";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, UploadOutlined } from "@ant-design/icons";
 import { FaPlus } from "react-icons/fa";
+import { addImageOption } from "../../../services/ApiServices/imageService";
 
 const FormViewProduct = () => {
     const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -37,29 +38,32 @@ const FormViewProduct = () => {
         getValues,
     } = useForm();
 
-    // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
-    //     const files = e.target.files;
-    //     if (files) {
-    //         const newFiles = Array.from(files);
-    //         const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
+        const files = e.target.files;
+        if (files) {
+            const newFiles = Array.from(files);
+            const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+            // console.log("newFiles", newFiles);
+            // console.log("newPreviews", newPreviews);
+            console.log("images", images);
 
-    //         if (index !== undefined) {
-    //             setImages((prev) => {
-    //                 const updatedImages = [...prev];
-    //                 updatedImages[index] = newPreviews[0];
-    //                 return updatedImages;
-    //             });
-    //             setImageFiles((prev) => {
-    //                 const updatedFiles = [...prev];
-    //                 updatedFiles[index] = newFiles[0];
-    //                 return updatedFiles;
-    //             });
-    //         } else {
-    //             setImageFiles((prev) => [...prev, ...newFiles]);
-    //             setImages((prev) => [...prev, ...newPreviews]);
-    //         }
-    //     }
-    // };
+            if (index !== undefined) {
+                setImages((prev) => {
+                    const updatedImages = [...prev];
+                    updatedImages[index] = newPreviews[0];
+                    return updatedImages;
+                });
+                setImageFiles((prev) => {
+                    const updatedFiles = [...prev];
+                    updatedFiles[index] = newFiles[0];
+                    return updatedFiles;
+                });
+            } else {
+                setImageFiles((prev) => [...prev, ...newFiles]);
+                setImages((prev) => [...prev, ...newPreviews]);
+            }
+        }
+    };
 
     // const handleRemoveImage = (index: number) => {
     //     setImageFiles((prev) => prev.filter((_, i) => i !== index));
@@ -151,6 +155,20 @@ const FormViewProduct = () => {
         try {
             setLoading(true);
 
+            await updateProduct(Number(id), data, token);
+            console.log(imageFiles)
+            
+            const updatedOptionsData = watch("options").map((option:any, index:number)=> ({
+                productId: Number(id),
+                optionValue: option.optionValue,
+                quantity: option.quantity,
+                optionPrice: option.optionPrice,
+                discPrice: option.discPrice,
+                optionId: option.optionId
+            }));
+            console.log("newOptionsData", watch("options"));
+            await Promise.all(updatedOptionsData.map((opt:any) => updateOption(opt.optionId ,opt, token)));
+
             if (tempOptions.length > 0) {
                 const newOptionsData = tempOptions.map(option => ({
                     productId: Number(id),
@@ -158,9 +176,10 @@ const FormViewProduct = () => {
                     quantity: option.quantity,
                     optionPrice: option.optionPrice,
                     discPrice: option.discPrice,
-                    imgUrl: option.imgUrl
+                    // imgUrl: option.imgUrl
                 }));
 
+                
                 const newOptions = await Promise.all(newOptionsData.map(opt => addOption(opt, token)));
 
                 data.options = [...data.options, ...newOptions];
@@ -168,10 +187,22 @@ const FormViewProduct = () => {
                 setTempOptions([]);
             }
 
-            await updateProduct(Number(id), data, token);
+            //Update images for existing options
+            if(imageFiles.length > 0) {
+                const imageUrls = await Promise.all(product.options.map((option:any,index:number) => {
+                  if (hiddenOptions.includes(index) || !imageFiles[index]) return null; 
+                  return addImageOption(option.optionId, imageFiles[index], token).then((url:any) => url.data)
+                }).filter(Boolean));
+                data.options.forEach((option:any,index:number) => {
+                  if(hiddenOptions.includes(index)) return
+                  option.imgUrl = imageUrls[index]
+                });
+                setImageFiles([]);
+            }
 
             for (const index of hiddenOptions) {
-                const optionId = watch(`options.${index}.id`);
+                const optionId = product.options[index].optionId;
+                // console.log("optionId", optionId);
                 if (optionId) {
                     await deleteOption(optionId, token);
                 }
@@ -180,6 +211,7 @@ const FormViewProduct = () => {
             await fetchProduct();
             setHiddenOptions([]);
             setIsEditing(false);
+            setUndoStack([]);
             notification.success({ message: "Cập nhật sản phẩm thành công! 🎉" });
         } catch (error: any) {
             console.error("Lỗi khi cập nhật sản phẩm:", error);
@@ -226,22 +258,23 @@ const FormViewProduct = () => {
             setValue('usageInstruct', productData.data.usageInstruct);
             setValue('status', productData.data.status);
             setValue('originCountry', productData.data.originCountry);
-            setValue('skinType.id', productData.data.skinType.id);
-            setValue('brand.brandId', productData.data.brand.brandId);
-            setValue('productType', productData.data.tag.category.categoryId);
-            setValue('tag.tagId', productData.data.tag.tagId);
+            setValue('skinType.id', productData.data.skinTypeId);
+            setValue('brand.brandId', productData.data.brandId);
+            // setValue('productType', productData.data.categoryId);
+            setValue('tag.tagId', productData.data.tagId);
             setValue('attribute', productData.data.attribute || "N/A");
             setValue('options', productData.data.options || []);
 
-            // if (productData.data.options?.length > 0) {
-            //     const optionsData = await Promise.all(
-            //         productData.data.options.map((opt: any) =>
-            //             getOptionById(opt.optionId, token)
-            //         )
-            //     );
-            //     setOptions(optionsData);
-            // }
+            if (productData.data.options?.length > 0) {
+                const optionsData = await Promise.all(
+                    productData.data.options.map((opt: any) =>
+                        getOptionById(opt.optionId, token)
+                    )
+                );
+                setProduct({ ...productData.data, options: optionsData.map((opt: any) => opt.data) });
+            }
         } catch (error) {
+            console.error("Error fetching product data", error);
             setError("Không thể tải sản phẩm.");
         } finally {
             setLoading(false);
@@ -278,7 +311,84 @@ const FormViewProduct = () => {
                                         Hình ảnh sản phẩm <span className="text-red-500">*</span>
                                     </label>
                                     <div className="relative mt-1 h-72 w-full">
-                                    </div>
+                                        {images.length > 0 ? (
+                                          <div className="relative h-full w-full">
+                                            {images.length > 1 && (
+                                              <div className="absolute top-1/2 left-0 z-10 transform -translate-y-1/2 flex items-center">
+                                                <Button
+                                                  type="primary"
+                                                  shape="circle"
+                                                  icon={<LeftOutlined />}
+                                                  onClick={handlePreviousImage}
+                                                  className="text-white bg-black opacity-50 hover:opacity-100"
+                                                  style={{ padding: '10px' }}
+                                                />
+                                              </div>
+                                            )}
+                                            <img
+                                              src={images[currentIndex]}
+                                              alt={`Product Preview ${currentIndex + 1}`}
+                                              className="h-full w-full object-cover rounded-md"
+                                            />
+                                            {images.length > 1 && (
+                                              <div className="absolute top-1/2 right-0 z-10 transform -translate-y-1/2 flex items-center">
+                                                <Button
+                                                  type="primary"
+                                                  shape="circle"
+                                                  icon={<RightOutlined />}
+                                                  // onClick={handleNextImage}
+                                                  className="text-white bg-black opacity-50 hover:opacity-100"
+                                                  style={{ padding: '10px' }}
+                                                />
+                                              </div>
+                                            )}
+                                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                              <button
+                                                type="button"
+                                                // onClick={() => handleReplaceImage(currentIndex)}
+                                                className="text-white text-2xl mx-2"
+                                              >
+                                                <EditOutlined />
+                                              </button>
+                                              <button
+                                                type="button"
+                                                // onClick={() => handleRemoveImage(currentIndex)}
+                                                className="text-white text-2xl mx-2"
+                                              >
+                                                <DeleteOutlined />
+                                              </button>
+                                            </div>
+                                          </div>
+                                        ) : (
+                                          <div className="h-full w-full bg-gray-200 flex items-center justify-center rounded-md">
+                                            <span className="text-gray-500">Hiện tại trống, hãy thêm ảnh vào</span>
+                                          </div>
+                                        )}
+
+                                        {/* Biểu tượng tải ảnh chỉ hiển thị khi không có ảnh */}
+                                        {images.length === 0 && (
+                                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                            <button
+                                              type="button"
+                                              onClick={() => document.getElementById('imageUpload')?.click()}
+                                              className="text-white text-2xl"
+                                            >
+                                              <UploadOutlined />
+                                            </button>
+                                          </div>
+                                        )}
+
+                                        {/* Input file ẩn */}
+                                        <input
+                                          id="imageUpload"
+                                          type="file"
+                                          accept="image/*"
+                                          onChange={(e) => handleFileChange(e)} // Thêm ảnh mới hoặc thay thế ảnh
+                                          className="hidden"
+                                          multiple
+                                        />
+                                      </div>
+
                                 </div>
                             </div>
 
@@ -569,21 +679,33 @@ const FormViewProduct = () => {
                                                             Hình ảnh <span className="text-red-500">*</span>
                                                         </Label>
                                                         <Input
-                                                            value={watch(`options.${index}.imgUrl`)}
+                                                            type="file"
+                                                            // value={watch(`options.${index}.imgUrl`)}
+                                                            accept="image/*"
                                                             disabled={hiddenOptions.includes(index) || !isEditing}
                                                             //{...register("imgUrl")}
-                                                            onChange={(e: any) => setValue(`options.${index}.imgUrl`, e.target.value)}
+                                                            // onChange={(e: any) => setValue(`options.${index}.imgUrl`, e.target.value)}
+                                                            onChange={(e) => handleFileChange(e, index)}
                                                             placeholder="Upload hình ảnh"
-                                                            type="url"
                                                             className="p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                                                         />
                                                     </div>
                                                     <div className="mt-3 flex justify-center col-span-3">
-                                                        {watch(`options.${index}.imgUrl`) && (
+                                                        {images[index] && (
                                                             <div className="mt-4">
                                                                 <Label className="text-left">Xem trước</Label>
                                                                 <img
-                                                                    src={watch(`options.${index}.imgUrl`)}
+                                                                    src={images[index]}
+                                                                    alt="Logo Preview"
+                                                                    className="w-full h-40 object-cover border rounded-md mt-2"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                        {!images[index] && product.options[index].images?.[0]?.imageUrl && (
+                                                          <div className="mt-4">
+                                                                <Label className="text-left">Xem trước</Label>
+                                                                <img
+                                                                    src={product.options[index].images[0].imageUrl}
                                                                     alt="Logo Preview"
                                                                     className="w-full h-40 object-cover border rounded-md mt-2"
                                                                 />
@@ -667,17 +789,32 @@ const FormViewProduct = () => {
                                                             Hình ảnh <span className="text-red-500">*</span>
                                                         </Label>
                                                         <Input
-                                                            type="url"
-                                                            value={option.imgUrl}
-                                                            onChange={(e) => {
-                                                                const newOptions = [...tempOptions];
-                                                                newOptions[index].imgUrl = e.target.value;
-                                                                setTempOptions(newOptions);
-                                                            }}
+                                                            type="file"
+                                                            accept="image/*"
+                                                            // value={option.imgUrl}
+                                                            // onChange={(e) => {
+                                                            //     const newOptions = [...tempOptions];
+                                                            //     newOptions[index].imgUrl = e.target.value;
+                                                            //     setTempOptions(newOptions);
+                                                            // }}
+                                                            onChange={(e) => handleFileChange(e, index + product.options.length)}
                                                             placeholder="Upload hình ảnh"
                                                             className="w-full"
                                                         />
                                                     </div>
+                                                    <div className="mt-3 flex justify-center col-span-3">
+                                                        {images[index + product.options.length] && (
+                                                            <div className="mt-4">
+                                                                <Label className="text-left">Xem trước</Label>
+                                                                <img
+                                                                    src={images[index + product.options.length]}
+                                                                    alt="Logo Preview"
+                                                                    className="w-full h-40 object-cover border rounded-md mt-2"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+
                                                 </div>
 
                                                 <div className="mt-4 flex justify-end space-x-4">
@@ -686,6 +823,7 @@ const FormViewProduct = () => {
                                                         onClick={() => {
                                                             const newOptions = tempOptions.filter((_, i) => i !== index);
                                                             setTempOptions(newOptions);
+                                                            setImages((prev) => prev.filter((_, i) => i !== index + product.options.length));
                                                         }}
                                                         className="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600 transition"
                                                     >

@@ -19,7 +19,7 @@ export async function getOptionById(id: number, token: string) {
 // Thêm mới option
 export async function addOption(optionData: any, token: string) {
     try {
-        const response = await axios.post(`${BASE_URL}/api/options/insert`, optionData, {
+        const response = await axios.post(`${BASE_URL}/api/Options/insert`, optionData, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -34,7 +34,7 @@ export async function addOption(optionData: any, token: string) {
 // Cập nhật option
 export async function updateOption(id: number, updatedData: any, token: string) {
     try {
-        const response = await axios.put(`${BASE_URL}/api/options/${id}`, updatedData, {
+        const response = await axios.put(`${BASE_URL}/api/Options/${id}`, updatedData, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -49,7 +49,7 @@ export async function updateOption(id: number, updatedData: any, token: string) 
 // Xóa option theo ID
 export async function deleteOption(id: number, token: string) {
     try {
-        const response = await axios.delete(`${BASE_URL}/api/options/${id}`, {
+        const response = await axios.delete(`${BASE_URL}/api/Options/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

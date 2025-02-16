@@ -32,12 +32,14 @@ export async function getImageById(id: any, token: any) {
 }
 
 // Thêm mới một hình ảnh
-export async function addImage(imageData: any, token: any) {
+export async function addImageOption(optionId: any, imageData: any, token: any) {
     try {
-        const response = await axios.post(`${BASE_URL}/api/Images/insert`, imageData, {
+        const formData = new FormData();
+        formData.append("file", imageData);
+        const response = await axios.post(`${BASE_URL}/api/Products/upload-image?optionId=${optionId}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json",
+                "Content-Type": "multipart/form-data",
             },
         });
         return response.data;

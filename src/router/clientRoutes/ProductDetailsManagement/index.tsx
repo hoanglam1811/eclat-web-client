@@ -21,7 +21,6 @@ import { addImageOption } from "../../../services/ApiServices/imageService";
 
 const FormViewProduct = () => {
     const [imageFiles, setImageFiles] = useState<File[]>([]);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [images, setImages] = useState<string[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [totalQuantity, setTotalQuantity] = useState(0);
@@ -157,8 +156,8 @@ const FormViewProduct = () => {
 
             await updateProduct(Number(id), data, token);
             console.log(imageFiles)
-            
-            const updatedOptionsData = watch("options").map((option:any, index:number)=> ({
+
+            const updatedOptionsData = watch("options").map((option: any, index: number) => ({
                 productId: Number(id),
                 optionValue: option.optionValue,
                 quantity: option.quantity,
@@ -167,7 +166,7 @@ const FormViewProduct = () => {
                 optionId: option.optionId
             }));
             console.log("newOptionsData", watch("options"));
-            await Promise.all(updatedOptionsData.map((opt:any) => updateOption(opt.optionId ,opt, token)));
+            await Promise.all(updatedOptionsData.map((opt: any) => updateOption(opt.optionId, opt, token)));
 
             if (tempOptions.length > 0) {
                 const newOptionsData = tempOptions.map(option => ({
@@ -179,7 +178,7 @@ const FormViewProduct = () => {
                     // imgUrl: option.imgUrl
                 }));
 
-                
+
                 const newOptions = await Promise.all(newOptionsData.map(opt => addOption(opt, token)));
 
                 data.options = [...data.options, ...newOptions];
@@ -188,14 +187,14 @@ const FormViewProduct = () => {
             }
 
             //Update images for existing options
-            if(imageFiles.length > 0) {
-                const imageUrls = await Promise.all(product.options.map((option:any,index:number) => {
-                  if (hiddenOptions.includes(index) || !imageFiles[index]) return null; 
-                  return addImageOption(option.optionId, imageFiles[index], token).then((url:any) => url.data)
+            if (imageFiles.length > 0) {
+                const imageUrls = await Promise.all(product.options.map((option: any, index: number) => {
+                    if (hiddenOptions.includes(index) || !imageFiles[index]) return null;
+                    return addImageOption(option.optionId, imageFiles[index], token).then((url: any) => url.data)
                 }).filter(Boolean));
-                data.options.forEach((option:any,index:number) => {
-                  if(hiddenOptions.includes(index)) return
-                  option.imgUrl = imageUrls[index]
+                data.options.forEach((option: any, index: number) => {
+                    if (hiddenOptions.includes(index)) return
+                    option.imgUrl = imageUrls[index]
                 });
                 setImageFiles([]);
             }
@@ -312,82 +311,83 @@ const FormViewProduct = () => {
                                     </label>
                                     <div className="relative mt-1 h-72 w-full">
                                         {images.length > 0 ? (
-                                          <div className="relative h-full w-full">
-                                            {images.length > 1 && (
-                                              <div className="absolute top-1/2 left-0 z-10 transform -translate-y-1/2 flex items-center">
-                                                <Button
-                                                  type="primary"
-                                                  shape="circle"
-                                                  icon={<LeftOutlined />}
-                                                  onClick={handlePreviousImage}
-                                                  className="text-white bg-black opacity-50 hover:opacity-100"
-                                                  style={{ padding: '10px' }}
+                                            <div className="relative h-full w-full">
+                                                {images.length > 1 && (
+                                                    <div className="absolute top-1/2 left-0 z-10 transform -translate-y-1/2 flex items-center">
+                                                        <Button
+                                                            type="primary"
+                                                            shape="circle"
+                                                            icon={<LeftOutlined />}
+                                                            //onClick={handlePreviousImage}
+                                                            className="text-white bg-black opacity-50 hover:opacity-100"
+                                                            style={{ padding: '10px' }}
+                                                        />
+                                                    </div>
+                                                )}
+                                                <img
+                                                    src={images[currentIndex]}
+                                                    alt={`Product Preview ${currentIndex + 1}`}
+                                                    className="h-full w-full object-cover rounded-md"
                                                 />
-                                              </div>
-                                            )}
-                                            <img
-                                              src={images[currentIndex]}
-                                              alt={`Product Preview ${currentIndex + 1}`}
-                                              className="h-full w-full object-cover rounded-md"
-                                            />
-                                            {images.length > 1 && (
-                                              <div className="absolute top-1/2 right-0 z-10 transform -translate-y-1/2 flex items-center">
-                                                <Button
-                                                  type="primary"
-                                                  shape="circle"
-                                                  icon={<RightOutlined />}
-                                                  // onClick={handleNextImage}
-                                                  className="text-white bg-black opacity-50 hover:opacity-100"
-                                                  style={{ padding: '10px' }}
-                                                />
-                                              </div>
-                                            )}
-                                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
-                                              <button
-                                                type="button"
-                                                // onClick={() => handleReplaceImage(currentIndex)}
-                                                className="text-white text-2xl mx-2"
-                                              >
-                                                <EditOutlined />
-                                              </button>
-                                              <button
-                                                type="button"
-                                                // onClick={() => handleRemoveImage(currentIndex)}
-                                                className="text-white text-2xl mx-2"
-                                              >
-                                                <DeleteOutlined />
-                                              </button>
+                                                {images.length > 1 && (
+                                                    <div className="absolute top-1/2 right-0 z-10 transform -translate-y-1/2 flex items-center">
+                                                        <Button
+                                                            type="primary"
+                                                            shape="circle"
+                                                            icon={<RightOutlined />}
+                                                            // onClick={handleNextImage}
+                                                            className="text-white bg-black opacity-50 hover:opacity-100"
+                                                            style={{ padding: '10px' }}
+                                                        />
+                                                    </div>
+                                                )}
+                                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                                    <button
+                                                        type="button"
+                                                        // onClick={() => handleReplaceImage(currentIndex)}
+                                                        className="text-white text-2xl mx-2"
+                                                    >
+                                                        <EditOutlined />
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        // onClick={() => handleRemoveImage(currentIndex)}
+                                                        className="text-white text-2xl mx-2"
+                                                    >
+                                                        <DeleteOutlined />
+                                                    </button>
+                                                </div>
                                             </div>
-                                          </div>
                                         ) : (
-                                          <div className="h-full w-full bg-gray-200 flex items-center justify-center rounded-md">
-                                            <span className="text-gray-500">Hiện tại trống, hãy thêm ảnh vào</span>
-                                          </div>
+                                            <div className="h-full w-full bg-gray-200 flex items-center justify-center rounded-md">
+                                                <span className="text-gray-500">Hiện tại trống, hãy thêm ảnh vào</span>
+                                            </div>
                                         )}
 
                                         {/* Biểu tượng tải ảnh chỉ hiển thị khi không có ảnh */}
                                         {images.length === 0 && (
-                                          <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
-                                            <button
-                                              type="button"
-                                              onClick={() => document.getElementById('imageUpload')?.click()}
-                                              className="text-white text-2xl"
-                                            >
-                                              <UploadOutlined />
-                                            </button>
-                                          </div>
+                                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
+                                                <button
+                                                    disabled={!isEditing}
+                                                    type="button"
+                                                    onClick={() => document.getElementById('imageUpload')?.click()}
+                                                    className="text-white text-2xl"
+                                                >
+                                                    <UploadOutlined />
+                                                </button>
+                                            </div>
                                         )}
 
                                         {/* Input file ẩn */}
                                         <input
-                                          id="imageUpload"
-                                          type="file"
-                                          accept="image/*"
-                                          onChange={(e) => handleFileChange(e)} // Thêm ảnh mới hoặc thay thế ảnh
-                                          className="hidden"
-                                          multiple
+                                            id="imageUpload"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => handleFileChange(e)} // Thêm ảnh mới hoặc thay thế ảnh
+                                            className="hidden"
+                                            multiple
                                         />
-                                      </div>
+                                    </div>
 
                                 </div>
                             </div>
@@ -702,7 +702,7 @@ const FormViewProduct = () => {
                                                             </div>
                                                         )}
                                                         {!images[index] && product.options[index].images?.[0]?.imageUrl && (
-                                                          <div className="mt-4">
+                                                            <div className="mt-4">
                                                                 <Label className="text-left">Xem trước</Label>
                                                                 <img
                                                                     src={product.options[index].images[0].imageUrl}

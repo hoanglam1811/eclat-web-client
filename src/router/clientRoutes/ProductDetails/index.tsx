@@ -5,14 +5,13 @@ import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import ProductSkeleton from "../Home/ProductSkeleton";
 import { ProductCard } from "../../../components/footer/components/Home";
 import RouteNames from "../../../constants/routeNames";
-import { StarFilled, StarOutlined, UserOutlined, TagsOutlined, DollarOutlined, CalendarOutlined } from '@ant-design/icons';
-
 
 const ProductDetails = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
     const [quantity, setQuantity] = useState(1);
+
 
     const handleQuantityChange = (change: any) => {
         setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));
@@ -33,6 +32,13 @@ const ProductDetails = () => {
             status: "Hết hàng",
             usage_instruct: "Sử dụng khi đi tiệc, có thể kết hợp với các trang sức khác để tạo sự nổi bật. Lau sạch sau khi sử dụng.",
             imageUrl: "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
+            images: [
+                "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
+                "https://media.hcdn.vn/wysiwyg/kimhuy/sua-rua-mat-cerave-sach-sau-cho-da-thuong-den-da-dau.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-tao-bot-cho-da-thuong-den-da-dau-3.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-tao-bot-cho-da-thuong-den-da-dau-1.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-cho-da-thuong-den-kho-1.jpg"
+            ],
             total_reviews: 200
         },
         {
@@ -49,6 +55,13 @@ const ProductDetails = () => {
             usage_instruct: "Dùng khi mặc trang phục tối màu để tạo điểm nhấn. Giữ nơi khô ráo và thoáng mát.",
             status: "Còn hàng",
             imageUrl: "https://product.hstatic.net/1000006063/product/glam_2.11.1_18a5ca6f9b814d9bb11125d8c6d2f704_1024x1024.png",
+            images: [
+                "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
+                "https://media.hcdn.vn/wysiwyg/kimhuy/sua-rua-mat-cerave-sach-sau-cho-da-thuong-den-da-dau.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-tao-bot-cho-da-thuong-den-da-dau-3.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-tao-bot-cho-da-thuong-den-da-dau-1.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-cho-da-thuong-den-kho-1.jpg"
+            ],
             total_reviews: 200
         },
         {
@@ -65,6 +78,13 @@ const ProductDetails = () => {
             usage_instruct: "Phù hợp với các bộ trang phục ngày hè. Tránh tiếp xúc với hóa chất và nước để duy trì độ bóng lâu dài.",
             status: "Còn hàng",
             imageUrl: "https://product.hstatic.net/1000006063/product/1_b5d9938d4e0d4b71b98a3ac1e059d73e_1024x1024.png",
+            images: [
+                "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
+                "https://media.hcdn.vn/wysiwyg/kimhuy/sua-rua-mat-cerave-sach-sau-cho-da-thuong-den-da-dau.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-tao-bot-cho-da-thuong-den-da-dau-3.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-tao-bot-cho-da-thuong-den-da-dau-1.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-cho-da-thuong-den-kho-1.jpg"
+            ],
             total_reviews: 200
         },
         {
@@ -81,6 +101,13 @@ const ProductDetails = () => {
             usage_instruct: "Thích hợp cho các buổi tiệc và sự kiện quan trọng. Nên đeo sau khi hoàn tất trang điểm để tránh tiếp xúc trực tiếp với các sản phẩm mỹ phẩm.",
             status: "Còn hàng",
             imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
+            images: [
+                "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
+                "https://media.hcdn.vn/wysiwyg/kimhuy/sua-rua-mat-cerave-sach-sau-cho-da-thuong-den-da-dau.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-tao-bot-cho-da-thuong-den-da-dau-3.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-tao-bot-cho-da-thuong-den-da-dau-1.jpg",
+                "https://media.hcdn.vn/wysiwyg/Chau/sua-rua-mat-cerave-cho-da-thuong-den-kho-1.jpg"
+            ],
             total_reviews: 200
         }
     ];
@@ -88,6 +115,11 @@ const ProductDetails = () => {
 
     const { id } = useParams<{ id: string }>();
     const product = products.find((product) => product.id === id);
+    const [currentImage, setCurrentImage] = useState(product?.images[0] || "");
+
+    if (!product) {
+        return <div className="text-center py-10">Sản phẩm không tồn tại.</div>;
+    }
 
     const handleAddToCart = (product: any, quantity: any) => {
         const existingCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
@@ -108,7 +140,6 @@ const ProductDetails = () => {
             });
         }
 
-        // Lưu danh sách sản phẩm cập nhật vào sessionStorage
         sessionStorage.setItem("cartItems", JSON.stringify(existingCart));
         navigate(RouteNames.CART);
     };
@@ -147,11 +178,24 @@ const ProductDetails = () => {
                             {/* Image Section */}
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                                 <div>
+                                    {/* Large Image */}
                                     <img
-                                        src={product?.imageUrl}
-                                        alt={product?.name}
+                                        src={currentImage}
+                                        alt={product.name}
                                         className="w-full h-auto rounded-lg shadow-md object-cover"
                                     />
+                                    {/* Thumbnails */}
+                                    <div className="flex ml-3 mt-4 space-x-2">
+                                        {product.images.map((image, index) => (
+                                            <img
+                                                key={index}
+                                                src={image}
+                                                alt={`Thumbnail ${index + 1}`}
+                                                className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
+                                                onClick={() => setCurrentImage(image)}
+                                            />
+                                        ))}
+                                    </div>
                                 </div>
 
                                 {/* Product Details */}
@@ -281,20 +325,6 @@ const ProductDetails = () => {
                     </div>
                 </div>
 
-                {/* Suggested Products */}
-                <div className="max-w-7xl mx-auto px-6 mt-3 bg-white shadow-lg mb-3">
-                    <h1 className="pt-10 pb-10 text-3xl font-bold text-[#578a3f]">Đề xuất cho bạn</h1>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-7">
-                        {isLoading ? (
-                            <ProductSkeleton />
-                        ) : products.length > 0 ? (
-                            products.map((item) => <ProductCard key={item.id} product={item} />)
-                        ) : (
-                            <p className="text-gray-600 col-span-4 text-center">Không có sản phẩm phù hợp.</p>
-                        )}
-                    </div>
-                </div>
-
                 {/* Product Details Section */}
                 <div className="max-w-7xl mx-auto p-6 bg-white shadow-lg">
                     <h1 className="mt-2 text-3xl font-bold text-[#578a3f]">Chi tiết sản phẩm</h1>
@@ -343,6 +373,22 @@ const ProductDetails = () => {
                         </ul>
                     </section>
                 </div>
+
+                {/* Suggested Products */}
+                <div className="max-w-7xl mx-auto px-6 mt-3 bg-white shadow-lg mb-3">
+                    <h1 className="pt-10 pb-10 text-3xl font-bold text-[#578a3f]">Đề xuất cho bạn</h1>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-7">
+                        {isLoading ? (
+                            <ProductSkeleton />
+                        ) : products.length > 0 ? (
+                            products.map((item) => <ProductCard key={item.id} product={item} />)
+                        ) : (
+                            <p className="text-gray-600 col-span-4 text-center">Không có sản phẩm phù hợp.</p>
+                        )}
+                    </div>
+                </div>
+
+
             </section>
         </>
     );

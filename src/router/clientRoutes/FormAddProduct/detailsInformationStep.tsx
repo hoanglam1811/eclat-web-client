@@ -23,7 +23,7 @@ const schema = z.object({
   //   .min(1, "Please choose at least one certificate"),
   // major: z.string().min(1, "Please choose a major"),
   // documents: z.array(z.number().or(z.object({}))).min(1, "At least one document is required"),
-  attribute: z.string().min(1, "Attribute is required"),
+  attribute: z.string().min(1, "Thuộc tính này là bắt buộc"),
   options: z
     .array(
       z.object({

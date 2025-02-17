@@ -8,24 +8,14 @@ import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import Select from "react-select";
 import { Textarea } from "../../../components/ui/textarea";
-import { Button, Carousel } from "antd";
-import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, UploadOutlined } from "@ant-design/icons";
-import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import { useNavigate } from "react-router-dom";
-import { getAllBrands } from "../../../services/ApiServices/brandService";
-import { getAllTags } from "../../../services/ApiServices/tagService";
+import { Button } from "antd";
 import { originCountries } from "./originCountries";
-
-
-interface OptionType {
-  value: string;
-  label: string;
-}
+import { UploadOutlined } from "@ant-design/icons";
 
 const schema = z.object({
-  imageUrl: z.string().optional(),
+  imageUrl: z
+    .string()
+    .min(1, "Ảnh là bắt buộc"),
   productName: z.string().min(1, "Tên sản phẩm là bắt buộc"),
   description: z.string().min(1, "Mô tả sản phẩm là bắt buộc"),
   usageInstruct: z.string().min(1, "Hướng dẫn sử dụng là bắt buộc"),
@@ -38,7 +28,8 @@ const schema = z.object({
 const GeneralInformationStep = ({
   formData,
   onSave,
-  handleUploadFile,
+  imageFiles,
+  setImageFiles,
   skinTypes,
   brands,
   tags,
@@ -46,15 +37,15 @@ const GeneralInformationStep = ({
 }: {
   formData: any;
   onSave: (data: any) => void;
-  handleUploadFile: any;
+  imageFiles: any;
+  setImageFiles: any;
   skinTypes: any;
   brands: any;
   tags: any;
   tagFull: any;
 }) => {
-  const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [images, setImages] = useState<string[]>([]);
+  // const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [currentImage, setCurrentImage] = useState<File | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const {
@@ -70,65 +61,29 @@ const GeneralInformationStep = ({
     defaultValues: formData,
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (files) {
-      const newFiles = Array.from(files);
-      const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
-
-      if (index !== undefined) {
-        // Nếu index được truyền vào, thay thế ảnh tại vị trí đó
-        setImages((prev) => {
-          const updatedImages = [...prev];
-          updatedImages[index] = newPreviews[0]; // Thay thế ảnh tại vị trí index
-          return updatedImages;
-        });
-        setImageFiles((prev) => {
-          const updatedFiles = [...prev];
-          updatedFiles[index] = newFiles[0]; // Thay thế file tại vị trí index
-          return updatedFiles;
-        });
-      } else {
-        // Nếu không có index (thêm ảnh mới)
-        setImageFiles((prev) => [...prev, ...newFiles]); // Thêm ảnh mới vào cuối
-        setImages((prev) => [...prev, ...newPreviews]); // Thêm ảnh preview mới vào cuối
-      }
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files).slice(0, 4);
+      setImageFiles(newFiles);
+      setCurrentImage(newFiles[0] || null);
+      setValue("imageUrl", URL.createObjectURL(newFiles[0]));
+    } else {
+      setValue("imageUrl", "");
     }
   };
-
-  const handleRemoveImage = (index: number) => {
-    setImageFiles((prev) => prev.filter((_, i) => i !== index)); // Xóa file thực tế tại vị trí index
-    setImages((prev) => prev.filter((_, i) => i !== index)); // Xóa URL preview tại vị trí index
-  };
-
-  const handleReplaceImage = (index: number) => {
-    const fileInput = document.getElementById('imageUpload') as HTMLInputElement;
-    fileInput.click();
-    fileInput.onchange = (e: any) => handleFileChange(e, index); // Đảm bảo chỉ thay thế ảnh tại index
-  };
-
-
-  const handleNextImage = () => {
-    if (currentIndex < images.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
-  };
-
-  // Hàm để chuyển về ảnh trước
-  const handlePreviousImage = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
-
 
   useEffect(() => {
-    return () => {
-      images.forEach((image) => URL.revokeObjectURL(image));
-    };
-  }, [images]);
+    // return () => {
+    //   imageFiles.forEach((file) => URL.revokeObjectURL(URL.createObjectURL(file)));
+    // };
+  }, [imageFiles]);
 
   const handleNext = async () => {
+    if (!getValues("imageUrl")) {
+      setValue("imageUrl", "");
+    }
+
     const isValid = await trigger();
     if (!isValid) {
       console.error("Validation failed", errors);
@@ -136,6 +91,7 @@ const GeneralInformationStep = ({
     }
     const data = getValues();
     console.log("Form data: ", data);
+    console.log(imageFiles)
     onSave(data);
   };
 
@@ -149,95 +105,71 @@ const GeneralInformationStep = ({
               Thông tin chung
             </h2>
 
-            <div className="grid grid-cols-4 gap-6">
-              {/* Phần hiển thị ảnh (chiếm 1 cột) */}
-              <div className="col-span-1">
-                <div className="mb-6 relative group">
-                  <label className="block text-sm font-medium text-gray-700 text-left">
-                    Hình ảnh sản phẩm <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative mt-1 h-72 w-full">
-                    {images.length > 0 ? (
-                      <div className="relative h-full w-full">
-                        {images.length > 1 && (
-                          <div className="absolute top-1/2 left-0 z-10 transform -translate-y-1/2 flex items-center">
-                            <Button
-                              type="primary"
-                              shape="circle"
-                              icon={<LeftOutlined />}
-                              onClick={handlePreviousImage}
-                              className="text-white bg-black opacity-50 hover:opacity-100"
-                              style={{ padding: '10px' }}
-                            />
-                          </div>
-                        )}
-                        <img
-                          src={images[currentIndex]}
-                          alt={`Product Preview ${currentIndex + 1}`}
-                          className="h-full w-full object-cover rounded-md"
-                        />
-                        {images.length > 1 && (
-                          <div className="absolute top-1/2 right-0 z-10 transform -translate-y-1/2 flex items-center">
-                            <Button
-                              type="primary"
-                              shape="circle"
-                              icon={<RightOutlined />}
-                              onClick={handleNextImage}
-                              className="text-white bg-black opacity-50 hover:opacity-100"
-                              style={{ padding: '10px' }}
-                            />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
-                          <button
-                            type="button"
-                            onClick={() => handleReplaceImage(currentIndex)}
-                            className="text-white text-2xl mx-2"
-                          >
-                            <EditOutlined />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveImage(currentIndex)}
-                            className="text-white text-2xl mx-2"
-                          >
-                            <DeleteOutlined />
-                          </button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="h-full w-full bg-gray-200 flex items-center justify-center rounded-md">
-                        <span className="text-gray-500">Hiện tại trống, hãy thêm ảnh vào</span>
-                      </div>
-                    )}
+            <div className="grid grid-cols-5 gap-6">
+              {/* Phần hiển thị ảnh (chiếm 2 cột) */}
+              <div className="col-span-2 text-left">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Hình ảnh sản phẩm <span className="text-red-500">*</span>
+                </label>
 
-                    {/* Biểu tượng tải ảnh chỉ hiển thị khi không có ảnh */}
-                    {images.length === 0 && (
-                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
-                        <button
-                          type="button"
-                          onClick={() => document.getElementById('imageUpload')?.click()}
-                          className="text-white text-2xl"
-                        >
-                          <UploadOutlined />
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Input file ẩn */}
-                    <input
-                      id="imageUpload"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange(e)} // Thêm ảnh mới hoặc thay thế ảnh
-                      className="hidden"
-                      multiple
-                    />
+                {/* Hiển thị ảnh lớn */}
+                {currentImage ? (
+                  <img
+                    src={URL.createObjectURL(currentImage)}
+                    alt="Ảnh chính"
+                    className="w-full h-[350px] object-cover rounded-lg shadow-md border-2 border-gray-300"
+                  />
+                ) : (imageFiles.length > 0 ? (
+                  <img
+                    src={URL.createObjectURL(imageFiles[0])}
+                    alt="Ảnh chính"
+                    className="w-full h-[350px] object-cover rounded-lg shadow-md border-2 border-gray-300"
+                  />
+                ) :
+                  <div className="w-full h-72 flex items-center justify-center bg-gray-200 rounded-lg border-2 border-dashed border-gray-300">
+                    <span className="text-gray-500">Chưa có ảnh</span>
                   </div>
+                )}
 
+                {/* Danh sách ảnh nhỏ */}
+                <div className="flex mt-4 space-x-2 ml-[18px]">
+                  {imageFiles.map((file: any, index: any) => (
+                    <img
+                      key={index}
+                      src={URL.createObjectURL(file)}
+                      alt={`Ảnh ${index + 1}`}
+                      className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 ${file === currentImage ? "border-blue-500 shadow-lg" : "border-gray-300"}`}
+                      onClick={() => setCurrentImage(file)}
+                    />
+                  ))}
                 </div>
-              </div>
 
+                {/* Nút upload ảnh */}
+                <div className="mt-4">
+                  <input
+                    id="imageUpload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    multiple
+                  />
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("imageUpload")?.click()}
+                    className="w-full bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center shadow-md hover:bg-blue-700"
+                  >
+                    <UploadOutlined className="mr-2" />
+                    Tải ảnh lên (Tối đa 4 ảnh)
+                  </button>
+                </div>
+
+                {/* Hiển thị thông báo lỗi nếu không có ảnh */}
+                {errors.imageUrl?.message && (
+                  <p className="text-sm text-red-500 mt-1">{String(errors.imageUrl?.message)}</p>
+                )}
+
+              </div>
 
               {/* Phần thông tin sản phẩm (chiếm 3 cột) */}
               <div className="col-span-3 space-y-8">

@@ -21,6 +21,8 @@ import { addProduct } from "../../../services/ApiServices/productService";
 const FormCreateProduct = () => {
     const [step, setStep] = useState(1);
     const [imageFile, setImageFile] = useState<File[]>([]);
+    const [imageFiles, setImageFiles] = useState<File[]>([]);
+
     const [isLoading, setIsLoading] = useState(false);
 
     const [skinTypes, setSkinTypes] = useState([]);
@@ -196,7 +198,9 @@ const FormCreateProduct = () => {
                                 <InformationStep
                                     formData={formData}
                                     onSave={handleNext}
-                                    handleUploadFile={handleFileChange}
+                                    imageFiles={imageFiles}
+                                    setImageFiles={setImageFiles}
+                                    // handleUploadFile={handleFileChange}
                                     skinTypes={skinTypes}
                                     brands={brands}
                                     tags={tags}
@@ -221,6 +225,7 @@ const FormCreateProduct = () => {
                                 <ViewDataCreated
                                     formData={formData}
                                     onBack={handleBack}
+                                    imageFiles={imageFiles}
                                     skinTypes={skinTypes}
                                     brands={brands}
                                     tags={tags}

@@ -8,17 +8,19 @@ import { Input } from "../../../components/ui/input";
 import { originCountries } from "./originCountries";
 import { Button, notification } from "antd";
 import { RootState } from "../../../store/store";
-import { addProduct } from "../../../services/ApiServices/productService";
+import { addProduct, uploadImage } from "../../../services/ApiServices/productService";
 import RouteNames from "../../../constants/routeNames";
 
-const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, tagFull }: {
+const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles, tagFull }: {
     formData: any;
     skinTypes: any; brands: any; tags: any; tagFull: any;
+    imageFiles: any;
     onBack: (data: any) => void;
 }) => {
     const user = useSelector((state: any) => state.token.user);
-    const isApplicant = user?.role;
     const [imageFile, setImageFile] = useState<File[]>([]);
+    const [currentImage, setCurrentImage] = useState<File | null>(null);
+
     const [isLoading, setIsLoading] = useState(false);
     const token = useSelector((state: RootState) => state.token.token);
     const navigate = useNavigate();
@@ -26,26 +28,30 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, tagFull }:
     const handleAddNewProduct = async () => {
         setIsLoading(true);
         try {
-            // const imageUrl = await uploadFile(imageFile);
-            // if (!imageUrl) {
-            //     notification.error({
-            //         message: "Error",
-            //         description: "Failed to upload image. Please try again.",
-            //     });
-            //     setIsLoading(false);
-            //     return;
-
-            // }
             if (!token) {
                 navigate("/login");
                 return;
             }
 
-            const response = await addProduct(formData, token)
-            console.log("DATA", response);
+            if (imageFile.length > 0) {
+                const uploadResponse = await uploadImage(imageFile[0], token, formData.productId, formData.optionId);
+
+                if (uploadResponse && uploadResponse.url) {
+                    formData.imageUrl = uploadResponse.url;
+                } else {
+                    notification.error({
+                        message: "Error",
+                        description: "Không thể tải ảnh lên. Vui lòng thử lại.",
+                    });
+                    setIsLoading(false);
+                    return;
+                }
+            }
+
+            const response = await addProduct(formData, token);
             setIsLoading(false);
 
-            if (response.status == "ok" || response.status === 201) {
+            if (response.status === "ok" || response.status === 201) {
                 notification.success({
                     message: "Tạo thành công",
                     description: "Sản phẩm đã được tạo thành công",
@@ -53,14 +59,11 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, tagFull }:
                 navigate(RouteNames.PRODUCTS_MANAGEMENT);
             }
         } catch (error: any) {
-            console.error("Error creating scholarship program", error);
-            console.error("Error response:", error.response.data);
-
+            console.error("Error creating product", error);
             setIsLoading(false);
             notification.error({
                 message: "Error",
-                description:
-                    "Không thể tạo sản phẩm. Vui lòng thử lại",
+                description: "Không thể tạo sản phẩm. Vui lòng thử lại",
             });
         }
     };
@@ -73,16 +76,47 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, tagFull }:
                     Thông tin sản phẩm {formData.productName}
                 </h2>
 
-                <div className="grid grid-cols-4 gap-6">
+                <div className="grid grid-cols-5 gap-6">
                     {/* Phần hiển thị ảnh (chiếm 1 cột) */}
-                    <div className="col-span-1">
-                        <div className="mb-6 relative group">
-                            <label className="block text-sm font-medium text-gray-700 text-left">
-                                Hình ảnh sản phẩm <span className="text-red-500">*</span>
-                            </label>
-                            <div className="relative mt-1 h-72 w-full">
+                    <div className="col-span-2 text-left">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Hình ảnh sản phẩm <span className="text-red-500">*</span>
+                        </label>
+
+                        {/* Hiển thị ảnh lớn */}
+                        {currentImage ? (
+                            <img
+                                src={URL.createObjectURL(currentImage)}
+                                alt="Ảnh chính"
+                                className="w-full h-[350px] object-cover rounded-lg shadow-md border-2 border-gray-300"
+                            />
+                        ) : (imageFiles.length > 0 ? (
+                            <img
+                                src={URL.createObjectURL(imageFiles[0])}
+                                alt="Ảnh chính"
+                                className="w-full h-[350px] object-cover rounded-lg shadow-md border-2 border-gray-300"
+                            />
+                        ) :
+                            <div className="w-full h-72 flex items-center justify-center bg-gray-200 rounded-lg border-2 border-dashed border-gray-300">
+                                <span className="text-gray-500">Chưa có ảnh</span>
                             </div>
+                        )}
+
+                        {/* Danh sách ảnh nhỏ */}
+                        <div className="flex mt-4 space-x-2 ml-[18px]">
+                            {imageFiles.map((file: any, index: any) => (
+                                <img
+                                    key={index}
+                                    src={URL.createObjectURL(file)}
+                                    alt={`Ảnh ${index + 1}`}
+                                    className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 ${file === currentImage ? "border-blue-500 shadow-lg" : "border-gray-300"}`}
+                                    onClick={() => setCurrentImage(file)}
+                                />
+                            ))}
                         </div>
+
+
+
                     </div>
 
 
@@ -264,8 +298,12 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, tagFull }:
                     <Button className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600" onClick={onBack}>
                         Về trước
                     </Button>
-                    <Button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" onClick={handleAddNewProduct}>
-                        Tạo sản phẩm
+                    <Button
+                        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                        onClick={handleAddNewProduct}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Đang tạo sản phẩm..." : "Tạo sản phẩm"}
                     </Button>
                 </div>
             </form>

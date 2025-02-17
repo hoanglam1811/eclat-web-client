@@ -92,3 +92,28 @@ export async function searchProducts(name: string, token: string) {
     throw error;
   }
 }
+
+export async function uploadImage(file: any, token: any, productId: any, optionId: any) {
+  try {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (productId) {
+      formData.append("productId", productId);
+    }
+    if (optionId) {
+      formData.append("optionId", optionId);
+    }
+
+    const response = await axios.post(`${BASE_URL}/api/Products/upload-image`, formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Failed to upload image:", error);
+    throw error;
+  }
+}

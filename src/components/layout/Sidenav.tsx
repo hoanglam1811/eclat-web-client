@@ -162,9 +162,9 @@ function Sidenav({ color }:any) {
 
   return (
     <>
-      <div className="brand">
-        <img src={logo} alt="" />
-        <span>Muse Dashboard</span>
+      <div className="brand flex items-center gap-3">
+        <img className="w-[60px] h-[60px]" src={"/src/assets/Éclat.png"} alt="" />
+        <span>Éclat Dashboard</span>
       </div>
       <hr />
       <Menu theme="light" mode="inline">
@@ -249,7 +249,7 @@ function Sidenav({ color }:any) {
           </NavLink>
         </Menu.Item>
       </Menu>
-      <div className="aside-footer">
+      {/*<div className="aside-footer">
         <div
           className="footer-box"
           style={{
@@ -265,7 +265,7 @@ function Sidenav({ color }:any) {
             DOCUMENTATION
           </Button>
         </div>
-      </div>
+      </div>*/}
     </>
   );
 }

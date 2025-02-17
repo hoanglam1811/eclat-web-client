@@ -782,7 +782,7 @@ ul.ant-menu.ant-menu-root.ant-menu-inline.ant-menu-light.left-nav
   margin-top: 15px;
 }
 .ant-layout {
-  background: #fafafa;
+  background: rgb(248, 247, 218);
 }
 .pageheader {
   display: flex;

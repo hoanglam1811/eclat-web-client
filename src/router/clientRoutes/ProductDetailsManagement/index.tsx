@@ -17,7 +17,7 @@ import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
 import { getAllTags } from "../../../services/ApiServices/tagService";
 import { DeleteOutlined, EditOutlined, LeftOutlined, RightOutlined, UploadOutlined } from "@ant-design/icons";
 import { FaPlus } from "react-icons/fa";
-import { addImageOption } from "../../../services/ApiServices/imageService";
+import { addImageOption, deleteImage } from "../../../services/ApiServices/imageService";
 
 const FormViewProduct = () => {
     const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -182,15 +182,21 @@ const FormViewProduct = () => {
                 
                 const newOptions = await Promise.all(newOptionsData.map(opt => addOption(opt, token)));
 
-                data.options = [...data.options, ...newOptions];
+                data.options = [...data.options, ...newOptions.map((opt:any) => opt.data)];
 
                 setTempOptions([]);
             }
 
             //Update images for existing options
+            console.log("data", data);
+            
             if(imageFiles.length > 0) {
-                const imageUrls = await Promise.all(product.options.map((option:any,index:number) => {
+                const imageUrls = await Promise.all(data.options.map((option:any,index:number) => {
                   if (hiddenOptions.includes(index) || !imageFiles[index]) return null; 
+                  option.images.forEach((image:any) => {
+                    deleteImage(image.imageId, token);
+                  })
+                  // console.log("option", option);
                   return addImageOption(option.optionId, imageFiles[index], token).then((url:any) => url.data)
                 }).filter(Boolean));
                 data.options.forEach((option:any,index:number) => {
@@ -263,7 +269,7 @@ const FormViewProduct = () => {
             // setValue('productType', productData.data.categoryId);
             setValue('tag.tagId', productData.data.tagId);
             setValue('attribute', productData.data.attribute || "N/A");
-            setValue('options', productData.data.options || []);
+            // setValue('options', productData.data.options || []);
 
             if (productData.data.options?.length > 0) {
                 const optionsData = await Promise.all(
@@ -272,6 +278,7 @@ const FormViewProduct = () => {
                     )
                 );
                 setProduct({ ...productData.data, options: optionsData.map((opt: any) => opt.data) });
+                setValue('options', optionsData.map((opt: any) => opt.data) || []);
             }
         } catch (error) {
             console.error("Error fetching product data", error);
@@ -319,7 +326,7 @@ const FormViewProduct = () => {
                                                   type="primary"
                                                   shape="circle"
                                                   icon={<LeftOutlined />}
-                                                  onClick={handlePreviousImage}
+                                                  // onClick={handlePreviousImage}
                                                   className="text-white bg-black opacity-50 hover:opacity-100"
                                                   style={{ padding: '10px' }}
                                                 />
@@ -382,6 +389,7 @@ const FormViewProduct = () => {
                                         <input
                                           id="imageUpload"
                                           type="file"
+                                          disabled={!isEditing}
                                           accept="image/*"
                                           onChange={(e) => handleFileChange(e)} // Thêm ảnh mới hoặc thay thế ảnh
                                           className="hidden"

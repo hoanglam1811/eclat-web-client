@@ -68,7 +68,7 @@ export async function updateImage(id: any, imageData: any, token: any) {
 // Xóa hình ảnh theo ID
 export async function deleteImage(id: any, token: any) {
     try {
-        const response = await axios.delete(`${BASE_URL}/api/Images/${id}`, {
+        const response = await axios.delete(`${BASE_URL}/api/images/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

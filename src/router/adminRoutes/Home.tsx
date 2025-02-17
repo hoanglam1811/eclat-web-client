@@ -364,7 +364,7 @@ function Home() {
                       </Title>
                     </Col>
                     <Col xs={6}>
-                      <div className="icon-box">{c.icon}</div>
+                      <div className="icon-box flex justify-center items-center">{c.icon}</div>
                     </Col>
                   </Row>
                 </div>

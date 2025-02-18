@@ -23,6 +23,8 @@ const FormCreateProduct = () => {
     const [imageFile, setImageFile] = useState<File[]>([]);
     const [imageFiles, setImageFiles] = useState<File[]>([]);
 
+    const [optionImageFiles, setOptionImageFiles] = useState<File[]>([]);
+    const [optionImages, setOptionImages] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     const [skinTypes, setSkinTypes] = useState([]);
@@ -216,8 +218,12 @@ const FormCreateProduct = () => {
                                     onSave={handleNext}
                                     onBack={handleBack}
                                     handleUploadFile={handleFileChange}
-                                />
-                            </>
+                                    imageFiles={optionImageFiles}
+                                    setImageFiles={setOptionImageFiles}
+                                    images={optionImages}
+                                    setImages={setOptionImages}
+                                  />
+                              </>
                         )}
 
                         {step === 3 && (
@@ -230,6 +236,8 @@ const FormCreateProduct = () => {
                                     brands={brands}
                                     tags={tags}
                                     tagFull={tagFull}
+                                    optionImages={optionImages}
+                                    optionImageFiles={optionImageFiles}
                                 />
                             </>
                         )}

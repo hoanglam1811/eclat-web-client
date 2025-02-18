@@ -8,14 +8,17 @@ import { Input } from "../../../components/ui/input";
 import { originCountries } from "./originCountries";
 import { Button, notification } from "antd";
 import { RootState } from "../../../store/store";
-import { addProduct, uploadImage } from "../../../services/ApiServices/productService";
+import { addProduct, getProductById, uploadImage } from "../../../services/ApiServices/productService";
 import RouteNames from "../../../constants/routeNames";
+import { addImageOption } from "../../../services/ApiServices/imageService";
 
-const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles, tagFull }: {
+const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles, tagFull, optionImages, optionImageFiles }: {
     formData: any;
     skinTypes: any; brands: any; tags: any; tagFull: any;
     imageFiles: any;
     onBack: (data: any) => void;
+    optionImages: any;
+    optionImageFiles: any;
 }) => {
     const user = useSelector((state: any) => state.token.user);
     const [imageFile, setImageFile] = useState<File[]>([]);
@@ -33,22 +36,17 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles
                 return;
             }
 
-            if (imageFile.length > 0) {
-                const uploadResponse = await uploadImage(imageFile[0], token, formData.productId, formData.optionId);
+            const response = await addProduct(formData, token);
+            const product = await getProductById(response.data.productId, token);
+            console.log(product);
 
-                if (uploadResponse && uploadResponse.url) {
-                    formData.imageUrl = uploadResponse.url;
-                } else {
-                    notification.error({
-                        message: "Error",
-                        description: "Không thể tải ảnh lên. Vui lòng thử lại.",
-                    });
-                    setIsLoading(false);
-                    return;
-                }
+            if (imageFiles.length > 0) {
+                await Promise.all(imageFiles.map((file: any) => uploadImage(file, token, product.data.productId)))
             }
 
-            const response = await addProduct(formData, token);
+            if(optionImageFiles.length > 0) {
+                await Promise.all(product.data.options.map((option: any, index: number) => addImageOption(option.optionId, optionImageFiles[index], token)))
+            }
             setIsLoading(false);
 
             if (response.status === "ok" || response.status === 201) {
@@ -255,6 +253,9 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles
                                     >
                                         <div className="grid grid-cols-3 gap-4">
                                             <div className="col-span-2">
+                                                <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                    Ví dụ: Da dầu, Da khô, 216ml, 348ml.. <span className="text-red-500">*</span>
+                                                </Label>
                                                 <Input
                                                     defaultValue={_option.optionValue || "N/A"}
                                                     disabled
@@ -263,6 +264,9 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles
                                                 />
                                             </div>
                                             <div className="col-span-1">
+                                                <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                    Số lượng <span className="text-red-500">*</span>
+                                                </Label>
                                                 <Input
                                                     type="number"
                                                     disabled
@@ -274,19 +278,40 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles
                                         </div>
 
                                         <div className="grid grid-cols-3 gap-4 mt-3">
+                                          <div className="col-span-1">
+                                            <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                Giá gốc <span className="text-red-500">*</span>
+                                            </Label>
                                             <Input
                                                 defaultValue={_option.optionPrice || "N/A"}
                                                 placeholder="Nhập giá gốc"
                                                 disabled
                                                 className="w-full"
                                             />
+                                          </div>
+                                          <div className="col-span-1">
+                                            <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                Giá khuyến mãi <span className="text-red-500">*</span>
+                                            </Label>
                                             <Input
                                                 defaultValue={_option.discPrice || "N/A"}
                                                 placeholder="Nhập giá khuyến mãi"
                                                 disabled
                                                 className="w-full"
                                             />
-                                            <img src={_option.imageUrl} className="w-12 h-12 rounded-md" alt="" />
+                                          </div>
+                                        </div>
+                                        <div className="mt-3 flex justify-center col-span-3">
+                                            {optionImages[index] && (
+                                                <div className="mt-4">
+                                                    <Label className="text-left">Xem trước</Label>
+                                                    <img
+                                                        src={optionImages[index]}
+                                                        alt="Logo Preview"
+                                                        className="w-full h-40 object-cover border rounded-md mt-2"
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}

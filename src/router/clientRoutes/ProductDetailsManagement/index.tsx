@@ -9,7 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { originCountries } from "./originCountries";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import { getProductById, updateProduct } from "../../../services/ApiServices/productService";
+import { getProductById, updateProduct, uploadImage } from "../../../services/ApiServices/productService";
 import { addOption, deleteOption, getOptionById, updateOption } from "../../../services/ApiServices/optionService";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { getAllCategories } from "../../../services/ApiServices/categoryService";
@@ -26,6 +26,8 @@ const FormViewProduct = () => {
     const [totalQuantity, setTotalQuantity] = useState(0);
 
 
+    const [productImageFiles, setProductImageFiles] = useState<File[]>([]);
+    const [currentImage, setCurrentImage] = useState<File | null>(null);
     const navigate = useNavigate();
 
     const {
@@ -36,6 +38,18 @@ const FormViewProduct = () => {
         setValue,
         getValues,
     } = useForm();
+
+  const handleProductFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const newFiles = Array.from(files).slice(0, 4);
+      setProductImageFiles(newFiles);
+      setCurrentImage(newFiles[0] || null);
+      setValue("imageUrl", URL.createObjectURL(newFiles[0]));
+    } else {
+      setValue("imageUrl", "");
+    }
+  };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
         const files = e.target.files;
@@ -157,6 +171,13 @@ const FormViewProduct = () => {
             await updateProduct(Number(id), data, token);
             console.log(imageFiles)
 
+            //Update product images
+            if(productImageFiles.length > 0 && typeof productImageFiles[0] !== "string") {
+                await Promise.all(product.productImages.map((image: any) => deleteImage(image.imageId, token)));
+                await Promise.all(productImageFiles.map((image: any) => uploadImage(image, token, Number(id))));
+            }
+
+            //Update options
             const updatedOptionsData = watch("options").map((option: any, index: number) => ({
                 productId: Number(id),
                 optionValue: option.optionValue,
@@ -168,6 +189,7 @@ const FormViewProduct = () => {
             console.log("newOptionsData", watch("options"));
             await Promise.all(updatedOptionsData.map((opt: any) => updateOption(opt.optionId, opt, token)));
 
+            //Add new options
             if (tempOptions.length > 0) {
                 const newOptionsData = tempOptions.map(option => ({
                     productId: Number(id),
@@ -186,9 +208,9 @@ const FormViewProduct = () => {
                 setTempOptions([]);
             }
 
-            //Update images for existing options
             console.log("data", data);
-            
+ 
+            //Update images for options
             if(imageFiles.length > 0) {
                 const imageUrls = await Promise.all(data.options.map((option:any,index:number) => {
                   if (hiddenOptions.includes(index) || !imageFiles[index]) return null; 
@@ -257,6 +279,7 @@ const FormViewProduct = () => {
             const productData = await getProductById(Number(id), token);
             console.log(productData)
             setProduct(productData.data);
+            setProductImageFiles(productData.data.productImages.map((image: any) => image.imageUrl));
 
             setValue('productName', productData.data.productName);
             setValue('description', productData.data.description);
@@ -309,94 +332,71 @@ const FormViewProduct = () => {
                             Thông tin sản phẩm {product.productName}
                         </h2>
 
-                        <div className="grid grid-cols-4 gap-6">
+                        <div className="grid grid-cols-5 gap-6">
                             {/* Phần hiển thị ảnh (chiếm 1 cột) */}
-                            <div className="col-span-1">
+                            <div className="col-span-2 text-left">
                                 <div className="mb-6 relative group">
                                     <label className="block text-sm font-medium text-gray-700 text-left">
                                         Hình ảnh sản phẩm <span className="text-red-500">*</span>
                                     </label>
-                                    <div className="relative mt-1 h-72 w-full">
-                                        {images.length > 0 ? (
-                                            <div className="relative h-full w-full">
-                                                {images.length > 1 && (
-                                                    <div className="absolute top-1/2 left-0 z-10 transform -translate-y-1/2 flex items-center">
-                                                        <Button
-                                                            type="primary"
-                                                            shape="circle"
-                                                            icon={<LeftOutlined />}
-                                                            //onClick={handlePreviousImage}
-                                                            className="text-white bg-black opacity-50 hover:opacity-100"
-                                                            style={{ padding: '10px' }}
-                                                        />
-                                                    </div>
-                                                )}
-                                                <img
-                                                    src={images[currentIndex]}
-                                                    alt={`Product Preview ${currentIndex + 1}`}
-                                                    className="h-full w-full object-cover rounded-md"
-                                                />
-                                                {images.length > 1 && (
-                                                    <div className="absolute top-1/2 right-0 z-10 transform -translate-y-1/2 flex items-center">
-                                                        <Button
-                                                            type="primary"
-                                                            shape="circle"
-                                                            icon={<RightOutlined />}
-                                                            // onClick={handleNextImage}
-                                                            className="text-white bg-black opacity-50 hover:opacity-100"
-                                                            style={{ padding: '10px' }}
-                                                        />
-                                                    </div>
-                                                )}
-                                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
-                                                    <button
-                                                        type="button"
-                                                        // onClick={() => handleReplaceImage(currentIndex)}
-                                                        className="text-white text-2xl mx-2"
-                                                    >
-                                                        <EditOutlined />
-                                                    </button>
-                                                    <button
-                                                        type="button"
-                                                        // onClick={() => handleRemoveImage(currentIndex)}
-                                                        className="text-white text-2xl mx-2"
-                                                    >
-                                                        <DeleteOutlined />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="h-full w-full bg-gray-200 flex items-center justify-center rounded-md">
-                                                <span className="text-gray-500">Hiện tại trống, hãy thêm ảnh vào</span>
-                                            </div>
-                                        )}
+                                    
+                                    {/* Hiển thị ảnh lớn */}
+                                    {currentImage ? (
+                                      <img
+                                        src={typeof currentImage === "string" ? currentImage : URL.createObjectURL(currentImage)}
+                                        alt="Ảnh chính"
+                                        className="w-full h-[350px] object-cover rounded-lg shadow-md border-2 border-gray-300"
+                                      />
+                                    ) : (productImageFiles.length > 0 ? (
+                                      <img
+                                        src={typeof productImageFiles[0] === "string" ? productImageFiles[0] : URL.createObjectURL(productImageFiles[0])}
+                                        alt="Ảnh chính"
+                                        className="w-full h-[350px] object-cover rounded-lg shadow-md border-2 border-gray-300"
+                                      />
+                                    ) :
+                                      <div className="w-full h-72 flex items-center justify-center bg-gray-200 rounded-lg border-2 border-dashed border-gray-300">
+                                        <span className="text-gray-500">Chưa có ảnh</span>
+                                      </div>
+                                    )}
 
-                                        {/* Biểu tượng tải ảnh chỉ hiển thị khi không có ảnh */}
-                                        {images.length === 0 && (
-                                            <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-md">
-                                                <button
-                                                    disabled={!isEditing}
-                                                    type="button"
-                                                    onClick={() => document.getElementById('imageUpload')?.click()}
-                                                    className="text-white text-2xl"
-                                                >
-                                                    <UploadOutlined />
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        {/* Input file ẩn */}
-                                        <input
-                                          id="imageUpload"
-                                          type="file"
-                                          disabled={!isEditing}
-                                          accept="image/*"
-                                          onChange={(e) => handleFileChange(e)} // Thêm ảnh mới hoặc thay thế ảnh
-                                          className="hidden"
-                                          multiple
+                                    {/* Danh sách ảnh nhỏ */}
+                                    <div className="flex mt-4 space-x-2 ml-[18px]">
+                                      {productImageFiles.map((file: any, index: any) => (
+                                        <img
+                                          key={index}
+                                          src={typeof file === "string" ? file : URL.createObjectURL(file)}
+                                          alt={`Ảnh ${index + 1}`}
+                                          className={`w-20 h-20 object-cover rounded-lg cursor-pointer border-2 ${file === currentImage ? "border-blue-500 shadow-lg" : "border-gray-300"}`}
+                                          onClick={() => setCurrentImage(file)}
                                         />
+                                      ))}
                                     </div>
 
+                                    {/* Nút upload ảnh */}
+                                    <div className="mt-4">
+                                      <input
+                                        id="imageUpload"
+                                        type="file"
+                                        accept="image/*"
+                                        disabled={!isEditing}
+                                        onChange={handleProductFileChange}
+                                        className="hidden"
+                                        multiple
+                                      />
+                                      <Button
+                                        disabled={!isEditing}
+                                        onClick={() => document.getElementById("imageUpload")?.click()}
+                                        className="w-full bg-blue-600 text-white py-2 rounded-lg flex items-center justify-center shadow-md hover:bg-blue-700"
+                                      >
+                                        <UploadOutlined className="mr-2" />
+                                        Tải ảnh lên (Tối đa 4 ảnh)
+                                      </Button>
+                                    </div>
+
+                                    {/* Hiển thị thông báo lỗi nếu không có ảnh */}
+                                    {errors.imageUrl?.message && (
+                                      <p className="text-sm text-red-500 mt-1">{String(errors.imageUrl?.message)}</p>
+                                    )}
                                 </div>
                             </div>
 
@@ -587,7 +587,7 @@ const FormViewProduct = () => {
                                     <div className="space-y-4 ">
                                         {product.options.map((option: any, index: number) => (
                                             <div key={index} className={`p-4 border rounded-md bg-white shadow-sm relative ${hiddenOptions.includes(index) ? "opacity-50 pointer-events-none" : ""}`}>
-                                                {!hiddenOptions.includes(index) && watch("options").length > 1 && (
+                                                {!hiddenOptions.includes(index) && watch("options").length - hiddenOptions.length > 1 && (
                                                     <Button
                                                         disabled={!isEditing}
                                                         onClick={() => handleDeleteOption(index)}

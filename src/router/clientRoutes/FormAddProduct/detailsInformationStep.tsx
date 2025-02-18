@@ -58,11 +58,19 @@ const DetailsInformationStep = ({
   onSave,
   onBack,
   handleUploadFile,
+  images,
+  setImages,
+  imageFiles,
+  setImageFiles
 }: {
   formData: any;
   onSave: (data: any) => void;
   onBack: (data: any) => void;
   handleUploadFile: any;
+  images: any;
+  setImages: any;
+  imageFiles: any;
+  setImageFiles: any
 }) => {
 
   const documentOptions = [
@@ -111,6 +119,33 @@ const DetailsInformationStep = ({
       // criteria: formData.criteria || [{ name: "", description: "", percentage: "" }],
     },
   });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
+        const files = e.target.files;
+        if (files) {
+            const newFiles = Array.from(files);
+            const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+            // console.log("newFiles", newFiles);
+            // console.log("newPreviews", newPreviews);
+            console.log("images", images);
+
+            if (index !== undefined) {
+                setImages((prev:any) => {
+                    const updatedImages = [...prev];
+                    updatedImages[index] = newPreviews[0];
+                    return updatedImages;
+                });
+                setImageFiles((prev:any) => {
+                    const updatedFiles = [...prev];
+                    updatedFiles[index] = newFiles[0];
+                    return updatedFiles;
+                });
+            } else {
+                setImageFiles((prev:any) => [...prev, ...newFiles]);
+                setImages((prev:any) => [...prev, ...newPreviews]);
+            }
+        }
+    };
 
   const handleNext = async () => {
     const isValid = await trigger();
@@ -213,13 +248,15 @@ const DetailsInformationStep = ({
                 >
                   {watch("options").length > 1 && (
                     <Button
-                      onClick={() =>
+                      onClick={() => {
                         setValue(
                           "options",
                           watch("options").filter((_: any, i: any) => i !== index),
                           { shouldValidate: true }
                         )
-                      }
+                        setImageFiles((prevFiles:any) => prevFiles.filter((_: any, i: any) => i !== index))
+                        setImages((prevFiles:any) => prevFiles.filter((_: any, i: any) => i !== index))
+                      }}
                       className="absolute top-2 right-2 bg-red-500 text-white w-8 h-8 flex items-center justify-center rounded-full shadow"
                     >
                       <DeleteOutlined className="w-4 h-4" />
@@ -228,6 +265,9 @@ const DetailsInformationStep = ({
                   {/* Dòng đầu tiên */}
                   <div className="grid grid-cols-3 gap-4">
                     <div className="col-span-2">
+                      <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                          Ví dụ: Da dầu, Da khô, 216ml, 348ml.. <span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         {...register(`options.${index}.optionValue`)}
                         placeholder="Ví dụ: Da dầu, Da khô, 216ml, 348ml.."
@@ -241,6 +281,9 @@ const DetailsInformationStep = ({
                         )}
                     </div>
                     <div className="col-span-1">
+                      <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                          Số lượng <span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         type="number"
                         {...register(`options.${index}.quantity`, {
@@ -263,6 +306,9 @@ const DetailsInformationStep = ({
                   <div className="grid grid-cols-3 gap-4 mt-3">
 
                     <div className="col-span-1">
+                      <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Giá gốc <span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         {...register(`options.${index}.optionPrice`, {
                           valueAsNumber: true,
@@ -279,6 +325,9 @@ const DetailsInformationStep = ({
                         )}
                     </div>
                     <div className="col-span-1">
+                      <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Giá khuyến mãi <span className="text-red-500">*</span>
+                      </Label>
                       <Input
                         {...register(`options.${index}.discPrice`, {
                           valueAsNumber: true,
@@ -295,12 +344,31 @@ const DetailsInformationStep = ({
                         )}
                     </div>
                     <div className="col-span-1">
+                      <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                          Hình ảnh <span className="text-red-500">*</span>
+                      </Label>
                       <Input
-                        type="text"
-                        {...register(`options.${index}.imageUrl`)}
-                        placeholder="Nhập đường link hình ảnh"
-                        className="w-full"
+                        type="file"
+                        // value={watch(`options.${index}.imgUrl`)}
+                        accept="image/*"
+                        //{...register("imgUrl")}
+                        // onChange={(e: any) => setValue(`options.${index}.imgUrl`, e.target.value)}
+                        onChange={(e) => handleFileChange(e, index)}
+                        placeholder="Upload hình ảnh"
+                        className="p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                       />
+                    </div>
+                    <div className="mt-3 flex justify-center col-span-3">
+                        {images[index] && (
+                            <div className="mt-4">
+                                <Label className="text-left">Xem trước</Label>
+                                <img
+                                    src={images[index]}
+                                    alt="Logo Preview"
+                                    className="w-full h-40 object-cover border rounded-md mt-2"
+                                />
+                            </div>
+                        )}
                     </div>
                     {/*<Input
                       type="file"

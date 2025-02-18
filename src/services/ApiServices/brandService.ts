@@ -3,15 +3,28 @@ import { BASE_URL } from "../../constants/api";
 
 //const ngrokSkipWarning: any = { headers: { "bypass-tunnel-reminder": "true" } };
 
-// Tạo tài khoản Staff
-export async function getAllBrands(token: string) {
+export async function getBrandById(id: number, token: string) {
   try {
-    const response = await axios.get(`${BASE_URL}/api/Brands`, 
-    {
+    const response = await axios.get(`${BASE_URL}/api/Brands/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       }
     });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to get brand by ID:", error);
+    throw error;
+  }
+}
+
+export async function getAllBrands(token: string) {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/Brands`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
     return response.data;
   } catch (error) {
     console.error("Failed to create staff:", error);

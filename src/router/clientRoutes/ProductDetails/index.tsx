@@ -11,6 +11,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { getBrandById } from "../../../services/ApiServices/brandService";
 import { getSkinTypeById } from "../../../services/ApiServices/skinTypeService";
+import { useKeenSlider } from "keen-slider/react";
+import "keen-slider/keen-slider.min.css";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 
 const ProductDetails = () => {
     const { TabPane } = Tabs;
@@ -26,6 +29,10 @@ const ProductDetails = () => {
     const [currentImage, setCurrentImage] = useState("");
     const [brandImageUrl, setBrandImageUrl] = useState<string | null>(null);
     const [tabIndex, setTabIndex] = useState(1);
+
+    const [sliderRef, instanceRef] = useKeenSlider({
+      slides: { perView: 5 },
+    });
 
     const handleTabChange = (key: any) => {
         setTabIndex(Number(key));
@@ -61,7 +68,7 @@ const ProductDetails = () => {
                 const productData = await getProductById(id, token);
                 console.log(productData)
                 setProduct(productData.data);
-                setCurrentImage(productData.data.productImages?.[0] || "");
+                setCurrentImage(productData.data.productImages?.[0]?.imageUrl || "");
                 // Lấy tên thương hiệu
                 if (productData.data.brandId) {
                     const brandData = await getBrandById(productData.data.brandId, token);
@@ -87,7 +94,9 @@ const ProductDetails = () => {
     }, [id]);
 
     const handleOptionSelect = (option: any) => {
-        console.log("Bạn đã chọn tùy chọn:", option.optionValue);
+        if(option.optionImages && option.optionImages.length > 0)
+          setCurrentImage(option.optionImages[0]);
+        // console.log("Bạn đã chọn tùy chọn:", option.optionValue);
     };
 
     const handleAddToCart = (product: any, quantity: any) => {
@@ -158,19 +167,61 @@ const ProductDetails = () => {
                                         className="w-full h-auto rounded-lg shadow-md object-cover"
                                     />
                                     {/* Thumbnails */}
-                                    <div className="flex ml-3 mt-4 space-x-2">
-                                        {product.images?.map((image: any, index: any) => (
-                                            <img
-                                                key={index}
-                                                src={image}
-                                                alt={`Thumbnail ${index + 1}`}
-                                                className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
-                                                onClick={() => setCurrentImage(image)}
-                                            />
-                                        ))}
-                                    </div>
-                                </div>
+                                    <div className="flex relative ml-[-10px]">
+                                      <button
+                                        onClick={() => instanceRef.current?.prev()}
+                                      >
+                                        <LeftOutlined  
+                                        className="text-xl text-black"
+                                        />
+                                      </button>
 
+                                      <div ref={sliderRef} className="keen-slider" >
+                                        {product?.productImages.map((img: any, index: number) => (
+                                          <div key={index} className={`keen-slider__slide ${currentImage == img.imageUrl && "border-4 border-orange-500 rounded-lg"}`}
+                                            style={{ padding: "10px" }}>
+                                            <img
+                                              className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
+                                              src={img.imageUrl}
+                                              onClick={() => setCurrentImage(img.imageUrl)}
+                                              alt={`Slide ${index}`}
+                                          />
+                                          {currentImage === img.imageUrl && (
+                                              <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
+                                                ✔
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                        {product?.options.map((option:any, index: number) => (
+                                          <div key={index} className={`keen-slider__slide ${currentImage == option.optionImages[0] && "border-4 border-orange-500 rounded-lg"}`}
+                                            style={{padding:"10px"}}>
+                                            <img
+                                              className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
+                                              src={option.optionImages[0]}
+                                              onClick={() => setCurrentImage(option.optionImages[0])}
+                                              alt={`Slide ${index}`}
+                                            />
+                                            {currentImage === option.optionImages[0] && (
+                                              <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
+                                                ✔
+                                              </div>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+
+                                      <button
+                                        onClick={() => instanceRef.current?.next()}
+                                      >
+                                        <RightOutlined 
+                                        className="text-xl text-black"
+                                        />
+                                      </button>
+                                    </div>
+
+
+                                </div>
                                 {/* Product Details */}
                                 <div className="flex flex-col bg-gray-50 rounded-md">
                                     <h1 className="text-3xl font-bold text-gray-800 mb-4">{product?.name}</h1>
@@ -227,7 +278,7 @@ const ProductDetails = () => {
                                                 </div>
 
                                                 {/* Giá discPrice thấp nhất và cao nhất */}
-                                                <div className="flex justify-between items-center ml-11 mr-11">
+                                                <div className="flex justify-between items-center ml-8 mr-8">
                                                     <span className="text-2xl font-bold text-red-600">
                                                         {Math.min(...product?.options?.map((option: any) => option.discPrice))?.toLocaleString("vi-VN")} VND
                                                     </span>
@@ -247,11 +298,12 @@ const ProductDetails = () => {
                                         <div className="mt-4">
                                             <div className="flex flex-wrap gap-2 mb-2">
                                                 <h4 className="text-lg font-semibold text-gray-700  text-left w-full">{product.attribute}:</h4>
+                                                <div className="grid grid-cols-3 gap-2 ml-6">
                                                 {product?.options?.map((option: any) => {
                                                     return (
                                                         <div
                                                             key={option.optionId}
-                                                            className="flex items-center p-2 w-1/3 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100"
+                                                            className={`flex relative items-center p-2 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 ${currentImage == option.optionImages[0] && "border-4 border-orange-500 rounded-lg"}`}
                                                             onClick={() => handleOptionSelect(option)}
                                                         >
                                                             <div className="w-2/3 h-8">
@@ -265,9 +317,15 @@ const ProductDetails = () => {
                                                             <div className="w-full pl-2">
                                                                 <span className="text-xs font-semibold text-gray-800">{option.optionValue}</span>
                                                             </div>
+{currentImage === option.optionImages[0] && (
+                                              <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
+                                                ✔
+                                              </div>
+                                            )}
                                                         </div>
                                                     );
                                                 })}
+                                                </div>
                                             </div>
                                         </div>
 

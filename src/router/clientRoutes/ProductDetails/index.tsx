@@ -26,6 +26,7 @@ const ProductDetails = () => {
     const [currentImage, setCurrentImage] = useState("");
     const [brandImageUrl, setBrandImageUrl] = useState<string | null>(null);
     const [tabIndex, setTabIndex] = useState(1);
+    const [selectedOption, setSelectedOption] = useState<any>(null);
 
     const handleTabChange = (key: any) => {
         setTabIndex(Number(key));
@@ -62,14 +63,12 @@ const ProductDetails = () => {
                 console.log(productData)
                 setProduct(productData.data);
                 setCurrentImage(productData.data.productImages?.[0] || "");
-                // Lấy tên thương hiệu
                 if (productData.data.brandId) {
                     const brandData = await getBrandById(productData.data.brandId, token);
                     setBrandName(brandData.data.brandName);
                     setBrandImageUrl(brandData.data.imgUrl);
                 }
 
-                // Lấy tên loại da
                 if (productData.data.skinTypeId) {
                     const skinTypeData = await getSkinTypeById(productData.data.skinTypeId, token);
                     setSkinTypeName(skinTypeData.result.skinName);
@@ -87,31 +86,44 @@ const ProductDetails = () => {
     }, [id]);
 
     const handleOptionSelect = (option: any) => {
-        console.log("Bạn đã chọn tùy chọn:", option.optionValue);
+        setSelectedOption(option);
     };
 
-    const handleAddToCart = (product: any, quantity: any) => {
+    const handleAddToCart = () => {
+        if (!selectedOption) {
+            notification.error({ message: "Vui lòng chọn một tùy chọn sản phẩm!" });
+            return;
+        }
+    
         const existingCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
-
-        const productExists = existingCart.find((item: any) => item.id == product.id);
-        console.log(productExists)
+    
+        const productExists = existingCart.find((item: any) => item.optionId === selectedOption.optionId);
+    
         if (productExists) {
             productExists.quantity += quantity;
         } else {
             existingCart.push({
-                id: product.id,
+                id: product.productId,
+                optionId: selectedOption.optionId,
                 name: product.name,
-                price: product.origin_price,
-                discountPrice: product.disc_price,
-                quantity: 1,
-                imageUrl: product.imageUrl,
-                color: product.color || "N/A",
+                price: selectedOption.origin_price,
+                discountPrice: selectedOption.discPrice,
+                quantity: quantity,
+                imageUrl: selectedOption.optionImages[0],
+                optionValue: selectedOption.optionValue,
             });
         }
-
+    
         sessionStorage.setItem("cartItems", JSON.stringify(existingCart));
+    
+        sessionStorage.setItem("lastAddedProduct", JSON.stringify({
+            id: product.productId,
+            optionId: selectedOption.optionId
+        }));
+    
         navigate(RouteNames.CART);
     };
+    
 
     const { pathname } = useLocation();
 
@@ -245,31 +257,30 @@ const ProductDetails = () => {
 
                                         {/* Option Prices */}
                                         <div className="mt-4">
-                                            <div className="flex flex-wrap gap-2 mb-2">
-                                                <h4 className="text-lg font-semibold text-gray-700  text-left w-full">{product.attribute}:</h4>
-                                                {product?.options?.map((option: any) => {
-                                                    return (
-                                                        <div
-                                                            key={option.optionId}
-                                                            className="flex items-center p-2 w-1/3 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100"
-                                                            onClick={() => handleOptionSelect(option)}
-                                                        >
-                                                            <div className="w-2/3 h-8">
-                                                                <img
-                                                                    src={option.optionImages[0]}
-                                                                    alt={option.optionValue}
-                                                                    className="w-full h-full object-cover rounded-lg"
-                                                                />
-                                                            </div>
-
-                                                            <div className="w-full pl-2">
-                                                                <span className="text-xs font-semibold text-gray-800">{option.optionValue}</span>
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
+    <div className="flex flex-wrap gap-2 mb-2">
+        <h4 className="text-lg font-semibold text-gray-700 text-left w-full">{product.attribute}:</h4>
+        {product?.options?.map((option: any) => (
+            <div
+                key={option.optionId}
+                className={`flex items-center p-2 w-1/3 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 ${
+                    selectedOption?.optionId === option.optionId ? "border-blue-500" : ""
+                }`}
+                onClick={() => handleOptionSelect(option)}
+            >
+                <div className="w-2/3 h-8">
+                    <img
+                        src={option.optionImages[0]}
+                        alt={option.optionValue}
+                        className="w-full h-full object-cover rounded-lg"
+                    />
+                </div>
+                <div className="w-full pl-2">
+                    <span className="text-xs font-semibold text-gray-800">{option.optionValue}</span>
+                </div>
+            </div>
+        ))}
+    </div>
+</div>
 
                                         {/* Quantity Selector */}
                                         <div className=" space-x-4 mb-6 flex items-center mt-4">
@@ -299,13 +310,13 @@ const ProductDetails = () => {
                                     {/* Action Buttons */}
                                     <div className="flex justify-center space-x-6">
                                         <button
-                                            onClick={() => handleAddToCart(product, quantity)}
+                                            onClick={handleAddToCart}
                                             className="px-8 py-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
                                         >
                                             Thêm vào giỏ
                                         </button>
                                         <button
-                                            onClick={() => handleAddToCart(product, quantity)}
+                                            onClick={handleAddToCart}
                                             className="px-8 py-4 bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
                                         >
                                             Mua ngay

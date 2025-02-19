@@ -29,6 +29,7 @@ const ProductDetails = () => {
     const [currentImage, setCurrentImage] = useState("");
     const [brandImageUrl, setBrandImageUrl] = useState<string | null>(null);
     const [tabIndex, setTabIndex] = useState(1);
+    const [selectedOption, setSelectedOption] = useState<any>(null);
 
     const [sliderRef, instanceRef] = useKeenSlider({
       slides: { perView: 5 },
@@ -76,7 +77,6 @@ const ProductDetails = () => {
                     setBrandImageUrl(brandData.data.imgUrl);
                 }
 
-                // Lấy tên loại da
                 if (productData.data.skinTypeId) {
                     const skinTypeData = await getSkinTypeById(productData.data.skinTypeId, token);
                     setSkinTypeName(skinTypeData.result.skinName);
@@ -97,30 +97,44 @@ const ProductDetails = () => {
         if(option.optionImages && option.optionImages.length > 0)
           setCurrentImage(option.optionImages[0]);
         // console.log("Bạn đã chọn tùy chọn:", option.optionValue);
+        setSelectedOption(option);
     };
 
-    const handleAddToCart = (product: any, quantity: any) => {
+    const handleAddToCart = () => {
+        if (!selectedOption) {
+            notification.error({ message: "Vui lòng chọn một tùy chọn sản phẩm!" });
+            return;
+        }
+    
         const existingCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
-
-        const productExists = existingCart.find((item: any) => item.id == product.id);
-        console.log(productExists)
+    
+        const productExists = existingCart.find((item: any) => item.optionId === selectedOption.optionId);
+    
         if (productExists) {
             productExists.quantity += quantity;
         } else {
             existingCart.push({
-                id: product.id,
+                id: product.productId,
+                optionId: selectedOption.optionId,
                 name: product.name,
-                price: product.origin_price,
-                discountPrice: product.disc_price,
-                quantity: 1,
-                imageUrl: product.imageUrl,
-                color: product.color || "N/A",
+                price: selectedOption.origin_price,
+                discountPrice: selectedOption.discPrice,
+                quantity: quantity,
+                imageUrl: selectedOption.optionImages[0],
+                optionValue: selectedOption.optionValue,
             });
         }
-
+    
         sessionStorage.setItem("cartItems", JSON.stringify(existingCart));
+    
+        sessionStorage.setItem("lastAddedProduct", JSON.stringify({
+            id: product.productId,
+            optionId: selectedOption.optionId
+        }));
+    
         navigate(RouteNames.CART);
     };
+    
 
     const { pathname } = useLocation();
 
@@ -357,13 +371,13 @@ const ProductDetails = () => {
                                     {/* Action Buttons */}
                                     <div className="flex justify-center space-x-6">
                                         <button
-                                            onClick={() => handleAddToCart(product, quantity)}
+                                            onClick={handleAddToCart}
                                             className="px-8 py-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
                                         >
                                             Thêm vào giỏ
                                         </button>
                                         <button
-                                            onClick={() => handleAddToCart(product, quantity)}
+                                            onClick={handleAddToCart}
                                             className="px-8 py-4 bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
                                         >
                                             Mua ngay

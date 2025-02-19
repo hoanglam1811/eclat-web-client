@@ -14,14 +14,24 @@ const Cart = () => {
         navigate("/cart/payment/");
     };
 
+    const handleGoBackToLastProduct = () => {
+        const lastAddedProduct = JSON.parse(sessionStorage.getItem("lastAddedProduct") || "{}");
+        if (lastAddedProduct?.id && lastAddedProduct?.optionId) {
+            navigate(`/product/${lastAddedProduct.id}`);
+        } else {
+            navigate(RouteNames.PRODUCTS);
+        }
+    };
+
     useEffect(() => {
         const storedCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
+        console.log(storedCart)
         setCartItems(storedCart);
     }, []);
 
-    const handleQuantityChange = (id: any, change: number) => {
+    const handleQuantityChange = (optionId: any, change: number) => {
         const updatedCart = cartItems.map((item) =>
-            item.id === id
+            item.optionId === optionId
                 ? { ...item, quantity: Math.max(1, item.quantity + change) }
                 : item
         );
@@ -29,8 +39,8 @@ const Cart = () => {
         sessionStorage.setItem("cartItems", JSON.stringify(updatedCart));
     };
 
-    const handleRemoveItem = (id: any) => {
-        const updatedCart = cartItems.filter((item) => item.id !== id);
+    const handleRemoveItem = (optionId: any) => {
+        const updatedCart = cartItems.filter((item) => item.optionId !== optionId);
         setCartItems(updatedCart);
         sessionStorage.setItem("cartItems", JSON.stringify(updatedCart));
     };
@@ -82,87 +92,52 @@ const Cart = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {cartItems.map((item) => (
-                                        <tr key={item.id} className="border-b">
+                                    {cartItems.map((item: any) => (
+                                        <tr key={item.optionId} className="border-b">
                                             {/* Tên sản phẩm */}
                                             <td className="p-4 flex items-start space-x-4">
-                                                {/* Hình ảnh sản phẩm */}
-                                                <img
-                                                    src={item.imageUrl}
-                                                    alt={item.name}
-                                                    className="w-16 h-16 rounded object-cover"
-                                                />
-                                                <div className="flex-1 text-left">
-                                                    {/* Tên sản phẩm */}
-                                                    <a
-                                                        href={`/product/${item.id}`}
-                                                        className="text-sm font-medium text-blue-600 hover:underline break-words text-left "
-                                                        style={{ maxWidth: "250px" }}
-                                                    >
-                                                        {item.name}
-                                                    </a>
-                                                    {/* Màu sắc */}
-                                                    <p className="text-sm text-gray-500 text-left">{item.color}</p>
+                                                <img src={item.imageUrl} alt={item.optionValue} className="w-16 h-16 rounded object-cover" />
+                                                <div className="mt-5">
+                                                    <span className="text-sm font-medium text-blue-600 hover:underline">
+                                                        {item.optionValue}
+                                                    </span>
                                                 </div>
                                             </td>
-                                            {/* Đơn giá */}
+                                            {/* Giá */}
                                             <td className="text-right p-4 text-sm text-gray-800">
-                                                {item.discountPrice ? (
-                                                    <>
-                                                        <span className="line-through text-gray-400 mr-2">
-                                                            {item.price.toLocaleString("vi-VN")}đ
-                                                        </span>
-                                                        <span className="text-red-600 font-bold">
-                                                            {item.discountPrice.toLocaleString("vi-VN")}đ
-                                                        </span>
-                                                    </>
-                                                ) : (
-                                                    <span>{item.price.toLocaleString("vi-VN")}đ</span>
-                                                )}
+                                                <>
+                                                    <span className="text-red-600 font-bold">
+                                                        {item?.discountPrice?.toLocaleString("vi-VN")}đ
+                                                    </span>
+                                                </>
                                             </td>
                                             {/* Số lượng */}
                                             <td className="text-center p-4">
                                                 <div className="flex items-center justify-center space-x-2">
-                                                    <button
-                                                        onClick={() => handleQuantityChange(item.id, -1)}
-                                                        className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                                                    >
-                                                        -
-                                                    </button>
-                                                    <span className="text-sm font-medium text-gray-800">{item.quantity}</span>
-                                                    <button
-                                                        onClick={() => handleQuantityChange(item.id, 1)}
-                                                        className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                                                    >
-                                                        +
-                                                    </button>
+                                                    <button onClick={() => handleQuantityChange(item.optionId, -1)} className="px-2 py-1 bg-gray-200 rounded">-</button>
+                                                    <span className="text-sm font-medium">{item.quantity}</span>
+                                                    <button onClick={() => handleQuantityChange(item.optionId, 1)} className="px-2 py-1 bg-gray-200 rounded">+</button>
                                                 </div>
                                             </td>
                                             {/* Thành tiền */}
                                             <td className="text-right p-4 text-sm text-red-600 font-bold">
-                                                {((item.discountPrice || item.price) * item.quantity).toLocaleString(
-                                                    "vi-VN"
-                                                )}
-                                                đ
+                                                {((item.discountPrice || item.price) * item.quantity).toLocaleString("vi-VN")}đ
                                             </td>
-                                            <td className="p-4"><button
-                                                onClick={() => handleRemoveItem(item.id)}
-                                                className="text-sm text-red-500 hover:underline"
-                                            >
-                                                Xoá
-                                            </button></td>
+                                            {/* Xóa */}
+                                            <td className="p-4">
+                                                <button onClick={() => handleRemoveItem(item.optionId)} className="text-sm text-red-500 hover:underline">Xoá</button>
+                                            </td>
                                         </tr>
                                     ))}
                                 </tbody>
+
                             </table>
 
                         </div>
                         <div className="flex justify-between items-center mt-6">
-                            <Link to={RouteNames.PRODUCTS}>
-                                <button className="text-blue-600 hover:underline">
-                                    Tiếp tục mua hàng
-                                </button>
-                            </Link>
+                            <button onClick={handleGoBackToLastProduct} className="text-blue-600 hover:underline">
+                                Trở về sản phẩm vừa thêm
+                            </button>
                             <p className="text-sm text-gray-700 font-semibold">
                                 Tổng tiền:{" "}
                                 <span className="text-red-600 text-lg font-bold">

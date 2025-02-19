@@ -114,22 +114,19 @@ const Products = () => {
                 getAllBrands(token),
                 getAllSkinTypes(token),
             ]);
+            console.log(products)
 
             let productsData = products.map((product: any) => ({
                 id: product.productId,
                 name: product.productName,
-                quantity: 20,
-                description: product.description,
-                origin_price: 1200000,
-                disc_price: 600000,
+                origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
+                disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
                 origin_country: product.originCountry,
                 skinTypeId: product.skinType.skinName,
                 brandId: product.brand.brandName,
-                average_rating: 4.9,
-                status: product.status ? "Còn hàng" : "Hết hàng",
-                imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-                total_reviews: 200
+                imageUrl: product.images[0].imageUrl,
             }));
+
             setProducts(productsData);
             setProductsFull(productsData);
             setBrands(brands.map((brand: any) => ({

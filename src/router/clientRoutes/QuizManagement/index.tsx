@@ -179,7 +179,7 @@ const SkincareQuiz = ({ }) => {
                     <div style={{ flex: 2 }}>{quiz.question_text}</div>
                     <div style={{ flex: 2, textAlign: "center" }}>
                         <img
-                            src={quiz.file || "https://github.com/shadcn.png"}
+                            src={quiz.img_url || "https://github.com/shadcn.png"}
                             alt="Logo"
                             style={{
                                 height: 70,
@@ -190,7 +190,7 @@ const SkincareQuiz = ({ }) => {
                                 objectFit: "cover",
                                 boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
                             }}
-                            onClick={() => handleOpenImage(quiz.file)}
+                            onClick={() => handleOpenImage(quiz.img_url)}
                         />
                     </div>
                     <div style={{ flex: 1, textAlign: "center" }}>

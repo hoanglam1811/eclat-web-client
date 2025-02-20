@@ -113,6 +113,21 @@
   }
 }
 
+/* Webkit-based browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
+  width: 8px; /* Thin scrollbar */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3); /* Subtle thumb */
+  border-radius: 10px; /* Rounded edges */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: skyblue; /* Darker on hover */
+}
+
+/* Hide scrollbar buttons (arrows) */
+::-webkit-scrollbar-button {
   display: none;
-} 
+}

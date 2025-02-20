@@ -199,7 +199,7 @@ const AddQuizModal = ({ isOpen, setIsOpen, fetchQuiz }: AddQuizModalProps) => {
                     onChange={(e) => handleFileChange(e)}
                   />
                   <label htmlFor="file-upload" className="cursor-pointer text-blue-500 hover:underline">
-                    <IoCloudUpload className="text-4xl mx-auto text-gray-400 mb-2" />
+                    <IoCloudUpload className="text-2xl mx-auto text-gray-400 mb-2" />
                     Bấm để tải ảnh
                   </label>
                 </div>
@@ -209,7 +209,7 @@ const AddQuizModal = ({ isOpen, setIsOpen, fetchQuiz }: AddQuizModalProps) => {
                     <img
                       src={URL.createObjectURL(currentImage)}
                       alt="Preview"
-                      className="max-w-full max-h-[220px] rounded-lg shadow-md"
+                      className="max-w-full max-h-[185px] rounded-lg shadow-md"
                     />
                   </div>
                 )}

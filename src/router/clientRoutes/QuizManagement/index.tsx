@@ -7,17 +7,13 @@ import { useNavigate } from "react-router-dom";
 import { Backdrop, CircularProgress, IconButton, Paper, Tooltip } from "@mui/material";
 import { CloseCircleOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { IoMdAddCircle } from "react-icons/io";
-import { EditIcon } from "lucide-react";
+import { DeleteIcon, EditIcon } from "lucide-react";
 import AddQuizModal from "./AddBrandForm";
 import EditQuizForm from "./EditBrandForm";
 
 const ITEMS_PER_PAGE = 5;
 const SkincareQuiz = ({ }) => {
     const [quizzes, setQuizzes] = useState<any[]>([]);
-    const [selectedQuiz, setSelectedQuiz] = useState(null);
-    const [answer, setAnswer] = useState<any[]>([]);
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [newQuestion, setNewQuestion] = useState("");
     const token = useSelector((state: RootState) => state.token.token);
     const [openImageModal, setOpenImageModal] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -63,17 +59,6 @@ const SkincareQuiz = ({ }) => {
             console.log(data)
         } catch (error) {
             notification.error({ message: "Failed to fetch quizzes" });
-        }
-    };
-
-    const handleCreateQuiz = async () => {
-        try {
-            await createQuiz(newQuestion, null, token);
-            setIsModalVisible(false);
-            fetchQuizzes();
-            notification.success({ message: "Quiz created successfully" });
-        } catch (error) {
-            notification.error({ message: "Failed to create quiz" });
         }
     };
 
@@ -207,6 +192,21 @@ const SkincareQuiz = ({ }) => {
                                 }}
                             >
                                 <EditIcon />
+                            </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Xoá câu hỏi">
+                            <IconButton
+                                onClick={(e: any) => {
+                                    e.stopPropagation();
+                                    handleDeleteQuiz(quiz.id);
+                                }}
+                                sx={{
+                                    color: "#d32f2f",
+                                    "&:hover": { color: "#b71c1c", backgroundColor: "#ffebee" }
+                                }}
+                            >
+                                <DeleteIcon />
                             </IconButton>
                         </Tooltip>
                     </div>

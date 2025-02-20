@@ -125,7 +125,7 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
                 <FaPen className="text-sky-500" />
-                Add New Brand
+                Thêm thương hiệu mới
               </h3>
               <button
                 onClick={() => {
@@ -191,7 +191,7 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
                 <Label className="mb-3 text-left">Logo URL</Label>
                 <Input
                   {...form.register("imgUrl")}
-                  placeholder="Enter image URL"
+                  placeholder="Nhập URL"
                   type="url"
                   className="p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                 />

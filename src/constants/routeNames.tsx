@@ -34,6 +34,7 @@ const RouteNames = {
   ADMIN_SIGNIN: "/admin/sign-in",
   ADMIN_SIGNUP: "/admin/sign-up",
   ADMIN_TABLES: "/admin/tables",
+  SKINCARE_QUIZ_MANAGEMENT: "/admin/skincare-quiz-management",
 };
 
 export default RouteNames;

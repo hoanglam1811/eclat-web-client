@@ -74,9 +74,6 @@ const GeneralInformationStep = ({
   };
 
   useEffect(() => {
-    // return () => {
-    //   imageFiles.forEach((file) => URL.revokeObjectURL(URL.createObjectURL(file)));
-    // };
   }, [imageFiles]);
 
   const handleNext = async () => {

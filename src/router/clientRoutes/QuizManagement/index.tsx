@@ -1,30 +1,42 @@
-import { useEffect, useState } from "react";
-import {
-    IconButton,
-    Tooltip,
-    CircularProgress,
-    Paper,
-    Backdrop,
-
-} from "@mui/material";
-import { Edit as EditIcon } from "@mui/icons-material";
-
-import React from "react";
-import { IoMdAddCircle } from "react-icons/io";
-import { Button } from "../../../components/ui/button";
-import AddBrandModal from "./AddBrandForm";
-import EditBrandForm from "./EditBrandForm";
-import { CloseCircleOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
-import { Input } from "antd";
-import { RootState } from "../../../store/store";
+import React, { useState, useEffect } from "react";
+import { Button, Card, Input, Modal, notification } from "antd";
 import { useSelector } from "react-redux";
-import { getAllBrands } from "../../../services/ApiServices/brandService";
+import { RootState } from "../../../store/store";
+import { createQuiz, deleteQuiz, getAllQuiz, submitQuiz } from "../../../services/ApiServices/quizQuestionService";
 import { useNavigate } from "react-router-dom";
+import { Backdrop, CircularProgress, IconButton, Paper, Tooltip } from "@mui/material";
+import { CloseCircleOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import { IoMdAddCircle } from "react-icons/io";
+import { EditIcon } from "lucide-react";
+import AddQuizModal from "./AddBrandForm";
+import EditQuizForm from "./EditBrandForm";
 
 const ITEMS_PER_PAGE = 5;
-
-const BrandsManagement = () => {
+const SkincareQuiz = ({ }) => {
+    const [quizzes, setQuizzes] = useState<any[]>([]);
+    const [selectedQuiz, setSelectedQuiz] = useState(null);
+    const [answer, setAnswer] = useState<any[]>([]);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [newQuestion, setNewQuestion] = useState("");
+    const token = useSelector((state: RootState) => state.token.token);
     const [openImageModal, setOpenImageModal] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const [openAddQuiz, setOpenAddQuiz] = useState<boolean>(false);
+    const [openEditQuiz, setOpenEditQuiz] = useState<boolean>(false);
+    const [currentQuiz, setCurrentQuiz] = useState<any | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const filteredQuizzes = quizzes.filter(quiz =>
+        quiz.question_text.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const [currentPage, setCurrentPage] = useState<number>(1);
+
+    const totalPages = Math.ceil(quizzes?.length / ITEMS_PER_PAGE);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
     const [selectedImage, setSelectedImage] = useState("");
 
     const handleOpenImage = (imageUrl: any) => {
@@ -35,96 +47,45 @@ const BrandsManagement = () => {
     const handleCloseImage = () => {
         setOpenImageModal(false);
     };
-    //     {
-    //         id: "1",
-    //         label: 'Cocoon',
-    //         value: 'cocoon',
-    //         logo: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/202667140005381.6239fc9e2048c.png'
-    //     },
-    //     {
-    //         id: "2",
-    //         label: 'L\'Oreal',
-    //         value: 'loreal',
-    //         logo: 'https://cdn.worldvectorlogo.com/logos/l-oreal-3.svg'
-    //     },
-    //     {
-    //         id: "3",
-    //         label: 'CeraVe',
-    //         value: 'cerave',
-    //         logo: 'https://i.pinimg.com/originals/01/df/ad/01dfadb784cdcd91ebb730d30592b481.png'
-    //     },
-    //     {
-    //         id: "4",
-    //         label: 'Cetaphil',
-    //         value: 'cetaphil',
-    //         logo: 'https://www.cetaphil.com.vn/on/demandware.static/-/Sites/default/dwf51c375b/Cetaphil_Logo_285.png'
-    //     },
-    //     {
-    //         id: "5",
-    //         label: 'The Ordinary',
-    //         value: 'ordinary',
-    //         logo: 'https://logovectordl.com/wp-content/uploads/2020/12/the-ordinary-logo-vector.png'
-    //     },
-    //     {
-    //         id: "6",
-    //         label: 'Hada Labo',
-    //         value: 'hada_labo',
-    //         logo: 'https://hadalabo.com.vn/wp-content/uploads/2021/03/HDLB_logo_m.png'
-    //     },
-    //     {
-    //         id: "7",
-    //         label: 'Kiehl\'s',
-    //         value: 'kiehls',
-    //         logo: 'https://cdn.freebiesupply.com/logos/large/2x/kiehls-logo-png-transparent.png'
-    //     }
-    // ];
-
-    const [brands, setBrands] = useState<any[]>([]);
-    const token = useSelector((state: RootState) => state.token.token);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-    const [openAddBrand, setOpenAddBrand] = useState<boolean>(false);
-    const [openEditBrand, setOpenEditBrand] = useState<boolean>(false);
-    const [currentBrand, setCurrentBrand] = useState<any | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const filteredBrands = brands.filter(brand =>
-        brand.label.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    const [currentPage, setCurrentPage] = useState<number>(1);
-
-    const totalPages = Math.ceil(brands?.length / ITEMS_PER_PAGE);
-
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-    };
-
-    const fetchBrands = () => {
-        setLoading(true);
-        if (!token) {
-            navigate("/login");
-            return;
-        }
-        getAllBrands(token)
-            .then((data: any) => {
-                setBrands(data.map((brand: any) => ({
-                    id: brand.brandId,
-                    label: brand.brandName,
-                    value: brand.brandName,
-                    logo: brand.imgUrl
-                })));
-            })
-            .catch((error: any) => {
-                console.error("Error fetching accounts:", error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    };
 
     useEffect(() => {
-        fetchBrands();
+        fetchQuizzes();
     }, []);
+
+    const fetchQuizzes = async () => {
+        try {
+            if (!token) {
+                navigate("/login");
+                return;
+            }
+            const data = await getAllQuiz(token);
+            setQuizzes(data.result);
+            console.log(data)
+        } catch (error) {
+            notification.error({ message: "Failed to fetch quizzes" });
+        }
+    };
+
+    const handleCreateQuiz = async () => {
+        try {
+            await createQuiz(newQuestion, null, token);
+            setIsModalVisible(false);
+            fetchQuizzes();
+            notification.success({ message: "Quiz created successfully" });
+        } catch (error) {
+            notification.error({ message: "Failed to create quiz" });
+        }
+    };
+
+    const handleDeleteQuiz = async (id: any) => {
+        try {
+            await deleteQuiz(id, token);
+            fetchQuizzes();
+            notification.success({ message: "Quiz deleted successfully" });
+        } catch (error) {
+            notification.error({ message: "Failed to delete quiz" });
+        }
+    };
 
     const renderTable = () => (
         <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>
@@ -132,7 +93,7 @@ const BrandsManagement = () => {
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Input
-                        placeholder="Tìm kiếm theo tên thương hiệu"
+                        placeholder="Tìm kiếm câu hỏi"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
@@ -158,7 +119,7 @@ const BrandsManagement = () => {
                 </div>
 
                 <Button
-                    onClick={() => setOpenAddBrand(true)}
+                    onClick={() => setOpenAddQuiz(true)}
                     style={{
                         backgroundColor: '#419f97',
                         color: 'white',
@@ -174,7 +135,7 @@ const BrandsManagement = () => {
                     }}
                 >
                     <IoMdAddCircle size={"24"} />
-                    Thêm thương hiệu
+                    Thêm câu hỏi
                 </Button>
             </div>
             <div
@@ -189,18 +150,18 @@ const BrandsManagement = () => {
                 }}
             >
                 <div style={{ flex: 0.5, textAlign: "center" }}>ID</div>
-                <div style={{ flex: 2 }}>Tên</div>
-                <div style={{ flex: 2, textAlign: "center" }}>Logo</div>
+                <div style={{ flex: 2 }}>Câu hỏi</div>
+                <div style={{ flex: 2, textAlign: "center" }}>Ảnh</div>
                 <div style={{ flex: 1, textAlign: "center" }}>Hành động</div>
             </div>
 
             {/* Hàng dữ liệu */}
-            {filteredBrands?.slice(
+            {filteredQuizzes?.slice(
                 (currentPage - 1) * ITEMS_PER_PAGE,
                 currentPage * ITEMS_PER_PAGE
-            ).map((brand) => (
+            ).map((quiz: any) => (
                 <div
-                    key={brand.id}
+                    key={quiz.id}
                     style={{
                         display: "flex",
                         padding: "12px",
@@ -214,11 +175,11 @@ const BrandsManagement = () => {
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#f5f5f5")}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#fff")}
                 >
-                    <div style={{ flex: 0.5, textAlign: "center" }}>{brand.id}</div>
-                    <div style={{ flex: 2 }}>{brand.label}</div>
+                    <div style={{ flex: 0.5, textAlign: "center" }}>{quiz.id}</div>
+                    <div style={{ flex: 2 }}>{quiz.question_text}</div>
                     <div style={{ flex: 2, textAlign: "center" }}>
                         <img
-                            src={brand.logo || "https://github.com/shadcn.png"}
+                            src={quiz.file || "https://github.com/shadcn.png"}
                             alt="Logo"
                             style={{
                                 height: 70,
@@ -229,16 +190,16 @@ const BrandsManagement = () => {
                                 objectFit: "cover",
                                 boxShadow: "0 2px 6px rgba(0,0,0,0.1)"
                             }}
-                            onClick={() => handleOpenImage(brand.logo)}
+                            onClick={() => handleOpenImage(quiz.file)}
                         />
                     </div>
                     <div style={{ flex: 1, textAlign: "center" }}>
-                        <Tooltip title="Chỉnh sửa thương hiệu">
+                        <Tooltip title="Chỉnh sửa câu hỏi">
                             <IconButton
-                                onClick={(e) => {
+                                onClick={(e: any) => {
                                     e.stopPropagation();
-                                    setCurrentBrand(brand);
-                                    setOpenEditBrand(true);
+                                    setCurrentQuiz(quiz);
+                                    setOpenEditQuiz(true);
                                 }}
                                 sx={{
                                     color: "#1976d2",
@@ -321,29 +282,29 @@ const BrandsManagement = () => {
         <div className="bg-gray-100 pt-5 pb-5 pl-5 pr-5">
             <div className="flex justify-between mb-5 mt-1">
                 <h2 className="text-xl" style={{ marginLeft: "16px", color: "#3f51b5", fontWeight: "bold" }}>
-                    QUẢN LÝ LOẠI THƯƠNG HIỆU
+                    QUẢN LÝ CÂU HỎI VỀ DA
                 </h2>
             </div>
 
             {loading ? <CircularProgress /> : renderTable()}
 
-            {brands && (
-                <AddBrandModal
-                    isOpen={openAddBrand}
-                    setIsOpen={(open) => setOpenAddBrand(open)}
-                    fetchBrand={async () => {
-                        fetchBrands();
+            {quizzes && (
+                <AddQuizModal
+                    isOpen={openAddQuiz}
+                    setIsOpen={(open) => setOpenAddQuiz(open)}
+                    fetchQuiz={async () => {
+                        fetchQuizzes();
                     }}
                 />
             )}
 
-            {brands && (
-                <EditBrandForm
-                    isOpen={openEditBrand}
-                    setIsOpen={(open) => setOpenEditBrand(open)}
-                    brand={currentBrand}
-                    fetchBrand={async () => {
-                        fetchBrands();
+            {quizzes && (
+                <EditQuizForm
+                    isOpen={openEditQuiz}
+                    setIsOpen={(open) => setOpenEditQuiz(open)}
+                    quiz={currentQuiz}
+                    fetchQuiz={async () => {
+                        fetchQuizzes();
                     }}
                 />
             )}
@@ -351,4 +312,4 @@ const BrandsManagement = () => {
     );
 };
 
-export default BrandsManagement;
+export default SkincareQuiz;

@@ -16,6 +16,7 @@ import FormCreateProduct from "./FormAddProduct/index.tsx";
 import FormViewProduct from "./ProductDetailsManagement/index.tsx";
 import Brands from "./Brands/index.tsx";
 import TagsManagement from "./TagManagement/index.tsx";
+import SkincareQuiz from "./QuizManagement/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -81,6 +82,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.TAGS_MANAGEMENT,
     element: <TagsManagement />,
+  },
+  {
+    path: RouteNames.SKINCARE_QUIZ_MANAGEMENT,
+    element: <SkincareQuiz />,
   }
 ];
 

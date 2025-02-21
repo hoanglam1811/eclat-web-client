@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { createQuiz, deleteQuiz, getAllQuiz, submitQuiz } from "../../../services/ApiServices/quizQuestionService";
 import { useNavigate } from "react-router-dom";
-import { Backdrop, CircularProgress, IconButton, Paper, Tooltip } from "@mui/material";
+import { Backdrop, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Paper, Tooltip } from "@mui/material";
 import { CloseCircleOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { IoMdAddCircle } from "react-icons/io";
 import { DeleteIcon, EditIcon } from "lucide-react";
@@ -21,6 +21,8 @@ const SkincareQuiz = ({ }) => {
     const [openAddQuiz, setOpenAddQuiz] = useState<boolean>(false);
     const [openEditQuiz, setOpenEditQuiz] = useState<boolean>(false);
     const [currentQuiz, setCurrentQuiz] = useState<any | null>(null);
+    const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+    const [quizToDelete, setQuizToDelete] = useState<any | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const filteredQuizzes = quizzes.filter(quiz =>
         quiz.question_text.toLowerCase().includes(searchQuery.toLowerCase())
@@ -44,6 +46,16 @@ const SkincareQuiz = ({ }) => {
         setOpenImageModal(false);
     };
 
+    const handleOpenDeleteDialog = (quiz: any) => {
+        setQuizToDelete(quiz);
+        setOpenConfirmDelete(true);
+    };
+
+    const handleCloseDeleteDialog = () => {
+        setOpenConfirmDelete(false);
+        setQuizToDelete(null);
+    };
+
     useEffect(() => {
         fetchQuizzes();
     }, []);
@@ -62,13 +74,16 @@ const SkincareQuiz = ({ }) => {
         }
     };
 
-    const handleDeleteQuiz = async (id: any) => {
-        try {
-            await deleteQuiz(id, token);
-            fetchQuizzes();
-            notification.success({ message: "Quiz deleted successfully" });
-        } catch (error) {
-            notification.error({ message: "Failed to delete quiz" });
+    const handleConfirmDelete = async () => {
+        if (quizToDelete) {
+            try {
+                await deleteQuiz(quizToDelete.id, token);
+                fetchQuizzes();
+                notification.success({ message: "Quiz đã được xoá thành công" });
+            } catch (error) {
+                notification.error({ message: "Xoá Quiz thất bại" });
+            }
+            handleCloseDeleteDialog();
         }
     };
 
@@ -197,9 +212,9 @@ const SkincareQuiz = ({ }) => {
 
                         <Tooltip title="Xoá câu hỏi">
                             <IconButton
-                                onClick={(e: any) => {
+                                onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDeleteQuiz(quiz.id);
+                                    handleOpenDeleteDialog(quiz);
                                 }}
                                 sx={{
                                     color: "#d32f2f",
@@ -212,6 +227,26 @@ const SkincareQuiz = ({ }) => {
                     </div>
                 </div>
             ))}
+
+            <Dialog open={openConfirmDelete} onClose={handleCloseDeleteDialog}>
+                <DialogTitle style={{ fontWeight: "bold", color: "#d32f2f" }}>
+                    Xác nhận xoá Quiz
+                </DialogTitle>
+                <DialogContent>
+                    <p>Bạn có chắc muốn xoá không?</p>
+                    <p style={{ fontSize: "14px", color: "#757575" }}>
+                        Nếu xoá Quiz sẽ đồng nghĩa với việc xoá cả câu trả lời. Nếu có hãy bấm "OK".
+                    </p>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDeleteDialog} style={{ color: "#1976d2" }}>
+                        Hủy
+                    </Button>
+                    <Button onClick={handleConfirmDelete} style={{ color: "#d32f2f" }}>
+                        OK
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
             <Backdrop open={openImageModal} onClick={handleCloseImage} sx={{ zIndex: 1000 }}>
                 <div

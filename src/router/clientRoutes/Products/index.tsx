@@ -124,7 +124,7 @@ const Products = () => {
                 origin_country: product.originCountry,
                 skinTypeId: product.skinType.skinName,
                 brandId: product.brand.brandName,
-                imageUrl: product.images[0].imageUrl,
+                imageUrl: product.images[0]?.imageUrl,
             }));
 
             setProducts(productsData);

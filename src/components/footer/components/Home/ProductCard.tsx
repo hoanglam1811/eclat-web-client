@@ -36,8 +36,8 @@ const ProductCard = ({ product, handleBrandChange }: { product: any, handleBrand
             className="text-sm font-bold text-gray-800"
             style={{ fontFamily: "Montserrat, sans-serif" }}
           >
-            {product?.name?.length > 30
-              ? product?.name.substring(0, 30) + "..."
+            {product?.name?.length > 40
+              ? product?.name.substring(0, 40) + "..."
               : product?.name}
           </h3>
 

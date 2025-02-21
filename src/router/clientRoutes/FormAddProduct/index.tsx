@@ -17,6 +17,7 @@ import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
 import { getAllTags } from "../../../services/ApiServices/tagService";
 import { addProduct } from "../../../services/ApiServices/productService";
+import { getAllCategories } from "../../../services/ApiServices/categoryService";
 
 const FormCreateProduct = () => {
     const [step, setStep] = useState(1);
@@ -30,7 +31,7 @@ const FormCreateProduct = () => {
     const [skinTypes, setSkinTypes] = useState([]);
 
     const [brands, setBrands] = useState([]);
-    // const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [tags, setTags] = useState([]);
     const [tagFull, setTagFull] = useState<any>([]);
 
@@ -68,10 +69,10 @@ const FormCreateProduct = () => {
         }
         try {
             setLoading(true);
-            const [skinTypes, brands, tags] = await Promise.all([
+            const [skinTypes, brands, categories, tags] = await Promise.all([
                 getAllSkinTypes(token),
                 getAllBrands(token),
-                //getAllCategories(token),
+                getAllCategories(token),
                 getAllTags(token)
             ]);
             if (skinTypes.code == 0)
@@ -83,10 +84,10 @@ const FormCreateProduct = () => {
                 value: brand.brandId,
                 label: brand.brandName
             })));
-            // setCategories(categories.map((category: any) => ({
-            //   value: category.categoryId, 
-            //   label: category.categoryName
-            // })))
+            setCategories(categories.map((category: any) => ({
+              value: category.categoryId, 
+              label: category.categoryName
+            })))
             setTagFull(tags);
             setTags(tags.map((tag: any) => ({
                 value: tag.tagId,
@@ -203,6 +204,7 @@ const FormCreateProduct = () => {
                                     imageFiles={imageFiles}
                                     setImageFiles={setImageFiles}
                                     // handleUploadFile={handleFileChange}
+                                    categories={categories}
                                     skinTypes={skinTypes}
                                     brands={brands}
                                     tags={tags}

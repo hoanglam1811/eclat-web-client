@@ -116,12 +116,12 @@ const ProductDetails = () => {
             existingCart.push({
                 id: product.productId,
                 optionId: selectedOption.optionId,
-                name: product.name,
+                name: product.productName,
                 price: selectedOption.origin_price,
                 discountPrice: selectedOption.discPrice,
                 quantity: quantity,
                 imageUrl: selectedOption.optionImages[0],
-                optionValue: selectedOption.optionValue,
+                optionValue: product.productName + " - " + selectedOption.optionValue,
             });
         }
     
@@ -317,7 +317,7 @@ const ProductDetails = () => {
                                                     return (
                                                         <div
                                                             key={option.optionId}
-                                                            className={`flex relative items-center p-2 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 ${currentImage == option.optionImages[0] && "border-4 border-orange-500 rounded-lg"}`}
+                                                            className={`flex relative items-center p-2 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 ${selectedOption == option && "border-4 border-orange-500 rounded-lg"}`}
                                                             onClick={() => handleOptionSelect(option)}
                                                         >
                                                             <div className="w-2/3 h-8">
@@ -331,7 +331,7 @@ const ProductDetails = () => {
                                                             <div className="w-full pl-2">
                                                                 <span className="text-xs font-semibold text-gray-800">{option.optionValue}</span>
                                                             </div>
-{currentImage === option.optionImages[0] && (
+                                            {selectedOption === option && (
                                               <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
                                                 ✔
                                               </div>

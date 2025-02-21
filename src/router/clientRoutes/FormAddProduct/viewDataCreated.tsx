@@ -37,6 +37,7 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles
             }
 
             const response = await addProduct(formData, token);
+            console.log(response);
             const product = await getProductById(response.data.productId, token);
             console.log(product);
 

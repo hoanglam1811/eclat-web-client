@@ -45,41 +45,42 @@ const ProductsManagement = () => {
         navigate(`/staff/product-update/${id}`);
     };
 
-      const fetchProducts = () => {
+    const fetchProducts = () => {
         setLoading(true);
-        if(!token){
-          navigate("/login"); 
-          return;
+        if (!token) {
+            navigate("/login");
+            return;
         }
         getAllProducts(token)
-          .then((data) => {
-            setProducts(data.map((product: any) => ({
-              id: product.productId,
-              name: product.productName,
-              quantity: 20,
-              description: product.description,
-              origin_price: 2000,
-              disc_price: 1500,
-              origin_country: product.originCountry,
-              skinTypeId: product.skinType.skinName,
-              brandId: product.brand.brandName,
-              average_rating: 5,
-              status: product.status ? "Còn hàng" : "Hết hàng",
-              imageUrl: "asdasd",
-              total_reviews: 200
-            })));
-          })
-          .catch((error) => {
-            console.error("Error fetching accounts:", error);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      };
+            .then((data) => {
+                setProducts(data.map((product: any) => {
+                    const totalQuantity = product.options.reduce((total: number, option: any) => total + option.quantity, 0);
+                    
+                    return {
+                        id: product.productId,
+                        name: product.productName,
+                        origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
+                        disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
+                        quantity: totalQuantity,
+                        origin_country: product.originCountry,
+                        skinTypeId: product.skinType.skinName,
+                        brandId: product.brand.brandName,
+                        imageUrl: product.images[0]?.imageUrl,
+                        status: totalQuantity > 0 ? "Còn hàng" : "Hết hàng",
+                    };
+                }));                
+            })
+            .catch((error) => {
+                console.error("Error fetching accounts:", error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
 
-      useEffect(() => {
+    useEffect(() => {
         fetchProducts();
-      }, []);
+    }, []);
 
     const renderTable = () => (
         <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>

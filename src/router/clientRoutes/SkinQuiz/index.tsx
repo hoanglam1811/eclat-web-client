@@ -33,7 +33,53 @@ export default function SkinQuiz() {
             }
         }
         fetchQuizzes();
-    }, []);
+    }, [token, navigate]);
+
+    useEffect(() => {
+        if (quizzes.length === 0 || Object.keys(selectedAnswers).length === 0) return;
+
+        const skinTypeCount: Record<string, number> = {};
+
+        quizzes.forEach((quiz) => {
+            const selectedAnswer = quiz.answers.find((a: any) => a.id === selectedAnswers[quiz.id]);
+            if (selectedAnswer?.skinTypeId) {
+                skinTypeCount[selectedAnswer.skinTypeId] = (skinTypeCount[selectedAnswer.skinTypeId] || 0) + 1;
+            }
+        });
+
+        const maxCount = Math.max(...Object.values(skinTypeCount), 0);
+
+        const mostCommonSkinTypeIds = Object.entries(skinTypeCount)
+            .filter(([_, count]) => count === maxCount)
+            .map(([skinTypeId]) => skinTypeId);
+
+        const skinTypeNames = mostCommonSkinTypeIds.map((id) => {
+            const match = quizzes.flatMap(q => q.answers).find(a => a.skinTypeId.toString() === id);
+            return match ? match.skinName : "Không xác định";
+        });
+
+        console.log("Skin Type Names:", skinTypeNames);
+
+        if (skinTypeNames.length > 0) {
+            setSkinType(skinTypeNames.join(", "));
+            const randomSkinType = skinTypeNames[Math.floor(Math.random() * skinTypeNames.length)];
+            sessionStorage.setItem("selectedSkinType", JSON.stringify([randomSkinType]));
+        } else {
+            setSkinType(null);
+        }
+    }, [quizzes, selectedAnswers]);
+
+
+    useEffect(() => {
+        if (skinType && isModalVisible) {
+            sessionStorage.setItem("selectedSkinType", JSON.stringify([skinType]));
+        } else if (isModalVisible) {
+            notification.error({
+                message: "Lỗi",
+                description: "Không xác định được loại da. Vui lòng thử lại!",
+            });
+        }
+    }, [skinType, isModalVisible]);
 
     const handleAnswerSelect = (questionId: any, answerId: any) => {
         setSelectedAnswers((prev) => ({ ...prev, [questionId]: answerId }));
@@ -69,8 +115,18 @@ export default function SkinQuiz() {
             };
 
             await submitQuiz(payload, token);
-
             setIsModalVisible(true);
+            console.log(skinType)
+            if (skinType && skinType.trim() !== "") {
+                sessionStorage.setItem("selectedSkinType", JSON.stringify([skinType]));
+            } else {
+                notification.error({
+                    message: "Lỗi",
+                    description: "Không xác định được loại da. Vui lòng thử lại!",
+                });
+            }
+
+
         } catch (error) {
             console.error("Failed to submit quiz:", error);
             notification.error({ message: "Lỗi khi gửi đáp án", description: "Vui lòng thử lại sau!" });
@@ -117,7 +173,7 @@ export default function SkinQuiz() {
 
                 <div className="flex justify-end mt-8">
                     <Button
-                        onClick={() => setIsModalVisible(true)}
+                        onClick={() => handleSubmit()}
                         className="px-8 py-4 text-xl font-bold bg-green-500 text-white rounded-xl shadow-lg hover:bg-green-600 transition-all"
                     >
                         Gửi đáp án
@@ -125,36 +181,20 @@ export default function SkinQuiz() {
                 </div>
             </div>
 
-            {/* Hộp thoại xác nhận */}
-            <Modal
-                title="Xác nhận gửi đáp án"
-                visible={isModalVisible}
-                onOk={() => {
-                    setIsModalVisible(false);
-                    handleSubmit();
-                }}
-                onCancel={() => setIsModalVisible(false)}
-                okText="Tiếp tục"
-                cancelText="Tôi chưa chắc"
-            >
-                <p className="text-lg">Bạn có chắc sẽ gửi những câu trả lời này chứ?</p>
-                <p className="text-gray-600">Nếu đồng ý hãy bấm "Tiếp tục"</p>
-            </Modal>
-
             {skinType && (
                 <Modal
                     title="Kết quả phân tích da"
                     visible={isModalVisible}
                     okText="Đến thử xem sao"
                     cancelText="Bỏ lỡ"
-                    onOk={() => navigate(`/product?skinType=${skinType}`)}
+                    onOk={() => navigate("/products")}
                     onCancel={() => navigate("/home")}
                 >
                     <p className="text-lg font-semibold mb-4">Dưới đây là câu trả lời bạn đã chọn:</p>
                     <ul className="mb-4">
                         {quizzes.map((quiz, index) => {
                             const selectedAnswer = quiz.answers.find((a: any) => a.id === selectedAnswers[quiz.id]);
-                            console.log(selectedAnswer)
+                            console.log(selectedAnswer);
                             return (
                                 <li key={quiz.id} className="mb-2">
                                     <strong>Câu {index + 1}: </strong> {quiz.question_text}
@@ -172,13 +212,19 @@ export default function SkinQuiz() {
                         })}
                     </ul>
                     <p className="text-lg">
-                        Sau khi thu thập đáp án của bạn, chúng tôi nhận định rằng loại da của bạn là{" "}
+                        Sau khi thu thập đáp án của bạn, có thể da của bạn thuộc loại{" "}
                         <strong className="text-green-600">{skinType}</strong>.
                     </p>
+
+                    {skinType.includes(",") && (
+                        <p className="text-sm text-gray-600 mt-2">
+                            Chúng tôi chỉ được gợi ý cho bạn 1 loại da, nếu có thắc mắc gì thêm, chúng tôi khuyên bạn nên đến phòng khám da liễu để được tư vấn chi tiết hơn.
+                        </p>
+                    )}
+
                     <p>Bạn có muốn xem thử các sản phẩm phù hợp với loại da này không?</p>
                 </Modal>
             )}
-
 
         </div>
     );

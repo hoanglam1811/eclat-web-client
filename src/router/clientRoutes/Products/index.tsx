@@ -20,57 +20,14 @@ const Products = () => {
         setPriceRange(value);
     };
     const [selectedBrands, setSelectedBrands] = useState<any>([]);
-    const [brands, setBrands] = useState([
-        {
-            label: 'Cocoon',
-            value: 'cocoon',
-            logo: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/202667140005381.6239fc9e2048c.png'
-        },
-        {
-            label: 'L\'Oreal',
-            value: 'loreal',
-            logo: 'https://cdn.worldvectorlogo.com/logos/l-oreal-3.svg'
-        },
-        {
-            label: 'CeraVe',
-            value: 'cerave',
-            logo: 'https://i.pinimg.com/originals/01/df/ad/01dfadb784cdcd91ebb730d30592b481.png'
-        },
-        {
-            label: 'Cetaphil',
-            value: 'cetaphil',
-            logo: 'https://www.cetaphil.com.vn/on/demandware.static/-/Sites/default/dwf51c375b/Cetaphil_Logo_285.png'
-        },
-        {
-            label: 'The Ordinary',
-            value: 'ordinary',
-            logo: 'https://logovectordl.com/wp-content/uploads/2020/12/the-ordinary-logo-vector.png'
-        },
-        {
-            label: 'Hada Labo',
-            value: 'hada_labo',
-            logo: 'https://hadalabo.com.vn/wp-content/uploads/2021/03/HDLB_logo_m.png'
-        },
-        {
-            label: 'Kiehl\'s',
-            value: 'kiehls',
-            logo: 'https://cdn.freebiesupply.com/logos/large/2x/kiehls-logo-png-transparent.png'
-        }
-    ]);
+    const [brands, setBrands] = useState<any>([]);
 
     const handleBrandChange = (selectedValues: any) => {
         setSelectedBrands(selectedValues);
     };
 
     const [selectedSkinTypes, setSelectedSkinTypes] = useState<any>([]);
-    const [skinTypes, setSkinTypes] = useState([
-        { label: 'Da Dầu', value: 'oily' },
-        { label: 'Da Khô', value: 'dry' },
-        { label: 'Da Nhạy Cảm', value: 'sensitive' },
-        { label: 'Da Hỗn Hợp', value: 'combination' },
-        { label: 'Da Lão Hóa', value: 'aging' },
-        { label: 'Da Mụn', value: 'acne' },
-    ]);
+    const [skinTypes, setSkinTypes] = useState<any>([]);
     const handleSkinTypeChange = (selectedValues: any) => {
         setSelectedSkinTypes(selectedValues);
     };
@@ -95,6 +52,14 @@ const Products = () => {
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     );
+
+    useEffect(() => {
+        const storedSkinType = sessionStorage.getItem("selectedSkinType");
+        if (storedSkinType) {
+            const parsedSkinTypes = JSON.parse(storedSkinType);
+            setSelectedSkinTypes(parsedSkinTypes);
+        }
+    }, []);
 
     const handleClearFilters = () => {
         setSelectedBrands([]);
@@ -153,13 +118,12 @@ const Products = () => {
 
     useEffect(() => {
         setProducts(productsFull.filter((product: any) =>
-            product.brandId.includes(selectedBrands)
-            && product.skinTypeId.includes(selectedSkinTypes)
-            && product.origin_country.includes(selectedOriginCountry)
-            && priceRange[0] <= product.disc_price && product.disc_price <= priceRange[1]
-        ))
-    }, [selectedBrands, selectedSkinTypes, selectedOriginCountry, priceRange]);
-
+            (selectedBrands.length === 0 || selectedBrands.includes(product.brandId)) &&
+            (selectedSkinTypes.length === 0 || selectedSkinTypes.includes(product.skinTypeId)) &&
+            (selectedOriginCountry.length === 0 || selectedOriginCountry.includes(product.origin_country)) &&
+            priceRange[0] <= product.disc_price && product.disc_price <= priceRange[1]
+        ));
+    }, [selectedBrands, selectedSkinTypes, selectedOriginCountry, priceRange, productsFull]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -204,7 +168,7 @@ const Products = () => {
                             infinite={true}
                             effect="scrollx"
                         >
-                            {brands.map((brand, index) => (
+                            {brands.map((brand: any, index: any) => (
                                 <div
                                     key={index}
                                     style={{
@@ -220,7 +184,7 @@ const Products = () => {
                                         style={{
                                             maxHeight: '80px',
                                             objectFit: 'contain',
-                                            marginTop: '25px', // Khoảng cách giữa các logo
+                                            marginTop: '25px',
                                         }}
                                     />
                                 </div>
@@ -267,6 +231,7 @@ const Products = () => {
                                 />
                             </div>
                         </div>
+
                         <div className="mt-4">
                             <h4 className="font-medium text-lg text-left">LOẠI DA</h4>
                         </div>
@@ -274,13 +239,14 @@ const Products = () => {
                             <div style={{ maxHeight: 135, overflowY: 'auto' }}>
                                 <Select
                                     options={skinTypes}
-                                    value={selectedSkinTypes}
+                                    value={skinTypes.filter((skin: any) => selectedSkinTypes.includes(skin.value))}
                                     onChange={handleSkinTypeChange}
                                     style={{ width: '100%' }}
                                     placeholder="Chọn loại da"
                                 />
                             </div>
                         </div>
+
                         <div className="mt-4">
                             <h4 className="font-medium text-lg text-left">XUẤT XỨ</h4>
                         </div>
@@ -307,11 +273,11 @@ const Products = () => {
                                 <ProductSkeleton />
                             ) : error ? (
                                 <p className="text-center text-2xl font-semibold text-red-600 md:col-span-3 lg:col-span-4">
-                                    Error loading products.
+                                    Lỗi khi tải sản phẩm.
                                 </p>
                             ) : products.length === 0 ? (
                                 <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
-                                    Không có sản phẩm nào giống với mô tả.
+                                    Không có sản phẩm nào phù hợp.
                                 </p>
                             ) : (
                                 paginatedmProducts.map((product: any) => (

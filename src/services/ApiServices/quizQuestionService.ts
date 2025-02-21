@@ -38,6 +38,20 @@ export async function getAllQuiz(token: any) {
     }
 }
 
+export async function getQuizById(id: string, token: any) {
+    try {
+        const response = await axios.get(`${BASE_URL}/quiz/${id}/details`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch quizzes:", error);
+        throw error;
+    }
+}
+
 export async function getQuizDetails(id: number, token: string) {
     try {
         const response = await axios.get(`${BASE_URL}/quiz/${id}/details`, {
@@ -51,6 +65,7 @@ export async function getQuizDetails(id: number, token: string) {
         throw error;
     }
 }
+
 
 // Cập nhật quiz
 export async function updateQuiz(id: any, questionText: any, file: any, token: any) {

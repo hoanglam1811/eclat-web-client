@@ -31,6 +31,7 @@ const GeneralInformationStep = ({
   imageFiles,
   setImageFiles,
   skinTypes,
+  categories,
   brands,
   tags,
   tagFull
@@ -41,6 +42,7 @@ const GeneralInformationStep = ({
   setImageFiles: any;
   skinTypes: any;
   brands: any;
+  categories: any,
   tags: any;
   tagFull: any;
 }) => {
@@ -271,36 +273,45 @@ const GeneralInformationStep = ({
                   </div>
                   <div className="col-span-1">
                     <Label htmlFor="productType" className="block text-sm font-medium text-gray-700 text-left">
-                      Tên thẻ <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      isSearchable
-                      placeholder="Chọn tên thẻ"
-                      options={tags}
-                      value={tags.find((tag: any) => tag.value === watch("tagId"))}
-                      onChange={(selected: any) => setValue("tagId", selected?.value)}
-                      className="mt-1"
-                    />
-                    {errors.tagId?.message && (
-                      <p className="text-sm text-red-500 mt-1">{String(errors.tagId.message)}</p>
-                    )}
-                  </div>
-                  <div className="col-span-1">
-                    <Label htmlFor="productType" className="block text-sm font-medium text-gray-700 text-left">
                       Loại sản phẩm <span className="text-red-500">*</span>
                     </Label>
                     <Select
                       isSearchable
                       placeholder="Chọn loại sản phẩm"
-                      value={tagFull.find((tag: any) => tag.tagId == watch("tagId")) &&
-                        tagFull.filter((tag: any) => tag.tagId == watch("tagId")).map((tag: any) => {
-                          return { label: tag.category.categoryName, value: tag.category.categoryId };
-                        })}
-                      isDisabled
+                      options={categories}
+                      value={categories.find((category: any) => category.value === watch("categoryId"))}
+                      onChange={(selected: any) => {
+                        setValue("categoryId", selected?.value)
+                        setValue("tagId", tagFull.find((tag: any) => tag.category.categoryId == selected?.value)?.tagId)
+                      }}
                       className="mt-1"
                     />
                     {errors.scholarshipType?.message && (
                       <p className="text-sm text-red-500 mt-1">{String(errors.scholarshipType.message)}</p>
+                    )}
+                  </div>
+                  <div className="col-span-1">
+                    <Label htmlFor="productType" className="block text-sm font-medium text-gray-700 text-left">
+                      Tên thẻ <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      isSearchable
+                      placeholder="Chọn tên thẻ"
+                      options={watch("categoryId") ? 
+                        tagFull.filter((tag: any) => tag.category.categoryId == watch("categoryId"))
+                          .map((tag: any) => ({ value: tag.tagId, label: tag.tagName })) :
+                        tags
+                      }
+                      value={tags.find((tag: any) => tag.value === watch("tagId"))}
+                      onChange={(selected: any) => {
+                        setValue("tagId", selected?.value)
+                        setValue("categoryId", tagFull.find((tag: any) => tag.tagId == selected?.value)
+                          .category.categoryId)
+                      }}
+                      className="mt-1"
+                    />
+                    {errors.tagId?.message && (
+                      <p className="text-sm text-red-500 mt-1">{String(errors.tagId.message)}</p>
                     )}
                   </div>
                 </div>

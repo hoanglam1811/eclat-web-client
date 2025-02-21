@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
-const ProductCard = ({ product }: { product: any }) => {
+const ProductCard = ({ product, handleBrandChange }: { product: any, handleBrandChange: any }) => {
+
   const discountPercentage = Math.round(
     ((product?.origin_price - product?.disc_price) / product?.origin_price) * 100
   );
@@ -23,8 +24,14 @@ const ProductCard = ({ product }: { product: any }) => {
         </div>
 
         {/* Product Details */}
-        <div className="text-center">
+        <div className="text-left">
           {/* Product Name */}
+          <h4 className="text-xs font-semibold text-gray-600 hover:underline" onClick={(e) => {
+            e.preventDefault(); 
+            handleBrandChange(product?.brandId);
+          }}>
+            {product.brandId}
+          </h4>
           <h3
             className="text-sm font-bold text-gray-800"
             style={{ fontFamily: "Montserrat, sans-serif" }}

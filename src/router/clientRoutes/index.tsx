@@ -18,6 +18,7 @@ import Brands from "./Brands/index.tsx";
 import TagsManagement from "./TagManagement/index.tsx";
 import SkincareQuiz from "./QuizManagement/index.tsx";
 import SkinQuiz from "./SkinQuiz/index.tsx";
+import SkincareBlog from "./Blog/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -91,6 +92,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.SKIN_QUIZ,
     element: <SkinQuiz />,
+  },
+  {
+    path: RouteNames.BEAUTY_BLOG,
+    element: <SkincareBlog />,
   }
 ];
 

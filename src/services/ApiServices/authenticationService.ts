@@ -3,7 +3,7 @@ import { BASE_URL } from "../../constants/api";
 
 const ngrokSkipWarning = { headers: { "bypass-tunnel-reminder": "true" } };
 
-export async function login(username:any, password:any) {
+export async function login(username: any, password: any) {
   try {
     const response = await axios.post(
       `${BASE_URL}/auth/log-in`,
@@ -17,11 +17,11 @@ export async function login(username:any, password:any) {
   }
 }
 
-export async function register(username:any, email:any, password:any, phoneNum:any) {
+export async function register(username: any, email: any, password: any, phone: any) {
   try {
     const response = await axios.post(
       `${BASE_URL}/auth/register`,
-      { username, email, password, phoneNum },
+      { username, email, password, phone },
       ngrokSkipWarning
     );
     return response.data;
@@ -31,7 +31,7 @@ export async function register(username:any, email:any, password:any, phoneNum:a
   }
 }
 
-export async function verifyUser(email:any) {
+export async function verifyUser(email: any) {
   try {
     const response = await axios.get(
       `${BASE_URL}/auth/verify`,

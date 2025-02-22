@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { register } from '../../../services/ApiServices/authenticationService';
 import RegisterType from './data';
 import EmailVerify from './emailVerify';
-import { Button, notification } from 'antd';
+import { notification } from 'antd';
 import RouteNames from '../../../constants/routeNames';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 

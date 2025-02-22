@@ -25,20 +25,17 @@ const Account = () => {
     const [form] = Form.useForm();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    //console.log(users)
     const fetchAccount = async () => {
         try {
             setIsLoading(true);
             if (!users) return;
             const response = await getUserById(users.userId, token);
-            //console.log(response)
             if (response.code == 0) {
                 setUser(response.result);
             }
         }
         catch (err: any) {
             setError(err.toString());
-            //console.log(err);
         }
         finally {
             setIsLoading(false);

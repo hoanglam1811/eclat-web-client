@@ -10,6 +10,7 @@ import { IoMdAddCircle } from "react-icons/io";
 import { DeleteIcon, EditIcon } from "lucide-react";
 import AddQuizModal from "./AddBrandForm";
 import EditQuizForm from "./EditBrandForm";
+import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
 
 const ITEMS_PER_PAGE = 5;
 const SkincareQuiz = ({ }) => {
@@ -36,6 +37,7 @@ const SkincareQuiz = ({ }) => {
         setCurrentPage(page);
     };
     const [selectedImage, setSelectedImage] = useState("");
+    const [skinTypes, setSkinTypes] = useState<any>([]);
 
     const handleOpenImage = (imageUrl: any) => {
         setSelectedImage(imageUrl);
@@ -68,6 +70,8 @@ const SkincareQuiz = ({ }) => {
             }
             const data = await getAllQuiz(token);
             setQuizzes(data.result);
+            const skinTypesData = await getAllSkinTypes(token);
+            setSkinTypes(skinTypesData.result);
             console.log(data)
         } catch (error) {
             notification.error({ message: "Failed to fetch quizzes" });
@@ -327,6 +331,7 @@ const SkincareQuiz = ({ }) => {
                 <AddQuizModal
                     isOpen={openAddQuiz}
                     setIsOpen={(open) => setOpenAddQuiz(open)}
+                    skinTypes={skinTypes}
                     fetchQuiz={async () => {
                         fetchQuizzes();
                     }}
@@ -338,6 +343,7 @@ const SkincareQuiz = ({ }) => {
                     isOpen={openEditQuiz}
                     setIsOpen={(open) => setOpenEditQuiz(open)}
                     quiz={currentQuiz}
+                    skinTypes={skinTypes}
                     fetchQuiz={async () => {
                         fetchQuizzes();
                     }}

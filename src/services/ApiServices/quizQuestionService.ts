@@ -70,13 +70,13 @@ export async function getQuizDetails(id: number, token: string) {
 // Cập nhật quiz
 export async function updateQuiz(id: any, questionText: any, file: any, token: any) {
     const formData = new FormData();
-    formData.append("question_text", questionText);
+    // formData.append("question_text", questionText);
     if (file) {
         formData.append("file", file);
     }
 
     try {
-        const response = await axios.put(`${BASE_URL}/quiz/${id}`, formData, {
+        const response = await axios.put(`${BASE_URL}/quiz/${id}?question_text=${questionText}`, formData, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "multipart/form-data",

@@ -16,8 +16,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
-import { createQuiz } from "../../../services/ApiServices/quizQuestionService";
-import { createQuizAnswer } from "../../../services/ApiServices/quizAnswerService";
+import { createQuiz, updateQuiz } from "../../../services/ApiServices/quizQuestionService";
+import { createQuizAnswer, updateQuizAnswer } from "../../../services/ApiServices/quizAnswerService";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { IoCloudUpload } from "react-icons/io5";
 import { BiCommentDetail } from "react-icons/bi";
@@ -27,10 +27,11 @@ interface EditQuizModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   quiz: any;
+  skinTypes:any;
   fetchQuiz: () => void;
 }
 
-const EditQuizForm = ({ isOpen, setIsOpen, quiz, fetchQuiz }: EditQuizModalProps) => {
+const EditQuizForm = ({ isOpen, setIsOpen, quiz, skinTypes, fetchQuiz }: EditQuizModalProps) => {
   const { id } = useParams<{ id: string }>();
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [currentImage, setCurrentImage] = useState<File | null>(null);
@@ -48,17 +49,13 @@ const EditQuizForm = ({ isOpen, setIsOpen, quiz, fetchQuiz }: EditQuizModalProps
     answers: z.array(
       z.object({
         answerText: z.string().min(1, 'Vui lòng nhập câu trả lời'),
-        skinTypeId: z.number().min(1, 'Vui lòng chọn loại da')
+        skinTypeId: z.number().min(1, 'Vui lòng chọn loại da'),
+        quizAnswerId: z.number()
       })
     )
       .length(4, 'Vui lòng nhập đủ 4 câu trả lời')
   });
 
-  const [skinTypes, setSkinTypes] = useState<any>([]);
-  const [selectedSkinTypes, setSelectedSkinTypes] = useState<any>([]);
-  const handleSkinTypeChange = (selectedValues: any) => {
-    setSelectedSkinTypes(selectedValues);
-  };
   const handlePreview = async (file: any) => {
     setPreviewImage(file.thumbUrl || file.url);
     setPreviewVisible(true);
@@ -70,7 +67,8 @@ const EditQuizForm = ({ isOpen, setIsOpen, quiz, fetchQuiz }: EditQuizModalProps
       imageUrl: "",
       answers: Array(4).fill({
         answerText: "",
-        skinTypeId: 0
+        skinTypeId: 0,
+        quizAnswerId: 0
       })
     }
   });
@@ -87,24 +85,6 @@ const EditQuizForm = ({ isOpen, setIsOpen, quiz, fetchQuiz }: EditQuizModalProps
     }
   };
 
-  const fetchSkinTypes = async () => {
-    try {
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-      const data = await getAllSkinTypes(token);
-      setSkinTypes(data.result);
-    }
-    catch (err: any) {
-      console.log(err);
-      notification.error({ message: "Failed to fetch skin types" })
-    }
-    finally {
-
-    }
-  }
-
   const handleSubmit = async (values: z.infer<typeof quizFormSchema>) => {
     try {
       if (!token) {
@@ -113,19 +93,11 @@ const EditQuizForm = ({ isOpen, setIsOpen, quiz, fetchQuiz }: EditQuizModalProps
       }
       setLoading(true);
 
-      const formData = new FormData();
-      formData.append("question_text", values.question_text);
-      if (imageFiles.length > 0) {
-        formData.append("file", imageFiles[0]);
-      }
-
-      const response = await createQuiz(values.question_text, imageFiles[0] || null, token);
-      const quiz = response.result;
-
-      await Promise.all(values.answers.map((answer: any) => createQuizAnswer({ ...answer, quizQuestionId: quiz.id }, token)));
+      await updateQuiz(quiz.id, values.question_text, imageFiles[0] || null, token);
+      await Promise.all(values.answers.map((answer: any) => updateQuizAnswer(answer.quizAnswerId, answer, token)));
 
       notification.success({
-        message: "Tạo quiz thành công 🎉",
+        message: "Thay đổi quiz thành công 🎉",
         description: "Quiz mới đã được thêm vào hệ thống.",
       });
 
@@ -147,20 +119,20 @@ const EditQuizForm = ({ isOpen, setIsOpen, quiz, fetchQuiz }: EditQuizModalProps
   };
 
   useEffect(() => {
+    if(!isOpen) return;
     form.setValue("question_text", quiz?.question_text);
     form.setValue("imageUrl", quiz?.img_url);
     setCurrentImage(quiz?.img_url);
     quiz?.answers.forEach((answer: any, index: number) => {
       form.setValue(`answers.${index}`, {
         answerText: answer.answerText,
-        skinTypeId: answer.skinTypeId
+        skinTypeId: answer.skinTypeId,
+        quizAnswerId: answer.id
       })
     })
-  }, [isOpen, id, form]);
+  }, [isOpen]);
 
-  useEffect(() => {
-    fetchSkinTypes();
-  }, [])
+  
 
   return (
     <AnimatePresence>
@@ -179,6 +151,8 @@ const EditQuizForm = ({ isOpen, setIsOpen, quiz, fetchQuiz }: EditQuizModalProps
 
             <form onSubmit={form.handleSubmit(handleSubmit)} className="grid grid-cols-2 gap-6">
               {/* Câu hỏi */}
+
+            {/* {JSON.stringify(form.getValues("answers"))} */}
               <div className="flex flex-col gap-4 text-left">
                 {/* Câu hỏi */}
                 <label className="text-gray-700 mb-1 flex items-center gap-2 font-bold">

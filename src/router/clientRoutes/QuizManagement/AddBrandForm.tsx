@@ -25,10 +25,11 @@ import { BiCommentDetail } from "react-icons/bi";
 interface AddQuizModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  skinTypes: any;
   fetchQuiz: () => void;
 }
 
-const AddQuizModal = ({ isOpen, setIsOpen, fetchQuiz }: AddQuizModalProps) => {
+const AddQuizModal = ({ isOpen, setIsOpen, skinTypes, fetchQuiz}: AddQuizModalProps) => {
   const { id } = useParams<{ id: string }>();
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [currentImage, setCurrentImage] = useState<File | null>(null);
@@ -52,11 +53,6 @@ const AddQuizModal = ({ isOpen, setIsOpen, fetchQuiz }: AddQuizModalProps) => {
       .length(4, 'Vui lòng nhập đủ 4 câu trả lời')
   });
 
-  const [skinTypes, setSkinTypes] = useState<any>([]);
-  const [selectedSkinTypes, setSelectedSkinTypes] = useState<any>([]);
-  const handleSkinTypeChange = (selectedValues: any) => {
-    setSelectedSkinTypes(selectedValues);
-  };
   const handlePreview = async (file: any) => {
     setPreviewImage(file.thumbUrl || file.url);
     setPreviewVisible(true);
@@ -84,24 +80,6 @@ const AddQuizModal = ({ isOpen, setIsOpen, fetchQuiz }: AddQuizModalProps) => {
       form.setValue("imageUrl", URL.createObjectURL(newFiles[0]));
     }
   };
-
-  const fetchSkinTypes = async () => {
-    try {
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-      const data = await getAllSkinTypes(token);
-      setSkinTypes(data.result);
-    }
-    catch (err: any) {
-      console.log(err);
-      notification.error({ message: "Failed to fetch skin types" })
-    }
-    finally {
-
-    }
-  }
 
   const handleSubmit = async (values: z.infer<typeof quizFormSchema>) => {
     try {
@@ -145,13 +123,10 @@ const AddQuizModal = ({ isOpen, setIsOpen, fetchQuiz }: AddQuizModalProps) => {
     }
   };
 
-  useEffect(() => {
+  // useEffect(() => {
 
-  }, [isOpen, id, form]);
+  // }, [isOpen, id, form]);
 
-  useEffect(() => {
-    fetchSkinTypes();
-  }, [])
 
   return (
     <AnimatePresence>

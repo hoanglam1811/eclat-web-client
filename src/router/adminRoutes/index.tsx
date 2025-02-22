@@ -7,6 +7,7 @@ import Rtl from "./Rtl";
 import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import Tables from "./Tables";
+import StaffManagement from "./StaffManagement";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -34,8 +35,12 @@ const publicRoutes: RouteObject[] = [
     element: <SignUp />,
   },
   {
+    path: RouteNames.STAFF_MANAGEMENT,
+    element: <StaffManagement />,
+  },
+  {
     path: RouteNames.ADMIN_TABLES,
-    element: <Tables />,
+    element: <Tables/>,
   }
 ];
 

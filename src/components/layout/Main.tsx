@@ -14,6 +14,7 @@ function Main({ children }:any) {
   const [placement, setPlacement] = useState("right");
   const [sidenavColor, setSidenavColor] = useState("#1890ff");
   const [sidenavType, setSidenavType] = useState("transparent");
+  const [breadCrumbText, setBreadCrumbText] = useState("");
   const [fixed, setFixed] = useState(false);
 
   const openDrawer = () => setVisible(!visible);
@@ -115,7 +116,7 @@ function Main({ children }:any) {
             />
           </AntHeader>
         )}
-        <Content className="content-ant">{children}</Content>
+        {/* <Content className="content-ant">{children}</Content> */}
           <Outlet />
         <Footer />
       </Layout>

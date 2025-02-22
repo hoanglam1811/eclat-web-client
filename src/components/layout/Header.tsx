@@ -29,6 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { removeToken, removeUser } from "../../reducers/tokenSlice";
 import RouteNames from "../../constants/routeNames";
+import { vietRouteNames } from "../../constants/vietRouteNames";
 
 const ButtonContainer = styled.div`
   .ant-btn-primary {
@@ -260,7 +261,9 @@ function Header({
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => window.scrollTo(0, 0));
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, []);
 
   const showDrawer = () => setVisible(true);
   const hideDrawer = () => setVisible(false);
@@ -291,7 +294,8 @@ function Header({
             </Breadcrumb.Item>
             <Breadcrumb.Item 
             >
-              {name.replace("admin/", "")}
+              {!vietRouteNames[name] && name.replace("admin/", "")}
+              {vietRouteNames[name]}
             </Breadcrumb.Item>
           </Breadcrumb>
           <div className="ant-page-header-heading">
@@ -299,7 +303,8 @@ function Header({
               className="ant-page-header-heading-title"
               style={{ textTransform: "capitalize" }}
             >
-              {subName.replace("admin/", "")}
+              {!vietRouteNames[subName] && subName.replace("admin/", "")}
+              {vietRouteNames[subName]}
             </span>
           </div>
         </Col>

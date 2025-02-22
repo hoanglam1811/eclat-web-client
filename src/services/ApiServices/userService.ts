@@ -16,9 +16,11 @@ export async function createStaff(userData: any) {
 }
 
 // Lấy danh sách tất cả người dùng
-export async function getAllUsers() {
+export async function getAllUsers(token: string) {
   try {
-    const response = await axios.get(`${BASE_URL}/users`, ngrokSkipWarning);
+    const response = await axios.get(`${BASE_URL}/users`, {
+      headers: { Authorization: "Bearer " + token },
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to get users:", error);

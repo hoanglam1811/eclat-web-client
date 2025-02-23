@@ -281,7 +281,7 @@ const Products = () => {
                                 </p>
                             ) : (
                                 paginatedmProducts.map((product: any) => (
-                                    <ProductCard key={product.id} product={product} handleBrandChange={handleBrandChange}/>
+                                    <ProductCard key={product.id} product={product} handleBrandChange={handleBrandChange} />
                                 ))
                             )}
 

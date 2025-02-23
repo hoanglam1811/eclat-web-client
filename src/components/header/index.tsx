@@ -83,12 +83,12 @@ const Header = () => {
             fontSize: "16px",
             fontWeight: "bold",
             color: "#333",
-            fontFamily: "Montserrat, sans-serif",
           }}
         >
 
           {user?.role !== RoleNames.STAFF && (
             <>
+
               <li
                 className="mr-5"
                 style={{ position: "relative", cursor: "pointer" }}

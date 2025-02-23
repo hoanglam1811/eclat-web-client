@@ -3,95 +3,60 @@ import HomepageImage2 from "../../../assets/homepagepic2.png";
 import HomepageImage3 from "../../../assets/homepagepic3.png";
 import DMSP from "../../../assets/DMSP.png";
 import { Carousel } from "antd";
-import { useNavigate } from "react-router-dom";
-import RouteNames from "../../../constants/routeNames";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import { useState } from "react";
-import { removeToken, removeUser } from "../../../reducers/tokenSlice";
-import RoleNames from "../../../constants/roleNames";
+import { useEffect, useState } from "react";
 import { ProductCard } from "../../../components/footer/components/Home";
 import ProductSkeleton from "./ProductSkeleton";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { useNavigate } from "react-router-dom";
+import { getAllProducts } from "../../../services/ApiServices/productService";
+import { getAllBrands } from "../../../services/ApiServices/brandService";
+import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
 
 const Home = () => {
+    const token = useSelector((state: RootState) => state.token.token);
+    const navigate = useNavigate();
+    const [products, setProducts] = useState<any>([]);
+    const [productsFull, setProductsFull] = useState(products);
 
-    const products = [
-        {
-            id: "1",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 50,
-            description: "Beautiful earrings with a unique palm design.",
-            origin_price: 835000,
-            disc_price: 120000,
-            origin_country: "USA",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand A",
-            average_rating: 4.5,
-            status: "Hết hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "2",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 30,
-            description: "Elegant necklace with a red birthstone.",
-            origin_price: 100000,
-            disc_price: 90000,
-            origin_country: "USA",
-            skinTypeId: "Sensitive Skin",
-            brandId: "Brand B",
-            average_rating: 4.8,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/glam_2.11.1_18a5ca6f9b814d9bb11125d8c6d2f704_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "3",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1_b5d9938d4e0d4b71b98a3ac1e059d73e_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "4",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "5",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-    ];
+    useEffect(() => {
+        const fetchProducts = async () => {
+            if (!token) {
+                navigate("/login");
+                return;
+            }
+            try {
+                setIsLoading(true);
+                const [products] = await Promise.all([
+                    getAllProducts(token),
+                    getAllBrands(token),
+                    getAllSkinTypes(token),
+                ]);
+                console.log(products);
+
+                let productsData = products.map((product: any) => ({
+                    id: product.productId,
+                    name: product.productName,
+                    origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
+                    disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
+                    origin_country: product.originCountry,
+                    skinTypeId: product.skinType.skinName,
+                    brandId: product.brand.brandName,
+                    imageUrl: product.images[0]?.imageUrl,
+                }));
+
+                setProducts(productsData);
+                setProductsFull(productsData);
+            } catch (error: any) {
+                setError(error.toString());
+                console.error("Error fetching skin types", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProducts();
+    }, [token, navigate]);
 
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -137,48 +102,45 @@ const Home = () => {
                 </Carousel>
             </section>
 
-            {/* Feature Section */}
             <section
                 style={{
-                    fontFamily: "Montserrat, sans-serif",
                     display: "flex",
                     justifyContent: "space-around",
                     padding: "20px 40px",
-                    backgroundColor: "#ffffff",
                     borderRadius: "8px",
                     boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
                 }}
             >
-                <div style={{ backgroundColor: "#2980b9", color: "#ffffff", padding: "15px", borderRadius: "5px", textAlign: "center", fontWeight: "bold" }}>
+                <div className="bg-orange-400" style={{ color: "#ffffff", padding: "15px", borderRadius: "5px", textAlign: "center", fontWeight: "bold" }}>
                     <h3 style={{ margin: 0 }}>MIỄN PHÍ vận chuyển</h3>
                     <p style={{ fontSize: "14px", margin: "5px 0" }}>Đơn hàng từ 500.000 VNĐ</p>
                 </div>
-                <div style={{ backgroundColor: "#2980b9", color: "#ffffff", padding: "15px", borderRadius: "5px", textAlign: "center", fontWeight: "bold" }}>
+                <div className="bg-orange-400" style={{ color: "#ffffff", padding: "15px", borderRadius: "5px", textAlign: "center", fontWeight: "bold" }}>
                     <h3 style={{ margin: 0 }}>Hoàn trả dễ dàng</h3>
                     <p style={{ fontSize: "14px", margin: "5px 0" }}>Đảm bảo hài lòng</p>
                 </div>
-                <div style={{ backgroundColor: "#2980b9", color: "#ffffff", padding: "15px", borderRadius: "5px", textAlign: "center", fontWeight: "bold" }}>
+                <div className="bg-orange-400" style={{ color: "#ffffff", padding: "15px", borderRadius: "5px", textAlign: "center", fontWeight: "bold" }}>
                     <h3 style={{ margin: 0 }}>Ưu đãi thành viên</h3>
                     <p style={{ fontSize: "14px", margin: "5px 0" }}>Dành riêng cho bạn</p>
                 </div>
-                <div style={{ backgroundColor: "#2980b9", color: "#ffffff", padding: "15px", borderRadius: "5px", textAlign: "center", fontWeight: "bold" }}>
+                <div className="bg-orange-400" style={{ color: "#ffffff", padding: "15px", borderRadius: "5px", textAlign: "center", fontWeight: "bold" }}>
                     <h3 style={{ margin: 0 }}>Hỗ trợ 24/7</h3>
                     <p style={{ fontSize: "14px", margin: "5px 0" }}>Luôn sẵn sàng</p>
                 </div>
             </section>
-            <hr className=" mt-20 w-[50%] mx-auto border-t-2 border-[#578a3f]" />
-            <section className="p-6">
-                <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f]">SẢN PHẨM BÁN CHẠY</h2>
+
+            <section className="p-6 bg-orange-100">
+                <h2 className="text-center text-3xl font-bold my-8 text-[#578a3f]">SẢN PHẨM BÁN CHẠY</h2>
                 <menu className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mt-10">
                     {isLoading ? (
                         <ProductSkeleton />
                     ) : error ? (
                         <p className="text-center text-2xl font-semibold text-red-600 md:col-span-3 lg:col-span-4">
-                            Error loading scholarship programs.
+                            Lỗi khi tải sản phẩm.
                         </p>
                     ) : products.length === 0 ? (
                         <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
-                            No data found matching your search.
+                            Không có sản phẩm nào phù hợp.
                         </p>
                     ) : (
                         products.map((product: any) => (
@@ -189,9 +151,8 @@ const Home = () => {
                 </menu>
             </section>
 
-            <hr className=" mt-10 w-[50%] mx-auto border-t-2 border-[#578a3f]" />
 
-            <section className="p-6">
+            <section className="p-6 bg-orange-50 ">
                 <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f] ">DANH MỤC SẢN PHẨM</h2>
 
                 <div className="flex flex-col md:flex-row gap-3 items-center mt-10">

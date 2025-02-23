@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaPen, FaCheckCircle, FaBuilding, FaImage } from 'react-icons/fa';
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
@@ -145,7 +145,7 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
             >
               {/* Name Field */}
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Tên</Label>
+                <Label className="mb-3 text-left">Tên thương hiệu</Label>
                 <div className="relative">
                   <Input
                     {...form.register("brandName")}
@@ -153,7 +153,7 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
+                  <FaBuilding className="absolute left-3 top-3 text-gray-500" />
                 </div>
                 {form.formState.errors.brandName && (
                   <p className="text-red-500 text-sm">
@@ -189,12 +189,15 @@ const AddBrandModal = ({ isOpen, setIsOpen, fetchBrand }: AddBrandModalProps) =>
 
               <div className="flex flex-col">
                 <Label className="mb-3 text-left">Logo URL</Label>
-                <Input
-                  {...form.register("imgUrl")}
-                  placeholder="Nhập URL"
-                  type="url"
-                  className="p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
-                />
+                <div className="relative">
+                  <Input
+                    {...form.register("imgUrl")}
+                    placeholder="Nhập URL"
+                    type="url"
+                    className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                  />
+                  <FaImage className="absolute left-3 top-3 text-gray-500" />
+                </div>
                 {form.formState.errors.imgUrl && (
                   <p className="text-red-500 text-sm">
                     {form.formState.errors.imgUrl.message}

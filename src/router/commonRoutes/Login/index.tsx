@@ -115,7 +115,7 @@ const Login = () => {
                         animation: "fadeIn 1s ease-in-out",
                     }}
                 >
-                    <h2 className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", color: "#578a3f", marginBottom: "30px" }}>
+                    <h2 className='font-bold' style={{ color: "#578a3f", marginBottom: "30px" }}>
                         CHÀO MỪNG ĐẾN VỚI ÉCLAT
                     </h2>
 
@@ -185,7 +185,7 @@ const Login = () => {
                         {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
                     </button>
 
-                    <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
+                    <p className='font-bold' style={{ fontSize: "14px", color: "#555" }}>
                         Bạn chưa có tài khoản?{" "}
                         <Link
                             to="/register"
@@ -201,7 +201,7 @@ const Login = () => {
                         </Link>
                     </p>
 
-                    <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
+                    <p className='font-bold' style={{ fontSize: "14px", color: "#555" }}>
                         <Link
                             to="/forgot-password"
                             style={{

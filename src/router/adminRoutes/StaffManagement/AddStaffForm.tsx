@@ -10,10 +10,8 @@ import { FaTimes, FaPen, FaCheckCircle, FaUser, FaLockOpen, FaEnvelope, FaPhone 
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
-import { Textarea } from "../../../components/ui/textarea";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import { addSkinType } from "../../../services/ApiServices/skinTypeService";
 import { notification } from "antd";
 import { createStaff } from "../../../services/ApiServices/userService";
 
@@ -35,7 +33,7 @@ const AddStaffModal = ({ isOpen, setIsOpen, fetchStaffs }: AddStaffModalProps) =
     password: z
       .string()
       .min(8, "Mật khẩu phải có ít nhất 8 ký tự")
-      .regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/, 
+      .regex(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
         "Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 số và 1 ký tự đặc biệt, không có khoảng trắng"),
     email: z.string().min(1, "Vui lòng nhập email").email("Email không hợp lệ"),
     phone: z
@@ -74,9 +72,10 @@ const AddStaffModal = ({ isOpen, setIsOpen, fetchStaffs }: AddStaffModalProps) =
       setIsOpen(false);
       notification.success({ message: "Thêm Staff thành công! 🎉" });
       fetchStaffs();
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error creating staff:", error);
-      notification.error({ message: "Thêm Staff thất bại! ❌",
+      notification.error({
+        message: "Thêm Staff thất bại! ❌",
         description: error?.response?.data?.message == "User Existed" &&
           "Tên người dùng đã tồn tại!!"
       });

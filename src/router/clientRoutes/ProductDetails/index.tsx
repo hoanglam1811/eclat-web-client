@@ -5,7 +5,7 @@ import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import ProductSkeleton from "../Home/ProductSkeleton";
 import { ProductCard } from "../../../components/footer/components/Home";
 import RouteNames from "../../../constants/routeNames";
-import { getProductById } from "../../../services/ApiServices/productService";
+import { getAllProducts, getProductById } from "../../../services/ApiServices/productService";
 import { notification, Tabs } from "antd";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
@@ -14,6 +14,7 @@ import { getSkinTypeById } from "../../../services/ApiServices/skinTypeService";
 import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
+import { Star } from "lucide-react";
 
 const ProductDetails = () => {
     const { TabPane } = Tabs;
@@ -30,9 +31,10 @@ const ProductDetails = () => {
     const [brandImageUrl, setBrandImageUrl] = useState<string | null>(null);
     const [tabIndex, setTabIndex] = useState(1);
     const [selectedOption, setSelectedOption] = useState<any>(null);
+    const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
 
     const [sliderRef, instanceRef] = useKeenSlider({
-      slides: { perView: 5 },
+        slides: { perView: 5 },
     });
 
     const handleTabChange = (key: any) => {
@@ -45,12 +47,9 @@ const ProductDetails = () => {
         { text: "Không hợp da mình lắm", rating: 3, userId: "user3", create_at: "2025-02-16" },
         { text: "Chất lượng tuyệt vời, đáng tiền!", rating: 5, userId: "user4", create_at: "2025-02-15" },
         { text: "Sản phẩm không như mong đợi", rating: 2, userId: "user5", create_at: "2025-02-14" },
-        { text: "Được tặng quà kèm theo rất thích!", rating: 4, userId: "user6", create_at: "2025-02-13" },
-        { text: "Chắc chắn sẽ mua lại lần sau!", rating: 5, userId: "user7", create_at: "2025-02-12" },
-        { text: "Dùng tốt nhưng hơi đắt", rating: 4, userId: "user8", create_at: "2025-02-11" },
-        { text: "Không phù hợp với nhu cầu của tôi", rating: 3, userId: "user9", create_at: "2025-02-10" },
-        { text: "Tuyệt vời, sẽ giới thiệu cho bạn bè!", rating: 5, userId: "user10", create_at: "2025-02-09" },
+        { text: "Được tặng quà kèm theo rất thích!", rating: 4, userId: "user6", create_at: "2025-02-13" }
     ];
+    const [reviews, setReviews] = useState(sampleReviews);
 
     const handleQuantityChange = (change: any) => {
         setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));
@@ -70,7 +69,6 @@ const ProductDetails = () => {
                 console.log(productData)
                 setProduct(productData.data);
                 setCurrentImage(productData.data.productImages?.[0]?.imageUrl || "");
-                // Lấy tên thương hiệu
                 if (productData.data.brandId) {
                     const brandData = await getBrandById(productData.data.brandId, token);
                     setBrandName(brandData.data.brandName);
@@ -93,11 +91,44 @@ const ProductDetails = () => {
         }
     }, [id]);
 
+    useEffect(() => {
+        const fetchRelatedProducts = async () => {
+            if (!token) return;
+            console.log(product)
+            if (!product.brandId || !product.skinTypeId) {
+                console.error("Thiếu dữ liệu brand hoặc skinType:", product);
+                return;
+            }
+            try {
+                const allProducts = await getAllProducts(token);
+                console.log(allProducts)
+                const filteredProducts = allProducts.filter(
+                    (item: any) =>
+                        item.productId !== product.productId &&
+                        (item.brandId === product.brandId ||
+                            item.skinTypeId === product.skinTypeId)
+                );
+
+                setRelatedProducts(filteredProducts);
+                console.log(filteredProducts)
+            } catch (error) {
+                console.error("Lỗi khi tải sản phẩm liên quan:", error);
+            }
+        };
+
+        if (product && product.brandId && product.skinTypeId) {
+            fetchRelatedProducts();
+        }
+    }, [product]);
+
     const handleOptionSelect = (option: any) => {
-        if(option.optionImages && option.optionImages.length > 0)
-          setCurrentImage(option.optionImages[0]);
-        // console.log("Bạn đã chọn tùy chọn:", option.optionValue);
-        setSelectedOption(option);
+        if (selectedOption?.optionId === option.optionId) {
+            setSelectedOption(null);
+        } else {
+            if (option.optionImages && option.optionImages.length > 0)
+                setCurrentImage(option.optionImages[0]);
+            setSelectedOption(option);
+        }
     };
 
     const handleAddToCart = () => {
@@ -105,11 +136,11 @@ const ProductDetails = () => {
             notification.error({ message: "Vui lòng chọn một tùy chọn sản phẩm!" });
             return;
         }
-    
+
         const existingCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
-    
+
         const productExists = existingCart.find((item: any) => item.optionId === selectedOption.optionId);
-    
+
         if (productExists) {
             productExists.quantity += quantity;
         } else {
@@ -124,17 +155,16 @@ const ProductDetails = () => {
                 optionValue: product.productName + " - " + selectedOption.optionValue,
             });
         }
-    
+
         sessionStorage.setItem("cartItems", JSON.stringify(existingCart));
-    
+
         sessionStorage.setItem("lastAddedProduct", JSON.stringify({
             id: product.productId,
             optionId: selectedOption.optionId
         }));
-    
+
         navigate(RouteNames.CART);
     };
-    
 
     const { pathname } = useLocation();
 
@@ -158,7 +188,7 @@ const ProductDetails = () => {
                                 </BreadcrumbItem>
                                 <BreadcrumbSeparator />
                                 <BreadcrumbItem>
-                                    <p className="text-[#000] font-medium md:text-xl text-lg">Thông tin sản phẩm {product?.name}</p>
+                                    <p className="text-[#000] font-medium md:text-xl text-lg">Thông tin sản phẩm {product?.productName}</p>
                                 </BreadcrumbItem>
                             </BreadcrumbList>
                         </Breadcrumb>
@@ -182,67 +212,67 @@ const ProductDetails = () => {
                                     />
                                     {/* Thumbnails */}
                                     <div className="flex relative ml-[-10px]">
-                                      <button
-                                        onClick={() => instanceRef.current?.prev()}
-                                      >
-                                        <LeftOutlined  
-                                        className="text-xl text-black"
-                                        />
-                                      </button>
-
-                                      <div ref={sliderRef} className="keen-slider" >
-                                        {product?.productImages.map((img: any, index: number) => (
-                                          <div key={index} className={`keen-slider__slide ${currentImage == img.imageUrl && "border-4 border-orange-500 rounded-lg"}`}
-                                            style={{ padding: "10px" }}>
-                                            <img
-                                              className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
-                                              src={img.imageUrl}
-                                              onClick={() => setCurrentImage(img.imageUrl)}
-                                              alt={`Slide ${index}`}
-                                          />
-                                          {currentImage === img.imageUrl && (
-                                              <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
-                                                ✔
-                                              </div>
-                                            )}
-                                          </div>
-                                        ))}
-                                        {product?.options.map((option:any, index: number) => (
-                                          <div key={index} className={`keen-slider__slide ${currentImage == option.optionImages[0] && "border-4 border-orange-500 rounded-lg"}`}
-                                            style={{padding:"10px"}}>
-                                            <img
-                                              className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
-                                              src={option.optionImages[0]}
-                                              onClick={() => setCurrentImage(option.optionImages[0])}
-                                              alt={`Slide ${index}`}
+                                        <button
+                                            onClick={() => instanceRef.current?.prev()}
+                                        >
+                                            <LeftOutlined
+                                                className="text-xl text-black"
                                             />
-                                            {currentImage === option.optionImages[0] && (
-                                              <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
-                                                ✔
-                                              </div>
-                                            )}
-                                          </div>
-                                        ))}
-                                      </div>
+                                        </button>
 
-                                      <button
-                                        onClick={() => instanceRef.current?.next()}
-                                      >
-                                        <RightOutlined 
-                                        className="text-xl text-black"
-                                        />
-                                      </button>
+                                        <div ref={sliderRef} className="keen-slider" >
+                                            {product?.productImages.map((img: any, index: number) => (
+                                                <div key={index} className={`keen-slider__slide ${currentImage == img.imageUrl && "border-4 border-orange-500 rounded-lg"}`}
+                                                    style={{ padding: "10px" }}>
+                                                    <img
+                                                        className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
+                                                        src={img.imageUrl}
+                                                        onClick={() => setCurrentImage(img.imageUrl)}
+                                                        alt={`Slide ${index}`}
+                                                    />
+                                                    {currentImage === img.imageUrl && (
+                                                        <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
+                                                            ✔
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                            {product?.options.map((option: any, index: number) => (
+                                                <div key={index} className={`keen-slider__slide ${currentImage == option.optionImages[0] && "border-4 border-orange-500 rounded-lg"}`}
+                                                    style={{ padding: "10px" }}>
+                                                    <img
+                                                        className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
+                                                        src={option.optionImages[0]}
+                                                        onClick={() => setCurrentImage(option.optionImages[0])}
+                                                        alt={`Slide ${index}`}
+                                                    />
+                                                    {currentImage === option.optionImages[0] && (
+                                                        <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
+                                                            ✔
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        <button
+                                            onClick={() => instanceRef.current?.next()}
+                                        >
+                                            <RightOutlined
+                                                className="text-xl text-black"
+                                            />
+                                        </button>
                                     </div>
 
 
                                 </div>
                                 {/* Product Details */}
                                 <div className="flex flex-col bg-gray-50 rounded-md">
-                                    <h1 className="text-3xl font-bold text-gray-800 mb-4">{product?.name}</h1>
+                                    <h1 className="text-2xl font-bold text-gray-800 mb-6 text-left ml-4 mt-4 mr-2">{product?.productName}</h1>
 
                                     {/* Ratings & Reviews */}
                                     <div className="flex ml-20 items-center space-x-3 mb-6">
-                                        <span className="text-2xl font-bold text-yellow-600">
+                                        <span className="text-xl font-bold text-yellow-600">
                                             {product?.average_rating ? `${product.average_rating.toFixed(1)}` : "Chưa có đánh giá"}
                                         </span>
                                         <div className="flex space-x-1">
@@ -277,33 +307,47 @@ const ProductDetails = () => {
                                     {/* Price */}
                                     <div className="flex flex-col mb-4 mx-4">
                                         <div className="bg-gray-100 rounded-md">
-                                            <div className="flex flex-col mb-2">
-                                                {/* Giá optionPrice thấp nhất và cao nhất (gạch bỏ) */}
-                                                <div className="flex justify-between items-center mt-3 mb-1 ml-20 mr-20">
-                                                    <span className=" text-lg font-semibold text-gray-500 line-through">
-                                                        {Math.min(...product?.options?.map((option: any) => option.optionPrice))?.toLocaleString("vi-VN")} VND
-                                                    </span>
-                                                    <span className="text-lg font-semibold text-gray-500">
-                                                        -
-                                                    </span>
-                                                    <span className="text-lg font-semibold text-gray-500 line-through">
-                                                        {Math.max(...product?.options?.map((option: any) => option.optionPrice))?.toLocaleString("vi-VN")} VND
-                                                    </span>
+                                            {/* Giá Option */}
+                                            <div className="flex flex-col mb-2 text-center">
+                                                {/* Giá gốc (line-through) */}
+                                                <div className="flex justify-center items-center mt-3 mb-1">
+                                                    {selectedOption ? (
+                                                        <span className="text-lg font-semibold text-gray-500 line-through">
+                                                            {selectedOption.optionPrice?.toLocaleString("vi-VN")} VND
+                                                        </span>
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-lg font-semibold text-gray-500 line-through">
+                                                                {Math.min(...product?.options?.map((option: any) => option.optionPrice))?.toLocaleString("vi-VN")} VND
+                                                            </span>
+                                                            <span className="text-lg font-semibold text-gray-500 mx-2"> - </span>
+                                                            <span className="text-lg font-semibold text-gray-500 line-through">
+                                                                {Math.max(...product?.options?.map((option: any) => option.optionPrice))?.toLocaleString("vi-VN")} VND
+                                                            </span>
+                                                        </>
+                                                    )}
                                                 </div>
 
-                                                {/* Giá discPrice thấp nhất và cao nhất */}
-                                                <div className="flex justify-between items-center ml-8 mr-8">
-                                                    <span className="text-2xl font-bold text-red-600">
-                                                        {Math.min(...product?.options?.map((option: any) => option.discPrice))?.toLocaleString("vi-VN")} VND
-                                                    </span>
-                                                    <span className="text-lg font-bold text-red-600">
-                                                        -
-                                                    </span>
-                                                    <span className="text-2xl font-bold text-red-600">
-                                                        {Math.max(...product?.options?.map((option: any) => option.discPrice))?.toLocaleString("vi-VN")} VND
-                                                    </span>
+                                                {/* Giá giảm (nếu có) */}
+                                                <div className="flex justify-center items-center">
+                                                    {selectedOption ? (
+                                                        <span className="text-2xl font-bold text-red-600">
+                                                            {selectedOption.discPrice?.toLocaleString("vi-VN")} VND
+                                                        </span>
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-2xl font-bold text-red-600">
+                                                                {Math.min(...product?.options?.map((option: any) => option.discPrice))?.toLocaleString("vi-VN")} VND
+                                                            </span>
+                                                            <span className="text-lg font-bold text-red-600 mx-2"> - </span>
+                                                            <span className="text-2xl font-bold text-red-600">
+                                                                {Math.max(...product?.options?.map((option: any) => option.discPrice))?.toLocaleString("vi-VN")} VND
+                                                            </span>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
+
 
                                             <div className="text-md font-bold text-orange-500 mb-2">(Đã bao gồm VAT)</div>
                                         </div>
@@ -313,32 +357,32 @@ const ProductDetails = () => {
                                             <div className="flex flex-wrap gap-2 mb-2">
                                                 <h4 className="text-lg font-semibold text-gray-700  text-left w-full">{product.attribute}:</h4>
                                                 <div className="grid grid-cols-3 gap-2 ml-6">
-                                                {product?.options?.map((option: any) => {
-                                                    return (
-                                                        <div
-                                                            key={option.optionId}
-                                                            className={`flex relative items-center p-2 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 ${selectedOption == option && "border-4 border-orange-500 rounded-lg"}`}
-                                                            onClick={() => handleOptionSelect(option)}
-                                                        >
-                                                            <div className="w-2/3 h-8">
-                                                                <img
-                                                                    src={option.optionImages[0]}
-                                                                    alt={option.optionValue}
-                                                                    className="w-full h-full object-cover rounded-lg"
-                                                                />
-                                                            </div>
+                                                    {product?.options?.map((option: any) => {
+                                                        return (
+                                                            <div
+                                                                key={option.optionId}
+                                                                className={`flex relative items-center p-2 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 ${selectedOption == option && "border-4 border-orange-500 rounded-lg"}`}
+                                                                onClick={() => handleOptionSelect(option)}
+                                                            >
+                                                                <div className="w-2/3 h-8">
+                                                                    <img
+                                                                        src={option.optionImages[0]}
+                                                                        alt={option.optionValue}
+                                                                        className="w-full h-full object-cover rounded-lg"
+                                                                    />
+                                                                </div>
 
-                                                            <div className="w-full pl-2">
-                                                                <span className="text-xs font-semibold text-gray-800">{option.optionValue}</span>
+                                                                <div className="w-full pl-2">
+                                                                    <span className="text-xs font-semibold text-gray-800">{option.optionValue}</span>
+                                                                </div>
+                                                                {selectedOption === option && (
+                                                                    <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
+                                                                        ✔
+                                                                    </div>
+                                                                )}
                                                             </div>
-                                            {selectedOption === option && (
-                                              <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
-                                                ✔
-                                              </div>
-                                            )}
-                                                        </div>
-                                                    );
-                                                })}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
                                         </div>
@@ -437,7 +481,7 @@ const ProductDetails = () => {
                 </div>
 
                 {/* Product Details Section */}
-                <div className="max-w-7xl mx-auto p-6 bg-white shadow-lg rounded-xl">
+                <div className="max-w-7xl mx-auto p-6 bg-white shadow-lg mt-4">
                     {/* Tabs */}
                     <Tabs
                         activeKey={tabIndex.toString()}
@@ -478,25 +522,29 @@ const ProductDetails = () => {
                     )}
 
                     {tabIndex === 2 && (
-                        <section className="p-6 bg-gray-100 rounded-xl mt-4 shadow-md">
-                            <h2 className="text-2xl font-bold text-gray-800 mb-6">Đánh giá từ người dùng</h2>
-                            {sampleReviews.length > 0 ? (
-                                <div
-                                    className={`grid grid-cols-1 md:grid-cols-2 gap-6 text-left ${sampleReviews.length > 4 ? "max-h-[500px] overflow-y-auto" : ""}`}
-                                >
-                                    {sampleReviews.map((review, index) => (
-                                        <div key={index} className="p-6 bg-white shadow-lg rounded-xl">
-                                            <p className="text-lg font-semibold text-gray-800">Người dùng: {review.userId}</p>
-                                            <p className="text-gray-600 mt-2">{review.text}</p>
-                                            <p className="text-yellow-500 mt-2">⭐ {review.rating}/5</p>
-                                            <p className="text-gray-500 text-sm mt-2">Ngày: {review.create_at}</p>
+                        <div className="p-6 bg-gray-100 rounded-lg shadow">
+                            <h2 className="text-xl font-bold text-gray-700 mb-4">Đánh giá sản phẩm</h2>
+                            <div className="space-y-4">
+                                {sampleReviews.map((review, index) => (
+                                    <div key={index} className="p-4 bg-white rounded-lg shadow-sm flex items-start space-x-4">
+                                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-semibold">
+                                            {review.userId.charAt(0).toUpperCase()}
                                         </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-600">Chưa có đánh giá nào.</p>
-                            )}
-                        </section>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="text-gray-600 text-sm">{review.create_at}</span>
+                                                <div className="flex">
+                                                    {[...Array(5)].map((_, i) => (
+                                                        <Star key={i} size={18} className={i < review.rating ? "text-yellow-500" : "text-gray-300"} fill={i < review.rating ? "currentColor" : "none"} />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <p className="text-gray-800 text-sm">{review.text}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     )}
 
                 </div>
@@ -505,17 +553,13 @@ const ProductDetails = () => {
                 <div className="max-w-7xl mx-auto px-6 mt-3 bg-white shadow-lg mb-3">
                     <h1 className="pt-10 pb-10 text-3xl font-bold text-[#578a3f]">Đề xuất cho bạn</h1>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pb-7">
-                        {isLoading ? (
-                            <ProductSkeleton />
-                        ) : product.length > 0 ? (
-                            product.map((item: any) => <ProductCard key={item.id} product={item} />)
+                        {relatedProducts.length > 0 ? (
+                            relatedProducts.map((item) => <ProductCard key={item.id} product={item} />)
                         ) : (
                             <p className="text-gray-600 col-span-4 text-center">Không có sản phẩm phù hợp.</p>
                         )}
                     </div>
                 </div>
-
-
             </section>
         </>
     );

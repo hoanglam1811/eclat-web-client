@@ -43,7 +43,7 @@ const formProps = {
   headers: {
     authorization: "authorization-text",
   },
-  onChange(info:any) {
+  onChange(info: any) {
     if (info.file.status !== "uploading") {
       console.log(info.file, info.fileList);
     }
@@ -54,7 +54,6 @@ const formProps = {
     }
   },
 };
-// table code start
 const columns = [
   {
     title: "ID",
@@ -353,14 +352,14 @@ const data = [
 ];
 
 function StaffManagement() {
-  const onChange = (e:any) => {
-    if(e.target.value == "b"){
+  const onChange = (e: any) => {
+    if (e.target.value == "b") {
       setStaffs(users.filter((user: any) => user.role.includes("Staff") && user.status))
     }
-    else if(e.target.value == "c"){
+    else if (e.target.value == "c") {
       setStaffs(users.filter((user: any) => user.role.includes("Staff") && !user.status))
     }
-    else{
+    else {
       setStaffs(users.filter((user: any) => user.role.includes("Staff")))
     }
   }
@@ -372,27 +371,26 @@ function StaffManagement() {
   const navigate = useNavigate();
 
   const fetchUsers = async () => {
-    if(!token){
+    if (!token) {
       navigate("/login");
       return;
     }
-    try{
+    try {
       setLoading(true);
       const response = await getAllUsers(token);
       setUsers(response.result);
       setStaffs(response.result.filter((user: any) => user.role.includes("Staff")));
       console.log(response)
     }
-    catch(err: any){
+    catch (err: any) {
       notification.error({
         message: "Lỗi lấy người dùng không thành công",
       })
     }
-    finally{
+    finally {
       setLoading(false);
     }
   }
-
 
   useEffect(() => {
     fetchUsers();
@@ -424,7 +422,7 @@ function StaffManagement() {
               <div className="table-responsive">
                 <Table
                   columns={columns}
-                  dataSource={staffs.map((user:any, index:number) => (
+                  dataSource={staffs.map((user: any, index: number) => (
                     {
                       key: index,
                       id: (
@@ -484,7 +482,7 @@ function StaffManagement() {
                           </Button>
                         </>
                       ),
-                      
+
                     }
                   ))}
                   pagination={false}
@@ -495,11 +493,11 @@ function StaffManagement() {
           </Col>
         </Row>
         {openAddStaff && (
-            <AddStaffModal
-                isOpen={openAddStaff}
-                setIsOpen={setOpenAddStaff}
-                fetchStaffs={fetchUsers}
-            />
+          <AddStaffModal
+            isOpen={openAddStaff}
+            setIsOpen={setOpenAddStaff}
+            fetchStaffs={fetchUsers}
+          />
         )}
       </div>
     </>

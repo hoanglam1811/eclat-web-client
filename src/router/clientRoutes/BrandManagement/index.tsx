@@ -15,13 +15,42 @@ import { Button } from "../../../components/ui/button";
 import AddBrandModal from "./AddBrandForm";
 import EditBrandForm from "./EditBrandForm";
 import { CloseCircleOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
-import { Input } from "antd";
+import { Avatar, Input, Typography } from "antd";
 import { RootState } from "../../../store/store";
 import { useSelector } from "react-redux";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { useNavigate } from "react-router-dom";
 
 const ITEMS_PER_PAGE = 5;
+
+const { Title } = Typography;
+
+const columns = [
+    {
+        title: "ID",
+        dataIndex: "id",
+        key: "id",
+        width: "20%",
+    },
+    {
+        title: "Tên thương hiệu",
+        dataIndex: "name",
+        key: "name",
+    },
+    {
+        title: "Logo",
+        dataIndex: "logo",
+        key: "logo",
+        render: (logo: any) => (
+            <Avatar shape="square" size={64} src={logo} />
+        ),
+    },
+    {
+        title: "Ngày tạo",
+        dataIndex: "created_at",
+        key: "created_at",
+    }
+];
 
 const BrandsManagement = () => {
     const [openImageModal, setOpenImageModal] = useState(false);

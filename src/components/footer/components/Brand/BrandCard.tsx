@@ -19,7 +19,6 @@ const BrandCard = ({ brand }: { brand: any }) => {
                     {/* Brand Name */}
                     <h3
                         className="text-sm font-bold text-gray-800"
-                        style={{ fontFamily: "Montserrat, sans-serif" }}
                     >
                         {brand?.brandName?.length > 30
                             ? brand?.brandName.substring(0, 30) + "..."

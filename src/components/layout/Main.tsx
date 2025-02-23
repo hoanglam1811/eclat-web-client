@@ -3,9 +3,9 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { Layout, Drawer, Affix } from "antd";
 import Sidenav from "./Sidenav";
 import Header from "./Header";
-import Footer from "./Footer";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import Footer from "../footer";
 
 const { Header: AntHeader, Content, Sider } = Layout;
 

@@ -94,7 +94,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchRelatedProducts = async () => {
             if (!token) return;
-            console.log(product)
+            console.log("product",product)
             if (!product.brandId || !product.skinTypeId) {
                 console.error("Thiếu dữ liệu brand hoặc skinType:", product);
                 return;
@@ -105,12 +105,21 @@ const ProductDetails = () => {
                 const filteredProducts = allProducts.filter(
                     (item: any) =>
                         item.productId !== product.productId &&
-                        (item.brandId === product.brandId ||
-                            item.skinTypeId === product.skinTypeId)
-                );
+                        (item.brand.brandId === product.brandId ||
+                            item.skinType.id === product.skinTypeId)
+                ).map((product: any) => ({
+                    id: product.productId,
+                    name: product.productName,
+                    origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
+                    disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
+                    origin_country: product.originCountry,
+                    skinTypeId: product.skinType.skinName,
+                    brandId: product.brand.brandName,
+                    imageUrl: product.images[0]?.imageUrl,
+                }));
 
                 setRelatedProducts(filteredProducts);
-                console.log(filteredProducts)
+                console.log("filteredProducts",filteredProducts)
             } catch (error) {
                 console.error("Lỗi khi tải sản phẩm liên quan:", error);
             }

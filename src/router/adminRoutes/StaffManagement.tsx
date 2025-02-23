@@ -363,12 +363,24 @@ function StaffManagement() {
       setStaffs(users.filter((user: any) => user.role.includes("Staff")))
     }
   }
+  
+
   const [loading, setLoading] = useState(false);
   const [openAddStaff, setOpenAddStaff] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [staffs, setStaffs] = useState<any[]>([]);
   const token = useSelector((state: RootState) => state.token.token);
   const navigate = useNavigate();
+  const ITEMS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const totalPages = Math.ceil(staffs?.length / ITEMS_PER_PAGE);
+  const paginatedStaffs = staffs?.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+  );
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const fetchUsers = async () => {
     if (!token) {
@@ -422,7 +434,7 @@ function StaffManagement() {
               <div className="table-responsive">
                 <Table
                   columns={columns}
-                  dataSource={staffs.map((user: any, index: number) => (
+                  dataSource={paginatedStaffs.map((user: any, index: number) => (
                     {
                       key: index,
                       id: (
@@ -488,6 +500,25 @@ function StaffManagement() {
                   pagination={false}
                   className="ant-border-space"
                 />
+              </div>
+              <div style={{ marginTop: "20px", marginRight: "10px", marginBottom: '10px', textAlign: 'right' }}>
+                  {Array.from({ length: totalPages }, (_, index) => (
+                      <button
+                          key={index}
+                          onClick={() => handlePageChange(index + 1)}
+                          style={{
+                              margin: "0 5px",
+                              padding: "5px 10px",
+                              backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                              color: currentPage === index + 1 ? "white" : "black",
+                              border: "none",
+                              borderRadius: "5px",
+                              cursor: "pointer",
+                          }}
+                      >
+                          {index + 1}
+                      </button>
+                  ))}
               </div>
             </Card>
           </Col>

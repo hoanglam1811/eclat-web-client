@@ -353,7 +353,17 @@ const data = [
 ];
 
 function StaffManagement() {
-  const onChange = (e:any) => console.log(`radio checked:${e.target.value}`);
+  const onChange = (e:any) => {
+    if(e.target.value == "b"){
+      setStaffs(users.filter((user: any) => user.role.includes("Staff") && user.status))
+    }
+    else if(e.target.value == "c"){
+      setStaffs(users.filter((user: any) => user.role.includes("Staff") && !user.status))
+    }
+    else{
+      setStaffs(users.filter((user: any) => user.role.includes("Staff")))
+    }
+  }
   const [loading, setLoading] = useState(false);
   const [openAddStaff, setOpenAddStaff] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
@@ -401,7 +411,8 @@ function StaffManagement() {
                 <>
                   <Radio.Group onChange={onChange} defaultValue="a">
                     <Radio.Button value="a">All</Radio.Button>
-                    <Radio.Button value="b">ONLINE</Radio.Button>
+                    <Radio.Button value="b">ACTIVE</Radio.Button>
+                    <Radio.Button value="c">INACTIVE</Radio.Button>
                   </Radio.Group>
                   <Button type="primary" className="ml-7" onClick={() => setOpenAddStaff(true)}>
                     <PlusOutlined className="mr-1" />

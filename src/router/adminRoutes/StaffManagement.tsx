@@ -33,6 +33,7 @@ import { useEffect, useState } from "react";
 import { RootState } from "../../store/store";
 import { useSelector } from "react-redux";
 import { getAllUsers } from "../../services/ApiServices/userService";
+import AddStaffModal from "./StaffManagement/AddStaffForm";
 
 const { Title } = Typography;
 
@@ -354,6 +355,7 @@ const data = [
 function StaffManagement() {
   const onChange = (e:any) => console.log(`radio checked:${e.target.value}`);
   const [loading, setLoading] = useState(false);
+  const [openAddStaff, setOpenAddStaff] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
   const [staffs, setStaffs] = useState<any[]>([]);
   const token = useSelector((state: RootState) => state.token.token);
@@ -401,7 +403,7 @@ function StaffManagement() {
                     <Radio.Button value="a">All</Radio.Button>
                     <Radio.Button value="b">ONLINE</Radio.Button>
                   </Radio.Group>
-                  <Button type="primary" className="ml-7">
+                  <Button type="primary" className="ml-7" onClick={() => setOpenAddStaff(true)}>
                     <PlusOutlined className="mr-1" />
                     Thêm Staff
                   </Button>
@@ -467,7 +469,7 @@ function StaffManagement() {
                       status: (
                         <>
                           <Button className={`${user.status ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-500"}`}>
-                            {user.status ? "ONLINE" : "OFFLINE"}
+                            {user.status ? "ACTIVE" : "INACTIVE"}
                           </Button>
                         </>
                       ),
@@ -481,6 +483,13 @@ function StaffManagement() {
             </Card>
           </Col>
         </Row>
+        {openAddStaff && (
+            <AddStaffModal
+                isOpen={openAddStaff}
+                setIsOpen={setOpenAddStaff}
+                fetchStaffs={fetchUsers}
+            />
+        )}
       </div>
     </>
   );

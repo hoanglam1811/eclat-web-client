@@ -5,9 +5,11 @@ const ngrokSkipWarning: any = { headers: { "bypass-tunnel-reminder": "true" } };
 //const token = useSelector((state: RootState) => state.token.token);
 
 // Tạo tài khoản Staff
-export async function createStaff(userData: any) {
+export async function createStaff(userData: any, token: string) {
   try {
-    const response = await axios.post(`${BASE_URL}/users`, userData, ngrokSkipWarning);
+    const response = await axios.post(`${BASE_URL}/users`, userData, {
+      headers: { Authorization: "Bearer " + token },
+    });
     return response.data;
   } catch (error) {
     console.error("Failed to create staff:", error);

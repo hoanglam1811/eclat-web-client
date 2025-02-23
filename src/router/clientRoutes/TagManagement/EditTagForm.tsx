@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
-import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaPen, FaCheckCircle, FaTag, FaEdit } from 'react-icons/fa';
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
@@ -104,7 +104,7 @@ const EditTagModal = ({ isOpen, setIsOpen, tag, fetchTag }: EditTagModalProps) =
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
                 <FaPen className="text-sky-500" />
-                Chỉnh sửa thẻ
+                Chỉnh sửa thẻ tên
               </h3>
               <button onClick={() => { setIsOpen(false); form.reset() }} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
                 <FaTimes />
@@ -123,7 +123,7 @@ const EditTagModal = ({ isOpen, setIsOpen, tag, fetchTag }: EditTagModalProps) =
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
+                  <FaTag className="absolute left-3 top-3 text-gray-500" />
                 </div>
                 {form.formState.errors.tagName && <p className="text-red-500 text-sm">{form.formState.errors.tagName.message}</p>}
               </div>
@@ -165,7 +165,7 @@ const EditTagModal = ({ isOpen, setIsOpen, tag, fetchTag }: EditTagModalProps) =
                     placeholder="Nhập mô tả"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
+                  <FaEdit className="absolute left-3 top-4 text-gray-500" />
                 </div>
                 {form.formState.errors.description && <p className="text-red-500 text-sm">{form.formState.errors.description.message}</p>}
               </div>

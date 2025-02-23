@@ -2,7 +2,6 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
-import ProductSkeleton from "../Home/ProductSkeleton";
 import { ProductCard } from "../../../components/footer/components/Home";
 import RouteNames from "../../../constants/routeNames";
 import { getAllProducts, getProductById } from "../../../services/ApiServices/productService";
@@ -443,7 +442,7 @@ const ProductDetails = () => {
                         {/* Shipping Section (20%) */}
                         <div className="col-span-1 row-span-1 bg-white p-6 shadow-md">
                             {/* Grid Layout */}
-                            <div className=" gap-4 ">
+                            <div className=" gap-4  ">
                                 {/* Phần Miễn phí vận chuyển */}
                                 <div>
                                     <h2 className="text-lg font-bold text-gray-800 mb-4">Miễn phí vận chuyển</h2>

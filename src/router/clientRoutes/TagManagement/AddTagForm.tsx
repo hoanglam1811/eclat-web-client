@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaPen, FaCheckCircle, FaTag, FaEdit } from 'react-icons/fa';
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
@@ -118,7 +118,7 @@ const AddTagModal = ({ isOpen, setIsOpen, fetchTag }: AddTagModalProps) => {
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
+                  <FaTag className="absolute left-3 top-3 text-gray-500" />
                 </div>
                 {form.formState.errors.tagName && <p className="text-red-500 text-sm">{form.formState.errors.tagName.message}</p>}
               </div>
@@ -160,7 +160,7 @@ const AddTagModal = ({ isOpen, setIsOpen, fetchTag }: AddTagModalProps) => {
                     placeholder="Nhập mô tả"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
+                  <FaEdit className="absolute left-3 top-4 text-gray-500" />
                 </div>
                 {form.formState.errors.description && <p className="text-red-500 text-sm">{form.formState.errors.description.message}</p>}
               </div>

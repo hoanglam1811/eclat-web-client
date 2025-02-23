@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ProductSkeleton from "./ProductSkeleton";
 import { ProductCard } from "../../../components/footer/components/Home";
-import { Button, Select, Slider } from "antd";
+import { Button, Input, Select, Slider } from "antd";
 import { Carousel } from 'antd';
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
@@ -12,9 +12,14 @@ import { getAllProducts } from "../../../services/ApiServices/productService";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
 import { originCountries } from "../FormAddProduct/originCountries";
+import { Search } from "lucide-react";
 
 
 const Products = () => {
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
     const [priceRange, setPriceRange] = useState([0, 10000000]);
     const handlePriceChange = (value: any) => {
         setPriceRange(value);
@@ -121,9 +126,10 @@ const Products = () => {
             (selectedBrands.length === 0 || selectedBrands.includes(product.brandId)) &&
             (selectedSkinTypes.length === 0 || selectedSkinTypes.includes(product.skinTypeId)) &&
             (selectedOriginCountry.length === 0 || selectedOriginCountry.includes(product.origin_country)) &&
-            priceRange[0] <= product.disc_price && product.disc_price <= priceRange[1]
+            priceRange[0] <= product.disc_price && product.disc_price <= priceRange[1] &&
+            product.name.toLowerCase().includes(searchTerm.toLowerCase())
         ));
-    }, [selectedBrands, selectedSkinTypes, selectedOriginCountry, priceRange, productsFull]);
+    }, [selectedBrands, selectedSkinTypes, selectedOriginCountry, priceRange, searchTerm, productsFull]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -199,6 +205,17 @@ const Products = () => {
                 <div className="flex gap-2">
                     <div className="w-full md:w-1/5 p-6 bg-white shadow-md">
                         <div>
+                            <div className="flex bg-white mb-2">
+                                <Search className="text-gray-500 mr-2 mt-2" />
+                                <Input
+                                    type="text"
+                                    placeholder="Tìm kiếm tên sản phẩm..."
+                                    className="flex-1 px-4 border-none focus:ring-0 focus:outline-none"
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                />
+                            </div>
+
                             <h4 className="font-medium text-lg text-left">KHOẢNG GIÁ</h4>
                             <Slider
                                 range

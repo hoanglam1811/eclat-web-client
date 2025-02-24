@@ -156,7 +156,7 @@ const Home = () => {
                 <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f] ">DANH MỤC SẢN PHẨM</h2>
 
                 <div className="flex flex-col md:flex-row gap-3 items-center mt-10">
-                    <div className="w-full md:w-1/4 flex justify-center items-center">
+                    <div className="w-full md:w-1/4 flex justify-center items-center mb-7">
                         <img
                             src={DMSP}
                             alt="Danh mục sản phẩm"

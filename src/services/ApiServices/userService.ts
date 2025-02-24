@@ -86,9 +86,11 @@ export async function updateUserPassword(userId: string, requestData: any, token
 }
 
 // Xóa user theo ID
-export async function deleteUser(userId: any) {
+export async function deleteUser(userId: any, token: string) {
   try {
-    const response = await axios.delete(`${BASE_URL}/users/${userId}`, ngrokSkipWarning);
+    const response = await axios.delete(`${BASE_URL}/users/${userId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return response.data;
   } catch (error) {
     console.error(`Failed to delete user with ID ${userId}:`, error);

@@ -131,7 +131,7 @@ const AddQuizModal = ({ isOpen, setIsOpen, skinTypes, fetchQuiz}: AddQuizModalPr
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed z-50 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed z-99 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <motion.div className="bg-white p-8 rounded-lg shadow-xl w-11/12 sm:w-2/3 lg:w-3/4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">

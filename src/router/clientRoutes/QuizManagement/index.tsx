@@ -123,9 +123,10 @@ const SkincareQuiz = ({ }) => {
                 </div>
 
                 <Button
+                    type="primary"
                     onClick={() => setOpenAddQuiz(true)}
                     style={{
-                        backgroundColor: '#419f97',
+                        // backgroundColor: '#419f97',
                         color: 'white',
                         padding: '8px 16px',
                         borderRadius: "8px",

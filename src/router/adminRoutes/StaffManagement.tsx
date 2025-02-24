@@ -11,28 +11,23 @@ import {
   Avatar,
   Typography,
   notification,
+  Tooltip,
 } from "antd";
 
-import { PlusOutlined, ToTopOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined, ToTopOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 
 // Images
-import ava1 from "../../assets/images/logo-shopify.svg";
-import ava2 from "../../assets/images/logo-atlassian.svg";
-import ava3 from "../../assets/images/logo-slack.svg";
-import ava5 from "../../assets/images/logo-jira.svg";
-import ava6 from "../../assets/images/logo-invision.svg";
 import face from "../../assets/images/face-1.jpg";
 import face2 from "../../assets/images/face-2.jpg";
 import face3 from "../../assets/images/face-3.jpg";
 import face4 from "../../assets/images/face-4.jpg";
 import face5 from "../../assets/images/face-5.jpeg";
 import face6 from "../../assets/images/face-6.jpeg";
-import pencil from "../../assets/images/pencil.svg";
 import { useEffect, useState } from "react";
 import { RootState } from "../../store/store";
 import { useSelector } from "react-redux";
-import { getAllUsers } from "../../services/ApiServices/userService";
+import { deleteUser, getAllUsers } from "../../services/ApiServices/userService";
 import AddStaffModal from "./StaffManagement/AddStaffForm";
 
 const { Title } = Typography;
@@ -90,6 +85,11 @@ const columns = [
     title: "Trạng thái",
     key: "status",
     dataIndex: "status",
+  },
+  {
+    title: "Hoạt động",
+    key: "action",
+    dataIndex: "action",
   },
 ];
 
@@ -382,6 +382,28 @@ function StaffManagement() {
     setCurrentPage(page);
   };
 
+  const handleInactiveStaff = async (userId: string) => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await deleteUser(userId, token);
+      notification.success({ message: "Xóa người dùng thành công"})
+      fetchUsers()
+      console.log(response)
+    }
+    catch (err: any) {
+      notification.error({
+        message: "Lỗi xóa người dùng không thành công",
+      })
+    }
+    finally {
+      setLoading(false);
+    }
+  }
+
   const fetchUsers = async () => {
     if (!token) {
       navigate("/login");
@@ -489,11 +511,20 @@ function StaffManagement() {
                       ),
                       status: (
                         <>
-                          <Button className={`${user.status ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-500"}`}>
+                          <Button className={`${user.status ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-500 text-white"}`}>
                             {user.status ? "ACTIVE" : "INACTIVE"}
                           </Button>
                         </>
                       ),
+                      action: (
+                        <>
+                          {user.status && <Tooltip title="Inactive Staff">
+                            <Button type="text" onClick={() => handleInactiveStaff(user.id)}> 
+                              <DeleteOutlined style={{ color: "red", fontSize: "15px" }} />
+                            </Button>
+                          </Tooltip>}
+                        </>
+                      )
 
                     }
                   ))}

@@ -207,6 +207,19 @@ function Sidenav({ color }:any) {
             <span className="label">Quản lý Staff</span>
           </NavLink>
         </Menu.Item>
+        <Menu.Item key="10">
+          <NavLink to="/admin/skincare-quiz-management">
+            <span
+              className="icon"
+              style={{
+                background: page === "skincare-quiz-management" ? color : "",
+              }}
+            >
+              {tables}
+            </span>
+            <span className="label">Quản lý câu hỏi</span>
+          </NavLink>
+        </Menu.Item>
         <Menu.Item key="3">
           <NavLink to="/admin/billing">
             <span

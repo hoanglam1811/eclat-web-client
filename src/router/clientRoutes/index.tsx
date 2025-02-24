@@ -85,10 +85,7 @@ const publicRoutes: RouteObject[] = [
     path: RouteNames.TAGS_MANAGEMENT,
     element: <TagsManagement />,
   },
-  {
-    path: RouteNames.SKINCARE_QUIZ_MANAGEMENT,
-    element: <SkincareQuiz />,
-  },
+  
   {
     path: RouteNames.SKIN_QUIZ,
     element: <SkinQuiz />,

@@ -8,6 +8,7 @@ import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 import Tables from "./Tables";
 import StaffManagement from "./StaffManagement";
+import SkincareQuiz from "../clientRoutes/QuizManagement";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -37,6 +38,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.STAFF_MANAGEMENT,
     element: <StaffManagement />,
+  },
+  {
+    path: RouteNames.SKINCARE_QUIZ_MANAGEMENT,
+    element: <SkincareQuiz />,
   },
   {
     path: RouteNames.ADMIN_TABLES,

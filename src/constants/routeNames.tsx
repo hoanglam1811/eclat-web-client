@@ -36,6 +36,8 @@ const RouteNames = {
   ADMIN_TABLES: "/admin/tables",
   SKINCARE_QUIZ_MANAGEMENT: "/admin/skincare-quiz-management",
   STAFF_MANAGEMENT: "/admin/staff-management",
+  BLOG_MANAGEMENT: "/admin/blog-management",
+  BLOG_DETAILS: "blog-details/:id",
 };
 
 export default RouteNames;

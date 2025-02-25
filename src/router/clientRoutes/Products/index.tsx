@@ -66,6 +66,18 @@ const Products = () => {
         }
     }, []);
 
+    useEffect(() => {
+        const storedBrand = sessionStorage.getItem("selectedBrand");
+        if (storedBrand) {
+            setSelectedBrands([JSON.parse(storedBrand)]);
+        }
+    
+        const storedSkinType = sessionStorage.getItem("selectedSkinType");
+        if (storedSkinType) {
+            setSelectedSkinTypes(JSON.parse(storedSkinType));
+        }
+    }, []);
+
     const handleClearFilters = () => {
         setSelectedBrands([]);
         setSelectedSkinTypes([]);
@@ -161,45 +173,6 @@ const Products = () => {
                     </div>
                 </div>
             </section>
-
-            <div className="max-w-8xl mx-auto p-6 bg-gray-100 ">
-                <div style={{ width: '100%', height: '120px', overflow: 'hidden', }}>
-                    <div style={{ direction: 'rtl' }}>
-                        <Carousel
-                            autoplay
-                            autoplaySpeed={1500}
-                            dots={false}
-                            slidesToShow={4}
-                            slidesToScroll={1}
-                            infinite={true}
-                            effect="scrollx"
-                        >
-                            {brands.map((brand: any, index: any) => (
-                                <div
-                                    key={index}
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        height: '100%',
-                                    }}
-                                >
-                                    <img
-                                        src={brand.logo}
-                                        alt={brand.label}
-                                        style={{
-                                            maxHeight: '80px',
-                                            objectFit: 'contain',
-                                            marginTop: '25px',
-                                        }}
-                                    />
-                                </div>
-                            ))}
-                        </Carousel>
-                    </div>
-                </div>
-            </div>
-
 
             <div className="max-w-8xl mx-auto p-6 bg-gray-100">
                 <div className="flex gap-2">

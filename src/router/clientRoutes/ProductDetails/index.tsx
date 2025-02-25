@@ -48,7 +48,6 @@ const ProductDetails = () => {
         { text: "Sản phẩm không như mong đợi", rating: 2, userId: "user5", create_at: "2025-02-14" },
         { text: "Được tặng quà kèm theo rất thích!", rating: 4, userId: "user6", create_at: "2025-02-13" }
     ];
-    const [reviews, setReviews] = useState(sampleReviews);
 
     const handleQuantityChange = (change: any) => {
         setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));

@@ -11,15 +11,15 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaTimes } from "react-icons/fa";
+import { FaCheckCircle, FaCity, FaEnvelope, FaHome, FaMapMarkerAlt, FaMoneyBillWave, FaPhone, FaTimes, FaUser } from "react-icons/fa";
+import { MdLocationCity } from "react-icons/md";
+
 
 function Payment() {
 
   //const {id} = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  //let { products } = location.state || { products: [] };
-  //const { setProducts } = location.state || { setProducts: () => {} };
 
   const [addAddress, setAddAddress] = useState(false);
   const [saveAddress, setSaveAddress] = useState(false);
@@ -79,9 +79,43 @@ function Payment() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isTermsDialogOpen, setIsTermsDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState('');
-  const handleOptionChange = (e: any) => {
-    setSelectedOption(e.target.value);
-  };
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [shippingFee, setShippingFee] = useState(30000);
+  const [discount, setDiscount] = useState(0);
+  const [recommendation, setRecommendation] = useState("");
+
+  useEffect(() => {
+    const storedCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
+    const calculatedTotal = storedCart.reduce(
+      (total: any, item: any) => total + item.quantity * (item.discountPrice || item.price),
+      0
+    );
+    setTotalPrice(calculatedTotal);
+
+    // Tính giảm giá và phí vận chuyển
+    let discountValue = 0;
+    let shippingCost = 30000;
+    let recommendationMessage = "";
+
+    if (calculatedTotal >= 1000000) {
+      discountValue = 100000;
+      shippingCost = 0;
+    } else if (calculatedTotal >= 500000) {
+      discountValue = 50000;
+    }
+
+    // Gợi ý mua thêm để đạt ưu đãi
+    if (calculatedTotal < 500000) {
+      recommendationMessage = `Bạn chỉ cần mua thêm ${(500000 - calculatedTotal).toLocaleString()}₫ để được giảm 50.000₫`;
+    } else if (calculatedTotal < 1000000) {
+      recommendationMessage = `Bạn chỉ cần mua thêm ${(1000000 - calculatedTotal).toLocaleString()}₫ để được miễn phí vận chuyển và giảm 100.000₫`;
+    }
+
+    setDiscount(discountValue);
+    setShippingFee(shippingCost);
+    setRecommendation(recommendationMessage);
+  }, []);
+
 
   const handleSubmit = () => {
 
@@ -223,6 +257,14 @@ function Payment() {
   // }, [])
 
   useEffect(() => {
+    console.log(province);
+    if (province?.name_with_type === "Thành phố Hồ Chí Minh") {
+      setShippingFee(0);
+    }
+  }, [province]);
+
+
+  useEffect(() => {
     fetchProvinces();
     if (province) {
       fetchDistricts(province.code);
@@ -230,7 +272,7 @@ function Payment() {
         fetchWards(district.code);
       }
     }
-  }, [userInfo])
+  }, [userInfo, province, district]);
 
   // if (!uid || selectedProducts.length === 0) {
   //   return (
@@ -267,336 +309,312 @@ function Payment() {
           </div>
         </div>
       </section>
-        <div className="flex flex-wrap px-5 w-full bg-gray-100 pt-6 pb-6 pl-30 gap-6">
-          <div className="w-full lg:w-8/12">
-            <div className="address-form-wrapper bg-white shadow-md p-5 mb-5">
-              <h2 className="text-xl font-bold mb-4 text-left">Địa chỉ giao hàng</h2>
-              <div className="space-y-4">
-                <div className="flex gap-3">
-                  <div className="w-full lg:w-1/2">
-                    <input
-                      placeholder="Họ và tên"
-                      {...form.register("receiverName")}
-                      className="w-full border rounded-md px-3 py-2"
-                    />
-                    {form.formState.errors.receiverName && <p className="text-red-500 text-sm">{form.formState.errors.receiverName.message}</p>}
-                  </div>
 
-                  {/* Email */}
-                  <div className="w-full lg:w-1/2">
-                    <input
-                      placeholder="Email"
-                      // value={userInfo?.email}
-                      {...form.register("email")}
-                      // onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
-                      className="w-full border rounded-md px-3 py-2"
-                    />
-                    {form.formState.errors.email && <p className="text-red-500 text-sm">{form.formState.errors.email.message}</p>}
-                  </div>
+      <div className="flex flex-wrap w-full bg-gray-100 pt-6 pb-6 pl-20 gap-6">
+        <div className="w-full lg:w-8/12">
+          <div className="address-form-wrapper bg-white shadow-md p-7 mb-5">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <FaMapMarkerAlt className="text-blue-500" /> Địa chỉ giao hàng
+            </h2>
+            <div className="space-y-4">
+              <div className="flex gap-3">
+                <div className="flex items-center w-full lg:w-1/2">
+                  <FaUser className="text-gray-500 mr-2" />
+                  <input
+                    placeholder="Họ và tên"
+                    {...form.register("receiverName")}
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+                  {form.formState.errors.receiverName && <p className="text-red-500 text-sm">{form.formState.errors.receiverName.message}</p>}
                 </div>
 
-                <div className="flex gap-3">
-                  {/* Địa chỉ */}
-                  <div className="w-full lg:w-1/2">
-                    <input
-                      placeholder="Địa chỉ, ví dụ: 151B Trần Quang Khải"
-                      // value={userInfo?.address}
-                      {...form.register("address")}
-                      // onChange={(e) => setUserInfo({ ...userInfo, address: e.target.value })}
-                      className="w-full border rounded-md px-3 py-2"
-                    />
-                    {form.formState.errors.address && <p className="text-red-500 text-sm">{form.formState.errors.address.message}</p>}
-                  </div>
-
-                  {/* Số Điện Thoại */}
-                  <div className="w-full lg:w-1/2">
-                    <input
-                      placeholder="Số Điện Thoại"
-                      // value={userInfo?.phoneNumber}
-                      {...form.register("phoneNumber")}
-                      // onChange={(e) => setUserInfo({ ...userInfo, phoneNumber: e.target.value })}
-                      className="w-full border rounded-md px-3 py-2"
-                    />
-                    {form.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{form.formState.errors.phoneNumber.message}</p>}
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <div className="w-full lg:w-1/3">
-                    <select
-                      className="w-full border rounded-md px-3 py-2 bg-white text-gray-700"
-                      onChange={async (e) => {
-                        fetchDistricts(e.currentTarget.value);
-                        const selectedProvince = await GetProvinceByCode(e.currentTarget.value);
-                        setProvince(selectedProvince);
-                        setDistrict("")
-                        setWard("")
-                        form.setValue("province", selectedProvince.name)
-                        form.setValue("district", "")
-                        form.setValue("ward", "")
-                      }}
-                      value={province.code || ""}
-                    >
-                      <option value="" disabled hidden>
-                        Vui lòng chọn Tỉnh Thành
-                      </option>
-                      {provinces.map((province) => (
-                        <option key={province.code} value={province.code}>{province.name_with_type}</option>
-                      ))}
-                    </select>
-                    {form.formState.errors.province && <p className="text-red-500 text-sm">{form.formState.errors.province.message}</p>}
-                  </div>
-                  <div className="w-full lg:w-1/3">
-                    <select
-                      className="w-full border rounded-md px-3 py-2 bg-white text-gray-700"
-                      onChange={async (e) => {
-                        fetchWards(e.currentTarget.value);
-                        const selectedDistrict = await GetDistrictByCode(e.currentTarget.value);
-                        setDistrict(selectedDistrict);
-                        setWard("")
-                        form.setValue("district", selectedDistrict.name)
-                        form.setValue("ward", "")
-                      }}
-                      value={district.code || ""}
-                    >
-                      <option value="" disabled hidden>
-                        Vui lòng chọn Quận Huyện
-                      </option>
-                      {districts.map((district) => (
-                        <option key={district.code} value={district.code}>{district.name_with_type}</option>
-                      ))}
-                    </select>
-                    {form.formState.errors.district && <p className="text-red-500 text-sm">{form.formState.errors.district.message}</p>}
-                  </div>
-                  <div className="w-full lg:w-1/3">
-                    <select
-                      className="w-full border rounded-md px-3 py-2 bg-white text-gray-700"
-                      onChange={async (e) => {
-                        const selectedWard = await GetWardByCode(e.currentTarget.value);
-                        setWard(selectedWard);
-                        form.setValue("ward", selectedWard.name)
-                      }}
-                      value={ward.code || ""}
-                    >
-                      <option value="" disabled hidden>
-                        Vui lòng chọn Phường Xã
-                      </option>
-                      {wards.map((ward) => (
-                        <option key={ward.code} value={ward.code}>{ward.name_with_type}</option>
-                      ))}
-                    </select>
-                    {form.formState.errors.ward && <p className="text-red-500 text-sm">{form.formState.errors.ward.message}</p>}
-                  </div>
-                </div>
-
-                <Textarea
-                  placeholder="Ghi chú"
-                  // value={userInfo?.additionalInfo}
-                  {...form.register("additionalInfo")}
-                  // onChange={(e) => setUserInfo({ ...userInfo, additionalInfo: e.target.value })}
-                  className="w-full border rounded-md px-3 py-2"
-                />
-                {form.formState.errors.additionalInfo && <p className="text-red-500 text-sm">{form.formState.errors.additionalInfo.message}</p>}
-              </div>
-            </div>
-
-            <div className="bg-white shadow-md p-5">
-              <h2 className="text-xl font-bold mb-4 text-left">Phương thức thanh toán</h2>
-              <div className="flex flex-wrap">
-                {/* Bên trái: Ship COD */}
-                <div className="w-full lg:w-1/2 flex items-center">
-                  <Radio.Group>
-                    <Radio value="Cash" style={{ display: 'flex', alignItems: 'center' }}>
-                      <img
-                        src="/COD.png"
-                        alt="Thanh toán khi nhận hàng (COD)"
-                        className="w-12 h-12 mr-4 rounded-md"
-                      />
-                      <Typography.Text>Thanh toán khi nhận hàng (COD)</Typography.Text>
-                    </Radio>
-                  </Radio.Group>
-                </div>
-
-                {/* Bên phải: VNPAY */}
-                <div className="w-full lg:w-1/2 flex items-center">
-                  <Radio.Group>
-                    <Radio value="BankTransfer" style={{ display: 'flex', alignItems: 'center' }}>
-                      <img
-                        src="/nganhang.png"
-                        alt="Thanh toán qua VNPAY"
-                        className="w-12 h-12 mr-4 rounded-md"
-                      />
-                      <Typography.Text>Thanh toán qua VNPAY</Typography.Text>
-                    </Radio>
-                  </Radio.Group>
+                {/* Email */}
+                <div className="flex items-center w-full lg:w-1/2">
+                  <FaEnvelope className="text-gray-500 mr-2" />
+                  <input
+                    placeholder="Email"
+                    // value={userInfo?.email}
+                    {...form.register("email")}
+                    // onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+                  {form.formState.errors.email && <p className="text-red-500 text-sm">{form.formState.errors.email.message}</p>}
                 </div>
               </div>
 
-              {selectedOption === 'BankTransfer' && (
-                <Upload
-                  id="imageinput"
-                  style={{ marginTop: 16 }}
-                  beforeUpload={() => false}
-                >
-                  <Button type="primary">Upload Payment Proof</Button>
-                </Upload>
-              )}
-            </div>
+              <div className="flex gap-3">
+                {/* Địa chỉ */}
+                <div className="flex items-center w-full lg:w-1/2">
+                  <FaMapMarkerAlt className="text-gray-500 mr-2" />
+                  <input
+                    placeholder="Địa chỉ, ví dụ: 151B Trần Quang Khải"
+                    // value={userInfo?.address}
+                    {...form.register("address")}
+                    // onChange={(e) => setUserInfo({ ...userInfo, address: e.target.value })}
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+                  {form.formState.errors.address && <p className="text-red-500 text-sm">{form.formState.errors.address.message}</p>}
+                </div>
 
+                {/* Số Điện Thoại */}
+                <div className="flex items-center w-full lg:w-1/2">
+                  <FaPhone className="text-gray-500 mr-2" />
+                  <input
+                    placeholder="Số Điện Thoại"
+                    // value={userInfo?.phoneNumber}
+                    {...form.register("phoneNumber")}
+                    // onChange={(e) => setUserInfo({ ...userInfo, phoneNumber: e.target.value })}
+                    className="w-full border rounded-md px-3 py-2"
+                  />
+                  {form.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{form.formState.errors.phoneNumber.message}</p>}
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <div className="w-full lg:w-1/3 flex items-center">
+                  <FaCity className="text-gray-500 mr-2" />
+                  <select
+                    className="w-full border rounded-md px-3 py-2 bg-white text-gray-700"
+                    onChange={async (e) => {
+                      fetchDistricts(e.currentTarget.value);
+                      const selectedProvince = await GetProvinceByCode(e.currentTarget.value);
+                      setProvince(selectedProvince);
+                      setDistrict("")
+                      setWard("")
+                      form.setValue("province", selectedProvince.name)
+                      form.setValue("district", "")
+                      form.setValue("ward", "")
+                    }}
+                    value={province.code || ""}
+                  >
+                    <option value="" disabled hidden>
+                      Vui lòng chọn Tỉnh Thành
+                    </option>
+                    {provinces.map((province) => (
+                      <option key={province.code} value={province.code}>{province.name_with_type}</option>
+                    ))}
+                  </select>
+                  {form.formState.errors.province && <p className="text-red-500 text-sm">{form.formState.errors.province.message}</p>}
+                </div>
+
+                <div className="w-full lg:w-1/3 flex items-center">
+                  <MdLocationCity className="text-gray-500 mr-2" />
+                  <select
+                    className="w-full border rounded-md px-3 py-2 bg-white text-gray-700"
+                    onChange={async (e) => {
+                      fetchWards(e.currentTarget.value);
+                      const selectedDistrict = await GetDistrictByCode(e.currentTarget.value);
+                      setDistrict(selectedDistrict);
+                      setWard("")
+                      form.setValue("district", selectedDistrict.name)
+                      form.setValue("ward", "")
+                    }}
+                    value={district.code || ""}
+                  >
+                    <option value="" disabled hidden>
+                      Vui lòng chọn Quận Huyện
+                    </option>
+                    {districts.map((district) => (
+                      <option key={district.code} value={district.code}>{district.name_with_type}</option>
+                    ))}
+                  </select>
+                  {form.formState.errors.district && <p className="text-red-500 text-sm">{form.formState.errors.district.message}</p>}
+                </div>
+
+                <div className="w-full lg:w-1/3 flex items-center">
+                  <FaHome className="text-gray-500 mr-2" />
+                  <select
+                    className="w-full border rounded-md px-3 py-2 bg-white text-gray-700"
+                    onChange={async (e) => {
+                      const selectedWard = await GetWardByCode(e.currentTarget.value);
+                      setWard(selectedWard);
+                      form.setValue("ward", selectedWard.name)
+                    }}
+                    value={ward.code || ""}
+                  >
+                    <option value="" disabled hidden>
+                      Vui lòng chọn Phường Xã
+                    </option>
+                    {wards.map((ward) => (
+                      <option key={ward.code} value={ward.code}>{ward.name_with_type}</option>
+                    ))}
+                  </select>
+                  {form.formState.errors.ward && <p className="text-red-500 text-sm">{form.formState.errors.ward.message}</p>}
+                </div>
+              </div>
+
+              <Textarea
+                placeholder="Ghi chú"
+                // value={userInfo?.additionalInfo}
+                {...form.register("additionalInfo")}
+                // onChange={(e) => setUserInfo({ ...userInfo, additionalInfo: e.target.value })}
+                className="w-full border rounded-md px-3 py-2"
+              />
+              {form.formState.errors.additionalInfo && <p className="text-red-500 text-sm">{form.formState.errors.additionalInfo.message}</p>}
+            </div>
           </div>
 
-          <div className="order-summary w-full lg:w-3/12 bg-white shadow-lg p-6">
-            <h2 className="text-xl font-bold mb-6 text-gray-800">Tổng hóa đơn</h2>
-
-            <div className="order-info space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Tổng tiền</span>
-                <span className="font-semibold text-gray-800">1,000,000₫</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Giảm giá</span>
-                <span className="font-semibold text-red-600">-50,000₫</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Phí vận chuyển</span>
-                <span className="font-semibold text-gray-800">30,000₫</span>
-              </div>
-            </div>
-
-            <hr className="my-4 border-gray-300" />
-
-            <div className="flex justify-between text-lg font-semibold">
-              <span className="text-gray-700">Tổng cộng:</span>
-              <span className="text-black">980,000₫</span>
-            </div>
-
-            <div className="mt-6">
-              <Button
-                type="primary"
-                className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-md"
-                onClick={async () => {
-                  const valid = await form.trigger();
-                  if (valid) setIsDialogOpen(true)
-                }}
-              >
-                Hoàn tất đơn
-              </Button>
-            </div>
-
-            {/* Dialog Xác nhận */}
-            <AnimatePresence>
-              {isDialogOpen && (
-                <div className="fixed z-99 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ duration: 0.3 }}
-                    className="bg-white p-8 rounded-lg shadow-xl w-11/12 sm:w-1/2 lg:w-1/3"
-                  >
-                    <div className="flex justify-between items-center mb-6">
-                      <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
-                        {/* <FaPen className="text-sky-500" /> */}
-                        {"Xác nhận đặt hàng"}
-                      </h3>
-                      <button onClick={() => setIsDialogOpen(false)} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
-                        <FaTimes />
-                      </button>
-                    </div>
-                    <div>
-                      Khi bấm "Đồng ý", bạn phải tuân thủ
-                      <span
-                        className="ml-1 text-blue-500 underline cursor-pointer"
-                        onClick={() => setIsTermsDialogOpen(true)}
-                      >
-                        Điều khoản đặt hàng.
-                      </span>
-                      <p className="mt-4">Bạn đồng ý chứ?</p>
-                    </div>
-
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="dashed"
-                        color="primary"
-                        onClick={() => {
-                          // handle confirm logic here
-                          setIsDialogOpen(false);
-                        }}
-                      >
-                        Tôi đồng ý
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        onClick={() => setIsDialogOpen(false)}
-                      >
-                        Huỷ
-                      </Button>
-                    </div>
-                  </motion.div>
-                </div>
-              )}
-            </AnimatePresence>
-
-            {/*<Dialog open={isDialogOpen} onClose={() => setIsDialogOpen(false)}>
-            <DialogTitle className="font-bold">Xác nhận đặt hàng</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Khi bấm "Đồng ý", bạn phải tuân thủ
-                <span
-                  className="ml-1 text-blue-500 underline cursor-pointer"
-                  onClick={() => setIsTermsDialogOpen(true)}
+          <div className="bg-white shadow-md p-7">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <FaMoneyBillWave className="text-green-500" /> Phương thức thanh toán
+            </h2>
+            <div className="flex flex-wrap mb-10 items-center ml-10 mt-5">
+              <div className="w-full lg:w-1/3 flex items-center mr-20">
+                <Radio.Group
+                  onChange={(e) => setSelectedOption(e.target.value)}
+                  value={selectedOption}
                 >
-                  Điều khoản đặt hàng.
-                </span>
-                <p className="mt-4">Bạn đồng ý chứ?</p>
+                  <Radio value="Cash" style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src="/COD.png"
+                      alt="Thanh toán khi nhận hàng (COD)"
+                      className="w-12 h-12 mr-4 rounded-md"
+                    />
+                    <Typography.Text>Thanh toán khi nhận hàng (COD)</Typography.Text>
+                  </Radio>
+                </Radio.Group>
+              </div>
+
+              <div className="w-full lg:w-1/3 flex items-center">
+                <Radio.Group
+                  onChange={(e) => setSelectedOption(e.target.value)}
+                  value={selectedOption}
+                >
+                  <Radio value="BankTransfer" style={{ display: "flex", alignItems: "center" }}>
+                    <img
+                      src="/nganhang.png"
+                      alt="Thanh toán qua VNPAY"
+                      className="w-12 h-12 mr-4 rounded-md"
+                    />
+                    <Typography.Text>Thanh toán qua VNPAY</Typography.Text>
+                  </Radio>
+                </Radio.Group>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="order-summary w-full lg:w-3/12 bg-white shadow-lg p-6">
+          <h2 className="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+            <FaCheckCircle className="text-green-500" /> Tổng hóa đơn
+          </h2>
+          <div className="order-info space-y-4">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Tổng tiền</span>
+              <span className="font-semibold text-gray-800">{totalPrice.toLocaleString()}₫</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Giảm giá</span>
+              <span className="font-semibold text-red-600">-{discount.toLocaleString()}₫</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Phí vận chuyển</span>
+              <span className="font-semibold text-gray-800">{shippingFee.toLocaleString()}₫</span>
+            </div>
+            <div className="flex justify-between items-center border-t pt-4 mt-4">
+              <span className="text-lg font-bold">Tổng thanh toán</span>
+              <span className="text-lg font-bold text-green-600">
+                {(totalPrice - discount + shippingFee).toLocaleString()}₫
+              </span>
+            </div>
+          </div>
+          {recommendation && (
+            <div className="mt-4 p-3 bg-yellow-100 text-yellow-800 text-sm rounded-lg">
+              {recommendation}
+            </div>
+          )}
+
+          <div className="mt-6">
+            <Button
+              type="primary"
+              className="w-full py-3 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-md"
+              onClick={async () => {
+                const valid = await form.trigger();
+                if (valid) setIsDialogOpen(true)
+              }}
+            >
+              Hoàn tất đơn
+            </Button>
+          </div>
+
+          {/* Dialog Xác nhận */}
+          <AnimatePresence>
+            {isDialogOpen && (
+              <div className="fixed z-99 inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white p-8 rounded-lg shadow-xl w-11/12 sm:w-1/2 lg:w-1/3"
+                >
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
+                      {/* <FaPen className="text-sky-500" /> */}
+                      {"Xác nhận đặt hàng"}
+                    </h3>
+                    <button onClick={() => setIsDialogOpen(false)} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
+                      <FaTimes />
+                    </button>
+                  </div>
+                  <div>
+                    Khi bấm "Đồng ý", bạn phải tuân thủ
+                    <span
+                      className="ml-1 text-blue-500 underline cursor-pointer"
+                      onClick={() => setIsTermsDialogOpen(true)}
+                    >
+                      Điều khoản đặt hàng.
+                    </span>
+                    <p className="mt-4">Bạn đồng ý chứ?</p>
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="dashed"
+                      color="primary"
+                      onClick={() => {
+                        setIsDialogOpen(false);
+                      }}
+                    >
+                      Tôi đồng ý
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Huỷ
+                    </Button>
+                  </div>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
+          <Dialog open={isTermsDialogOpen} onClose={() => setIsTermsDialogOpen(false)}>
+            <DialogTitle className="font-bold">Điều khoản đặt hàng</DialogTitle>
+            <DialogContent>
+              <DialogContentText className="text-gray-700 text-sm space-y-4">
+                <p>1. CHẤP THUẬN: Đơn không ràng buộc cho đến khi Bên Cung Cấp chấp thuận.</p>
+                <p>2. NGÀY GIAO HÀNG: Giao đúng hạn, nếu không, Bên Mua có quyền yêu cầu bồi thường.</p>
+                <p>3. SỐ LƯỢNG: Bên Mua có quyền từ chối nếu số lượng không đúng.</p>
+                <p>4. QUYỀN SỞ HỮU VÀ RỦI RO MẤT MÁT: Quyền sở hữu chuyển qua khi giao Hàng Hóa.</p>
+                <p>5. ĐÓNG GÓI: Hàng hóa phải được đóng gói đảm bảo không tổn hại.</p>
+                <p>6. BẢO HÀNH: Bảo đảm Hàng Hóa trong 18 tháng không lỗi, phù hợp thông số.</p>
               </DialogContentText>
             </DialogContent>
             <DialogActions>
               <Button
                 variant="dashed"
                 color="primary"
-                onClick={() => {
-                  // handle confirm logic here
-                  setIsDialogOpen(false);
-                }}
+                onClick={() => setIsTermsDialogOpen(false)}
               >
-                Tôi đồng ý
-              </Button>
-              <Button
-                variant="outlined"
-                onClick={() => setIsDialogOpen(false)}
-              >
-                Huỷ
+                Close
               </Button>
             </DialogActions>
-          </Dialog>*/}
-
-            {/* Dialog Điều khoản */}
-            <Dialog open={isTermsDialogOpen} onClose={() => setIsTermsDialogOpen(false)}>
-              <DialogTitle className="font-bold">Điều khoản đặt hàng</DialogTitle>
-              <DialogContent>
-                <DialogContentText className="text-gray-700 text-sm space-y-4">
-                  <p>1. CHẤP THUẬN: Đơn không ràng buộc cho đến khi Bên Cung Cấp chấp thuận.</p>
-                  <p>2. NGÀY GIAO HÀNG: Giao đúng hạn, nếu không, Bên Mua có quyền yêu cầu bồi thường.</p>
-                  <p>3. SỐ LƯỢNG: Bên Mua có quyền từ chối nếu số lượng không đúng.</p>
-                  <p>4. QUYỀN SỞ HỮU VÀ RỦI RO MẤT MÁT: Quyền sở hữu chuyển qua khi giao Hàng Hóa.</p>
-                  <p>5. ĐÓNG GÓI: Hàng hóa phải được đóng gói đảm bảo không tổn hại.</p>
-                  <p>6. BẢO HÀNH: Bảo đảm Hàng Hóa trong 18 tháng không lỗi, phù hợp thông số.</p>
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button
-                  variant="dashed"
-                  color="primary"
-                  onClick={() => setIsTermsDialogOpen(false)}
-                >
-                  Close
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </div>
-
+          </Dialog>
         </div>
+
+      </div>
 
     </>
   )

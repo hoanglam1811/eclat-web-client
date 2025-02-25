@@ -88,7 +88,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
               onSubmit={form.handleSubmit(handleSubmit)}
               className="flex flex-col gap-6">
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Tên</Label>
+                <Label className="mb-3 text-left">Tên loại sản phẩm</Label>
                 <div className="relative">
                   <Input
                     {...form.register("categoryName")}

@@ -6,7 +6,7 @@ import LogoImage from "@/assets/Éclat.png";
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { LoginOutlined, ShoppingCartOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { removeToken, removeUser } from "../../reducers/tokenSlice";
 import RoleNames from "../../constants/roleNames";
 import { CgProfile } from "react-icons/cg";
@@ -19,6 +19,24 @@ const Header = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
+
+  const updateCartCount = () => {
+    const storedCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
+    const totalItems = storedCart.reduce((total: any, item: any) => total + item.quantity, 0);
+    setCartCount(totalItems);
+  };
+
+  useEffect(() => {
+    updateCartCount();
+
+    const handleCartChange = () => updateCartCount();
+    window.addEventListener("cartUpdated", handleCartChange);
+
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartChange);
+    };
+  }, []);
 
   const handleMouseEnter = () => {
     setIsDropdownVisible(true);
@@ -101,8 +119,16 @@ const Header = () => {
               <li><Link to={RouteNames.BEAUTY_BLOG}>{navigation.BEAUTY_BLOG}</Link></li>
               <li><Link to={RouteNames.SKIN_QUIZ}>{navigation.SKIN_QUIZ}</Link></li>
               <li>
-                <Link to={RouteNames.CART} className="flex items-center text-gray-700 hover:text-blue-600 transition">
+                <Link
+                  to={RouteNames.CART}
+                  className="relative flex items-center text-gray-700 hover:text-blue-600 transition"
+                >
                   <ShoppingCartOutlined style={{ fontSize: "22px" }} className="mr-2" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                      {cartCount}
+                    </span>
+                  )}
                 </Link>
               </li>
             </>

@@ -37,12 +37,14 @@ const Cart = () => {
         );
         setCartItems(updatedCart);
         sessionStorage.setItem("cartItems", JSON.stringify(updatedCart));
+        window.dispatchEvent(new Event("cartUpdated"));
     };
 
     const handleRemoveItem = (optionId: any) => {
         const updatedCart = cartItems.filter((item) => item.optionId !== optionId);
         setCartItems(updatedCart);
         sessionStorage.setItem("cartItems", JSON.stringify(updatedCart));
+        window.dispatchEvent(new Event("cartUpdated"));
     };
 
     const totalPrice = cartItems.reduce(
@@ -76,10 +78,21 @@ const Cart = () => {
             </section>
 
             <div className=" bg-gray-100 pt-5 pl-20 pr-20 pb-10">
+                <div className="flex space-x-2 mb-3">
+                    <div className="w-1/3 text-md text-gray-700 bg-yellow-100 p-2 rounded-lg flex items-center border border-yellow-300">
+                        <span className="mr-2 text-yellow-500">🎉</span> Giảm 50.000đ cho đơn hàng từ 500.000đ
+                    </div>
+                    <div className="w-1/3 text-md text-gray-700 bg-green-100 p-2 rounded-lg flex items-center border border-green-300">
+                        <span className="mr-2 text-green-500">🚚</span> Miễn phí vận chuyển cho đơn hàng từ 1.000.000đ
+                    </div>
+                    <div className="w-1/3 text-md text-gray-700 bg-pink-100 p-2 rounded-lg flex items-center border border-pink-300">
+                        <span className="mr-2 text-pink-500">🎁</span> Tặng quà xịn sò cho đơn từ 1.500.000đ
+                    </div>
+                </div>
                 <div className="flex space-x-2">
                     {/* Phần giỏ hàng */}
-                    <div className="w-4/5 bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                        <h2 className="text-lg font-bold text-gray-800 mb-4">Thông tin sản phẩm</h2>
+                    <div className="w-full bg-white rounded-lg shadow-md p-6 border border-gray-200">
+                        <h2 className="text-2xl font-extrabold text-gray-800 mb-4">Thông tin sản phẩm</h2>
                         <div className="overflow-hidden border border-gray-200 rounded-lg">
                             <table className="min-w-full bg-white">
                                 <thead className="bg-gray-100 border-b">
@@ -151,34 +164,7 @@ const Cart = () => {
                             </button>
                         </div>
                     </div>
-
-                    {/* Phần voucher */}
-                    <div className="w-1/4 bg-white rounded-lg shadow-md p-6 border border-gray-200">
-                        <h2 className="text-lg font-bold text-gray-800 mb-4">Mã giảm giá</h2>
-                        <div className="mb-4">
-                            <input
-                                type="text"
-                                placeholder="Nhập mã giảm giá"
-                                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                            <button className="mt-2 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">
-                                Áp dụng
-                            </button>
-                        </div>
-                        <h3 className="text-md font-semibold text-gray-700 mb-2">Khuyến mãi:</h3>
-                        <ul className="space-y-2">
-                            <li className="text-sm text-gray-600 bg-gray-100 p-2 rounded-lg flex items-center">
-                                <span className="mr-2 text-blue-500">🎉</span> Giảm 50.000đ cho đơn hàng từ 500.000đ
-                            </li>
-                            <li className="text-sm text-gray-600 bg-gray-100 p-2 rounded-lg flex items-center">
-                                <span className="mr-2 text-blue-500">🚚</span> Miễn phí vận chuyển cho đơn hàng từ
-                                1.000.000đ
-                            </li>
-                        </ul>
-                    </div>
-
                 </div>
-
             </div>
         </>
     );

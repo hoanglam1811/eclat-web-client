@@ -129,7 +129,7 @@ const Home = () => {
                 </div>
             </section>
 
-            <section className="p-6 bg-orange-100">
+            <section className="p-6 bg-orange-200">
                 <h2 className="text-center text-3xl font-bold my-8 text-[#578a3f]">SẢN PHẨM BÁN CHẠY</h2>
                 <menu className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mt-10">
                     {isLoading ? (
@@ -142,15 +142,31 @@ const Home = () => {
                         <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
                             Không có sản phẩm nào phù hợp.
                         </p>
-                    ) : (
-                        products.map((product: any) => (
-                            <ProductCard key={product.id} product={product} />
-                        ))
-
-                    )}
+                    ) : products.slice(0, 5).map((product: any) => (
+                        <ProductCard key={product.id} product={product} />
+                    ))}
                 </menu>
             </section>
 
+            <section className="p-6 bg-orange-100">
+                <h2 className="text-center text-3xl font-bold my-8 text-[#578a3f]">GIẢM GIÁ CỰC SÂU</h2>
+                <menu className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mt-10">
+                    {isLoading ? (
+                        <ProductSkeleton />
+                    ) : error ? (
+                        <p className="text-center text-2xl font-semibold text-red-600 md:col-span-3 lg:col-span-4">
+                            Lỗi khi tải sản phẩm.
+                        </p>
+                    ) : (
+                        products
+                            .filter((product: any) =>
+                                Math.round(((product.origin_price - product.disc_price) / product.origin_price) * 100) >= 40
+                            )
+                            .map((product: any) => <ProductCard key={product.id} product={product} />)
+                    )}
+
+                </menu>
+            </section>
 
             <section className="p-6 bg-orange-50 ">
                 <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f] ">DANH MỤC SẢN PHẨM</h2>

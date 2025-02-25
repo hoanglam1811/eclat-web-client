@@ -9,6 +9,7 @@ import SignUp from "./SignUp";
 import Tables from "./Tables";
 import StaffManagement from "./StaffManagement";
 import SkincareQuiz from "../clientRoutes/QuizManagement";
+import SkincareBlogManagement from "../clientRoutes/BlogManagement";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -42,6 +43,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.SKINCARE_QUIZ_MANAGEMENT,
     element: <SkincareQuiz />,
+  },
+  {
+    path: RouteNames.BLOG_MANAGEMENT,
+    element: <SkincareBlogManagement />,
   },
   {
     path: RouteNames.ADMIN_TABLES,

@@ -97,10 +97,6 @@ const publicRoutes: RouteObject[] = [
     element: <SkincareBlog />,
   },
   {
-    path: RouteNames.BLOG_MANAGEMENT,
-    element: <SkincareBlogManagement />,
-  },
-  {
     path: RouteNames.BLOG_DETAILS,
     element: <SkincareBlogDetails />,
   }

@@ -73,16 +73,16 @@ const Products = () => {
     }
 
     const fetchProducts = async () => {
-        if (!token) {
-            navigate("/login");
-            return;
-        }
+        // if (!token) {
+        //     navigate("/login");
+        //     return;
+        // }
         try {
             setIsLoading(true);
             const [products, brands, skinTypes] = await Promise.all([
-                getAllProducts(token),
-                getAllBrands(token),
-                getAllSkinTypes(token),
+                getAllProducts(),
+                getAllBrands(),
+                getAllSkinTypes(),
             ]);
             console.log(products)
 

@@ -3,11 +3,11 @@ import { BASE_URL } from "../../constants/api";
 
 //const ngrokSkipWarning: any = { headers: { "bypass-tunnel-reminder": "true" } };
 
-export async function getSkinTypeById(id: number, token: string) {
+export async function getSkinTypeById(id: number) {
   try {
     const response = await axios.get(`${BASE_URL}/skintype/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer ${token}`,
       }
     });
     return response.data;
@@ -17,12 +17,12 @@ export async function getSkinTypeById(id: number, token: string) {
   }
 }
 
-export async function getAllSkinTypes(token: string) {
+export async function getAllSkinTypes() {
   try {
     const response = await axios.get(`${BASE_URL}/skintype`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
         }
       });
     return response.data;

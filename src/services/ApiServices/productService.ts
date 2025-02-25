@@ -2,11 +2,11 @@ import axios from "axios";
 import { BASE_URL } from "../../constants/api";
 
 // Lấy tất cả sản phẩm
-export async function getAllProducts(token: string) {
+export async function getAllProducts() {
   try {
     const response = await axios.get(`${BASE_URL}/api/Products`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer ${token}`,
       },
     });
     return response.data;
@@ -17,11 +17,11 @@ export async function getAllProducts(token: string) {
 }
 
 // Lấy thông tin sản phẩm theo ID
-export async function getProductById(id: number, token: string) {
+export async function getProductById(id: number) {
   try {
     const response = await axios.get(`${BASE_URL}/api/Products/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer ${token}`,
       },
     });
     return response.data;

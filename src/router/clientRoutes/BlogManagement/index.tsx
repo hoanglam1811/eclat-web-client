@@ -61,6 +61,7 @@ export default function SkincareBlogManagement() {
         }
 
         try {
+            setLoading(true)
             const formData = new FormData();
             formData.append("title", values.title);
             formData.append("content", values.content);
@@ -85,6 +86,9 @@ export default function SkincareBlogManagement() {
             await fetchBlogs();
         } catch (err) {
             message.error("Có lỗi xảy ra");
+        }
+        finally{
+          setLoading(false);
         }
     };
 
@@ -179,8 +183,12 @@ export default function SkincareBlogManagement() {
             <Modal
                 title={editingBlog ? "📝 Chỉnh sửa bài viết" : "🆕 Tạo bài viết mới"}
                 open={modalVisible}
-                onCancel={() => setModalVisible(false)}
-                onOk={() => form.submit()}
+                onCancel={() => !loading && setModalVisible(false)}
+                onOk={() => !loading && form.submit()}
+                okText={loading ? "Đang lưu..." : "OK"}
+                cancelText={"Huỷ"}
+                okButtonProps={{ disabled: loading }} 
+                cancelButtonProps={{ disabled: loading }}
             >
                 <Form className="mt-6" form={form} layout="vertical" onFinish={handleCreateOrUpdate}>
                     <Form.Item name="title" label="📝 Tiêu đề" rules={[{ required: true, message: "Vui lòng nhập tiêu đề" }]}>

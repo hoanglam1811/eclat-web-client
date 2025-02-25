@@ -2,11 +2,11 @@ import axios from "axios";
 import { BASE_URL } from "../../constants/api";
 
 // Lấy danh sách blog
-export async function getAllBlogs(token: string) {
+export async function getAllBlogs() {
     try {
         const response = await axios.get(`${BASE_URL}/blogs/blogs`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
             },
         });
         return response.data;
@@ -17,11 +17,11 @@ export async function getAllBlogs(token: string) {
 }
 
 // Lấy blog theo ID
-export async function getBlogById(id: number, token: string) {
+export async function getBlogById(id: number) {
     try {
         const response = await axios.get(`${BASE_URL}/blogs/blogs/${id}`, {
             headers: {
-                Authorization: `Bearer ${token}`,
+                // Authorization: `Bearer ${token}`,
             },
         });
         return response.data;

@@ -15,13 +15,13 @@ export default function SkincareBlogDetails() {
     const token = useSelector((state: RootState) => state.token.token);
 
     useEffect(() => {
-        if (!token || !id) {
-            navigate("/login");
-            return;
-        }
+        // if (!token || !id) {
+        //     navigate("/login");
+        //     return;
+        // }
         const fetchBlogDetails = async () => {
             try {
-                const response = await getBlogById(Number(id), token);
+                const response = await getBlogById(Number(id));
                 console.log(response)
                 if (response.status === "ok") {
                     setBlog(response.data);

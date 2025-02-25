@@ -220,6 +220,19 @@ function Sidenav({ color }:any) {
             <span className="label">Quản lý câu hỏi</span>
           </NavLink>
         </Menu.Item>
+        <Menu.Item key="1">
+          <NavLink to="/admin/blog-management">
+            <span
+              className="icon"
+              style={{
+                background: page === "blog-management" ? color : "",
+              }}
+            >
+              {tables}
+            </span>
+            <span className="label">Quản lý bài viết</span>
+          </NavLink>
+        </Menu.Item>
         <Menu.Item key="3">
           <NavLink to="/admin/billing">
             <span

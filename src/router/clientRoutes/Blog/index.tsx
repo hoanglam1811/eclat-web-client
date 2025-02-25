@@ -34,11 +34,11 @@ export default function SkincareBlog() {
     useEffect(() => {
         const fetchBlogs = async () => {
             try {
-                if (!token) {
-                    navigate("/login");
-                    return;
-                }
-                const response = await getAllBlogs(token);
+                // if (!token) {
+                //     navigate("/login");
+                //     return;
+                // }
+                const response = await getAllBlogs();
                 console.log(response)
                 if (response.status === "ok") {
                     setArticles(response.data);

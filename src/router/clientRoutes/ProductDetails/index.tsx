@@ -58,23 +58,23 @@ const ProductDetails = () => {
             setIsLoading(true);
             setError(null);
             try {
-                if (!token) {
-                    notification.error({ message: "Bạn chưa đăng nhập!" });
-                    navigate("/login");
-                    return;
-                }
-                const productData = await getProductById(id, token);
+                // if (!token) {
+                //     notification.error({ message: "Bạn chưa đăng nhập!" });
+                //     navigate("/login");
+                //     return;
+                // }
+                const productData = await getProductById(id);
                 console.log(productData)
                 setProduct(productData.data);
                 setCurrentImage(productData.data.productImages?.[0]?.imageUrl || "");
                 if (productData.data.brandId) {
-                    const brandData = await getBrandById(productData.data.brandId, token);
+                    const brandData = await getBrandById(productData.data.brandId);
                     setBrandName(brandData.data.brandName);
                     setBrandImageUrl(brandData.data.imgUrl);
                 }
 
                 if (productData.data.skinTypeId) {
-                    const skinTypeData = await getSkinTypeById(productData.data.skinTypeId, token);
+                    const skinTypeData = await getSkinTypeById(productData.data.skinTypeId);
                     setSkinTypeName(skinTypeData.result.skinName);
                 }
             } catch (err: any) {
@@ -91,14 +91,14 @@ const ProductDetails = () => {
 
     useEffect(() => {
         const fetchRelatedProducts = async () => {
-            if (!token) return;
+            // if (!token) return;
             console.log("product",product)
             if (!product.brandId || !product.skinTypeId) {
                 console.error("Thiếu dữ liệu brand hoặc skinType:", product);
                 return;
             }
             try {
-                const allProducts = await getAllProducts(token);
+                const allProducts = await getAllProducts();
                 console.log(allProducts)
                 const filteredProducts = allProducts.filter(
                     (item: any) =>
@@ -139,6 +139,10 @@ const ProductDetails = () => {
     };
 
     const handleAddToCart = () => {
+        if (!token) {
+          notification.error({ message: "Bạn cần phải đăng nhập!!" });
+          return;
+        }
         if (!selectedOption) {
             notification.error({ message: "Vui lòng chọn một tùy chọn sản phẩm!" });
             return;

@@ -3,11 +3,11 @@ import { BASE_URL } from "../../constants/api";
 
 //const ngrokSkipWarning: any = { headers: { "bypass-tunnel-reminder": "true" } };
 
-export async function getBrandById(id: number, token: string) {
+export async function getBrandById(id: number) {
   try {
     const response = await axios.get(`${BASE_URL}/api/Brands/${id}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        // Authorization: `Bearer ${token}`,
       }
     });
     return response.data;
@@ -17,12 +17,12 @@ export async function getBrandById(id: number, token: string) {
   }
 }
 
-export async function getAllBrands(token: string) {
+export async function getAllBrands() {
   try {
     const response = await axios.get(`${BASE_URL}/api/Brands`,
       {
         headers: {
-          Authorization: `Bearer ${token}`,
+          // Authorization: `Bearer ${token}`,
         }
       });
     return response.data;

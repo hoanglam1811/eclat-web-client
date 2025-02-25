@@ -1,7 +1,7 @@
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Select, Slider } from "antd";
 import { Carousel } from 'antd';
 import BrandSkeleton from "./BrandSkeleton";
@@ -17,16 +17,17 @@ const Brands = () => {
     const navigate = useNavigate();
     const [brands, setBrands] = useState<any>([]);
     const ITEMS_PER_PAGE = 10;
+    // const videoRef = useRef<any>(null);
 
     useEffect(() => {
         const fetchBrands = async () => {
             setIsLoading(true);
             try {
-                if (!token) {
-                    navigate("/login");
-                    return;
-                }
-                const data = await getAllBrands(token);
+                // if (!token) {
+                //     navigate("/login");
+                //     return;
+                // }
+                const data = await getAllBrands();
                 console.log(data)
                 setBrands(data);
             } catch (err) {
@@ -36,7 +37,13 @@ const Brands = () => {
             }
         };
 
+    // const startCamera = async () => {
+    //   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    //   videoRef.current.srcObject = stream;
+    // };
+
         fetchBrands();
+        // startCamera();
     }, []);
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -53,6 +60,7 @@ const Brands = () => {
     return (
         <>
             <section className="bg-gray-100 p-6">
+                
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
                         <Breadcrumb className="">
@@ -96,6 +104,8 @@ const Brands = () => {
                             )}
 
                         </menu>
+
+            {/* <video ref={videoRef} autoPlay playsInline style={{ display: "none" }} /> */}
                         <div style={{ marginTop: "20px", marginBottom: '10px', textAlign: 'right' }}>
                             {Array.from({ length: totalPages }, (_, index) => (
                                 <button

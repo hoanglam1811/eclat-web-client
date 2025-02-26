@@ -10,7 +10,7 @@ import CustomerManagement from "./CustomerManagement";
 const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.BILLING,
-    element: <Billing/>,
+    element: <Billing />,
   },
   {
     path: RouteNames.ADMIN_HOME,
@@ -30,7 +30,7 @@ const publicRoutes: RouteObject[] = [
   },
   {
     path: RouteNames.ADMIN_CUSTOMER_MANAGEMENT,
-    element: <CustomerManagement/>,
+    element: <CustomerManagement />,
   }
 ];
 
@@ -43,8 +43,8 @@ const privateRoutes: RouteObject[] = [
 
 const adminRoutes: RouteObject[] = [
   {
-     path: "/admin",
-     element: <Navigate to={RouteNames.ADMIN_HOME} replace />,
+    path: "/admin",
+    element: <Navigate to={RouteNames.ADMIN_HOME} replace />,
   },
   ...publicRoutes,
 ];

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, Col, Row, Typography, Radio, Modal } from "antd";
 import { FaShoppingCart, FaUserCircle, FaPhone, FaIdBadge, FaCheckCircle } from "react-icons/fa";
-import { MdOutlinePayment } from "react-icons/md";
+import { MdDateRange, MdOutlinePayment } from "react-icons/md";
 import LineChart from "../../components/chart/LineChart";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
@@ -44,10 +44,10 @@ function Home() {
     {
       orderId: "DH001",
       product: "Serum Vitamin C",
-      totalProducts: 3,
       quantity: 5,
       status: "Thành công",
       paymentMethod: "VNPAY",
+      purchaseDate: "2025-02-26",
       customer: {
         id: "KH001",
         username: "Nguyễn Văn A",
@@ -86,7 +86,7 @@ function Home() {
     {
       orderId: "DH002",
       product: "Kem dưỡng ẩm",
-      totalProducts: 2,
+      purchaseDate: "2025-02-26",
       quantity: 3,
       status: "Thành công",
       paymentMethod: "Tiền mặt",
@@ -128,7 +128,7 @@ function Home() {
     {
       orderId: "DH003",
       product: "Toner Hoa Hồng",
-      totalProducts: 1,
+      purchaseDate: "2025-02-26",
       quantity: 2,
       status: "Thành công",
       paymentMethod: "VNPAY",
@@ -163,7 +163,7 @@ function Home() {
     {
       orderId: "DH004",
       product: "Sữa rửa mặt dịu nhẹ",
-      totalProducts: 4,
+      purchaseDate: "2025-02-26",
       quantity: 6,
       status: "Thành công",
       paymentMethod: "Tiền mặt",
@@ -205,7 +205,7 @@ function Home() {
     {
       orderId: "DH005",
       product: "Mặt nạ dưỡng da",
-      totalProducts: 3,
+      purchaseDate: "2025-02-26",
       quantity: 4,
       status: "Thành công",
       paymentMethod: "VNPAY",
@@ -248,11 +248,11 @@ function Home() {
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  console.log(selectedProduct)
 
   const totalQuantity = selectedProduct?.options
     ? selectedProduct.options.reduce((total, option) => total + (option.quantity || 0), 0)
     : 0;
-
 
   const showProductModal = (product: Product) => {
     setSelectedProduct(product);
@@ -261,7 +261,7 @@ function Home() {
 
   const closeProductModal = () => {
     setIsProductModalOpen(false);
-    setTimeout(() => setSelectedProduct(null), 300); // Reset sau khi modal đóng
+    setTimeout(() => setSelectedProduct(null), 300);
   };
 
   const filteredOrders =
@@ -310,6 +310,7 @@ function Home() {
                     <th>Số lượng mua</th>
                     <th>Khách hàng</th>
                     <th>Trạng thái đơn</th>
+                    <th>Ngày mua</th>
                     <th>Hình thức thanh toán</th>
                   </tr>
                 </thead>
@@ -319,7 +320,7 @@ function Home() {
                       <td>{index + 1}</td>
                       <td><h6>{order.orderId}</h6></td>
                       <td
-                        className="cursor-pointer text-blue-500 hover:underline"
+                        className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
                         onClick={() => showProductModal(order.productDetails)}
                       >
                         {order.product}
@@ -346,9 +347,20 @@ function Home() {
                         </span>
                       </td>
 
-                      <td className="flex items-center gap-2">
-                        <MdOutlinePayment style={{ fontSize: "16px" }} />
-                        {order.paymentMethod}
+                      <td >
+                        <div className="flex items-center gap-2">
+                          <MdDateRange style={{ fontSize: "16px", color: "#1890ff" }} />
+                          {order.purchaseDate}
+                        </div>
+
+                      </td>
+
+                      <td >
+                        <div className="flex items-center gap-2">
+                          <MdOutlinePayment style={{ fontSize: "16px" }} />
+                          {order.paymentMethod}
+                        </div>
+
                       </td>
                     </tr>
                   ))}
@@ -389,86 +401,87 @@ function Home() {
 
       <Modal open={isProductModalOpen} onCancel={closeProductModal} footer={null}>
         {selectedProduct && (
-          <div className="bg-gray-50 p-8 rounded-lg shadow-md max-w-3xl">
-            <div className="max-h-[70vh] overflow-y-auto p-2">
-              <h2 className="text-2xl font-bold text-blue-700 mb-4">{selectedProduct.productName}</h2>
+          <div className="max-h-[70vh] overflow-y-auto p-2">
+            <h2 className="text-2xl font-bold text-blue-700 mb-4">Chi tiết sản phẩm {selectedProduct.productName}</h2>
 
-              {/* Hiển thị nhiều hình ảnh sản phẩm */}
-              <div className="flex gap-2 overflow-x-auto mb-4">
-                {selectedProduct.images.map((img, index) => (
-                  <img
-                    key={index}
-                    src={img}
-                    alt="Sản phẩm"
-                    className="w-24 h-24 object-cover rounded-lg border shadow-md"
-                  />
-                ))}
-              </div>
+            {/* Hiển thị nhiều hình ảnh sản phẩm */}
+            <div className="flex gap-2 overflow-x-auto mb-4">
+              {selectedProduct.images.map((img, index) => (
+                <img
+                  key={index}
+                  src={img}
+                  alt="Sản phẩm"
+                  className="w-24 h-24 object-cover rounded-lg border shadow-md"
+                />
+              ))}
+            </div>
 
-              {/* Thông tin chi tiết */}
-              <div className="grid grid-cols-2 gap-4">
-                <p><b>Thương hiệu:</b> {selectedProduct.brand}</p>
-                <p><b>Xuất xứ:</b> {selectedProduct.origin}</p>
-                <p><b>Loại sản phẩm:</b> {selectedProduct.category}</p>
-                <p><b>Loại da:</b> {selectedProduct.skinType}</p>
-              </div>
+            {/* Thông tin chi tiết */}
+            <div className="grid grid-cols-2 gap-4">
+              <p><b>Thương hiệu:</b> {selectedProduct.brand}</p>
+              <p><b>Xuất xứ:</b> {selectedProduct.origin}</p>
+              <p><b>Loại sản phẩm:</b> {selectedProduct.category}</p>
+              <p><b>Loại da:</b> {selectedProduct.skinType}</p>
+            </div>
 
-              {/* Mô tả sản phẩm */}
-              <div className="mt-4">
-                <b>Mô tả:</b>
-                <p className="text-gray-600">{selectedProduct.description}</p>
-              </div>
+            {/* Mô tả sản phẩm */}
+            <div className="mt-4">
+              <b>Mô tả:</b>
+              <p className="text-gray-600">{selectedProduct.description}</p>
+            </div>
 
-              <div className="mt-4">
-                <b>Tổng số lượng sản phẩm:</b>
-                <p className="text-gray-600">{totalQuantity}</p>
-              </div>
+            <div className="mt-4">
+              <b>Tổng số lượng sản phẩm:</b>
+              <p className="text-gray-600">{totalQuantity}</p>
+            </div>
 
-              {/* Tùy chọn sản phẩm */}
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold text-blue-700">Tùy chọn sản phẩm:</h3>
-                {selectedProduct.options.map((_option, index) => (
-                  <div key={index} className="border p-4 rounded-lg shadow-sm mt-2">
-                    <div className="grid grid-cols-3 gap-4">
-                      <div className="col-span-2">
-                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
-                          Tên tùy chọn
-                        </Label>
-                        <Input defaultValue={_option.optionValue} disabled className="w-full" />
-                      </div>
-                      <div className="col-span-1">
-                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
-                          Số lượng
-                        </Label>
-                        <Input type="number" defaultValue={_option.quantity} disabled className="w-full" />
-                      </div>
+            {/* Tùy chọn sản phẩm */}
+            <div className="mt-6">
+              <h3 className="text-lg font-semibold text-blue-700">Tùy chọn sản phẩm:</h3>
+              {selectedProduct.options.map((_option, index) => (
+                <div key={index} className="border p-4 rounded-lg shadow-sm mt-2">
+
+                  <div className="grid grid-cols-2 gap-4 ml-12">
+                    <div className="col-span-1">
+                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Tên tùy chọn
+                      </Label>
+                      <p className="w-full">{_option.optionValue}</p>
                     </div>
-
-                    <div className="grid grid-cols-3 gap-4 mt-3">
-                      <div className="col-span-1">
-                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
-                          Giá gốc
-                        </Label>
-                        <Input defaultValue={_option.optionPrice} disabled className="w-full" />
-                      </div>
-                      <div className="col-span-1">
-                        <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
-                          Giá khuyến mãi
-                        </Label>
-                        <Input defaultValue={_option.discPrice} disabled className="w-full" />
-                      </div>
-                    </div>
-
-                    {/* Hình ảnh tùy chọn */}
-                    <div className="flex gap-2 mt-3">
-                      {_option.images.map((img, idx) => (
-                        <img key={idx} src={img} alt="Hình ảnh tùy chọn" className="w-16 h-16 rounded-lg" />
-                      ))}
+                    <div className="col-span-1">
+                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Số lượng
+                      </Label>
+                      <p className="w-full">{_option.quantity}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div></div>
+
+
+                  <div className="grid grid-cols-2 gap-4 mt-3 ml-12">
+                    <div className="col-span-1">
+                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Giá gốc
+                      </Label>
+                      <p className="w-full">{_option.optionPrice}</p>
+                    </div>
+                    <div className="col-span-1">
+                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Giá khuyến mãi
+                      </Label>
+                      <p className="w-full">{_option.discPrice}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center gap-2 mt-6">
+                    {_option.images.map((img, idx) => (
+                      <img key={idx} src={img} alt="Hình ảnh" className="w-16 h-16 rounded-lg" />
+                    ))}
+                  </div>
+
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </Modal>
     </div>

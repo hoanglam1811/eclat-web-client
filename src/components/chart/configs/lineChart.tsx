@@ -1,4 +1,4 @@
-const lineChart:any = {
+const lineChart: any = {
   series: [
     {
       name: "Mobile apps",
@@ -76,7 +76,7 @@ const lineChart:any = {
 
     tooltip: {
       y: {
-        formatter: function (val:any) {
+        formatter: function (val: any) {
           return val;
         },
       },

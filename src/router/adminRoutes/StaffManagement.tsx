@@ -72,7 +72,7 @@ function StaffManagement() {
       setStaffs(users.filter((user: any) => user.role.includes("Staff")))
     }
   }
-  
+
   const [loading, setLoading] = useState(false);
   const [openAddStaff, setOpenAddStaff] = useState(false);
   const [users, setUsers] = useState<any[]>([]);
@@ -83,8 +83,8 @@ function StaffManagement() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const totalPages = Math.ceil(staffs?.length / ITEMS_PER_PAGE);
   const paginatedStaffs = staffs?.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
   );
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -98,7 +98,7 @@ function StaffManagement() {
     try {
       setLoading(true);
       const response = await deleteUser(userId, token);
-      notification.success({ message: "Xóa người dùng thành công"})
+      notification.success({ message: "Xóa người dùng thành công" })
       fetchUsers()
       console.log(response)
     }
@@ -214,7 +214,7 @@ function StaffManagement() {
                       action: (
                         <>
                           {user.status && <Tooltip title="Đổi trạng thái nhân viên">
-                            <Button type="text" onClick={() => handleInactiveStaff(user.id)}> 
+                            <Button type="text" onClick={() => handleInactiveStaff(user.id)}>
                               <DeleteOutlined style={{ color: "red", fontSize: "15px" }} />
                             </Button>
                           </Tooltip>}
@@ -228,23 +228,23 @@ function StaffManagement() {
                 />
               </div>
               <div style={{ marginTop: "20px", marginRight: "10px", marginBottom: '10px', textAlign: 'right' }}>
-                  {Array.from({ length: totalPages }, (_, index) => (
-                      <button
-                          key={index}
-                          onClick={() => handlePageChange(index + 1)}
-                          style={{
-                              margin: "0 5px",
-                              padding: "5px 10px",
-                              backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
-                              color: currentPage === index + 1 ? "white" : "black",
-                              border: "none",
-                              borderRadius: "5px",
-                              cursor: "pointer",
-                          }}
-                      >
-                          {index + 1}
-                      </button>
-                  ))}
+                {Array.from({ length: totalPages }, (_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handlePageChange(index + 1)}
+                    style={{
+                      margin: "0 5px",
+                      padding: "5px 10px",
+                      backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                      color: currentPage === index + 1 ? "white" : "black",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
               </div>
             </Card>
           </Col>

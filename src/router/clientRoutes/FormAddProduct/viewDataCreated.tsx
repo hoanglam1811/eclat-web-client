@@ -45,7 +45,7 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles
                 await Promise.all(imageFiles.map((file: any) => uploadImage(file, token, product.data.productId)))
             }
 
-            if(optionImageFiles.length > 0) {
+            if (optionImageFiles.length > 0) {
                 await Promise.all(product.data.options.map((option: any, index: number) => addImageOption(option.optionId, optionImageFiles[index], token)))
             }
             setIsLoading(false);
@@ -279,28 +279,28 @@ const ViewDataCreated = ({ formData, skinTypes, brands, tags, onBack, imageFiles
                                         </div>
 
                                         <div className="grid grid-cols-3 gap-4 mt-3">
-                                          <div className="col-span-1">
-                                            <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
-                                                Giá gốc <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                defaultValue={_option.optionPrice || "N/A"}
-                                                placeholder="Nhập giá gốc"
-                                                disabled
-                                                className="w-full"
-                                            />
-                                          </div>
-                                          <div className="col-span-1">
-                                            <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
-                                                Giá khuyến mãi <span className="text-red-500">*</span>
-                                            </Label>
-                                            <Input
-                                                defaultValue={_option.discPrice || "N/A"}
-                                                placeholder="Nhập giá khuyến mãi"
-                                                disabled
-                                                className="w-full"
-                                            />
-                                          </div>
+                                            <div className="col-span-1">
+                                                <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                    Giá gốc <span className="text-red-500">*</span>
+                                                </Label>
+                                                <Input
+                                                    defaultValue={_option.optionPrice || "N/A"}
+                                                    placeholder="Nhập giá gốc"
+                                                    disabled
+                                                    className="w-full"
+                                                />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <Label htmlFor="brandId" className="block text-sm font-bold text-blue-500 text-left mb-1">
+                                                    Giá khuyến mãi <span className="text-red-500">*</span>
+                                                </Label>
+                                                <Input
+                                                    defaultValue={_option.discPrice || "N/A"}
+                                                    placeholder="Nhập giá khuyến mãi"
+                                                    disabled
+                                                    className="w-full"
+                                                />
+                                            </div>
                                         </div>
                                         <div className="mt-3 flex justify-center col-span-3">
                                             {optionImages[index] && (

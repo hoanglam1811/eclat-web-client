@@ -2,14 +2,10 @@ import { Navigate, RouteObject } from "react-router-dom";
 import RouteNames from "../../constants/routeNames";
 import Billing from "./Billing";
 import Home from "./Home";
-import Profile from "./Profile";
-import Rtl from "./Rtl";
-import SignIn from "./SignIn";
-import SignUp from "./SignUp";
-import Tables from "./Tables";
 import StaffManagement from "./StaffManagement";
 import SkincareQuiz from "../clientRoutes/QuizManagement";
 import SkincareBlogManagement from "../clientRoutes/BlogManagement";
+import CustomerManagement from "./CustomerManagement";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -19,22 +15,6 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.ADMIN_HOME,
     element: <Home />,
-  },
-  {
-    path: RouteNames.ADMIN_PROFILE,
-    element: <Profile/>,
-  },
-  {
-    path: RouteNames.ADMIN_RTL,
-    element: <Rtl />,
-  },
-  {
-    path: RouteNames.ADMIN_SIGNIN,
-    element: <SignIn />,
-  },
-  {
-    path: RouteNames.ADMIN_SIGNUP,
-    element: <SignUp />,
   },
   {
     path: RouteNames.STAFF_MANAGEMENT,
@@ -49,8 +29,8 @@ const publicRoutes: RouteObject[] = [
     element: <SkincareBlogManagement />,
   },
   {
-    path: RouteNames.ADMIN_TABLES,
-    element: <Tables/>,
+    path: RouteNames.ADMIN_CUSTOMER_MANAGEMENT,
+    element: <CustomerManagement/>,
   }
 ];
 

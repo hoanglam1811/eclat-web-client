@@ -33,7 +33,7 @@ const RouteNames = {
   ADMIN_RTL: "/admin/rtl",
   ADMIN_SIGNIN: "/admin/sign-in",
   ADMIN_SIGNUP: "/admin/sign-up",
-  ADMIN_TABLES: "/admin/tables",
+  ADMIN_CUSTOMER_MANAGEMENT: "/admin/customer-management",
   SKINCARE_QUIZ_MANAGEMENT: "/admin/skincare-quiz-management",
   STAFF_MANAGEMENT: "/admin/staff-management",
   BLOG_MANAGEMENT: "/admin/blog-management",

@@ -1,4 +1,4 @@
-const lineChart = {
+const lineChart:any = {
   series: [
     {
       name: "Mobile apps",

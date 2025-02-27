@@ -290,7 +290,7 @@ function Header({
               style={{ textTransform: "capitalize" }}
           >
             <Breadcrumb.Item>
-              <NavLink to="/admin">Admin</NavLink>
+              <NavLink to="/staff">Staff</NavLink>
             </Breadcrumb.Item>
             <Breadcrumb.Item 
             >

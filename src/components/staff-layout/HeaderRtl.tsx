@@ -1,3 +1,15 @@
+/*!
+  =========================================================
+  * Muse Ant Design Dashboard - v1.0.0
+  =========================================================
+  * Product Page: https://www.creative-tim.com/product/muse-ant-design-dashboard
+  * Copyright 2021 Creative Tim (https://www.creative-tim.com)
+  * Licensed under MIT (https://github.com/creativetimofficial/muse-ant-design-dashboard/blob/main/LICENSE.md)
+  * Coded by Creative Tim
+  =========================================================
+  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+*/
+
 import { useState, useEffect } from "react";
 
 import {
@@ -22,14 +34,9 @@ import {
   FacebookFilled,
 } from "@ant-design/icons";
 
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import styled from "styled-components";
-import avtar from "../../assets/images/team-2.jpg";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { removeToken, removeUser } from "../../reducers/tokenSlice";
-import RouteNames from "../../constants/routeNames";
-import { vietRouteNames } from "../../constants/vietRouteNames";
+import avtar from "../assets/images/team-2.jpg";
 
 const ButtonContainer = styled.div`
   .ant-btn-primary {
@@ -256,62 +263,165 @@ function Header({
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
 
-  const user = useSelector((state: RootState) => state.token.user);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, []);
+  useEffect(() => window.scrollTo(0, 0));
 
   const showDrawer = () => setVisible(true);
   const hideDrawer = () => setVisible(false);
 
-  const handleLogout = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      dispatch(removeToken());
-      dispatch(removeUser());
-      localStorage.removeItem("token");
-      navigate(RouteNames.HOME);
-      setIsLoading(false);
-    }, 500);
-  };
-
   return (
     <>
-      <div className="setting-drwer flex justify-center items-center" onClick={showDrawer}>
+      <div className="setting-drwer" onClick={showDrawer}>
         {setting}
       </div>
       <Row gutter={[24, 0]}>
         <Col span={24} md={6}>
-          <Breadcrumb 
-              style={{ textTransform: "capitalize" }}
-          >
+          <Breadcrumb>
             <Breadcrumb.Item>
-              <NavLink to="/admin">Admin</NavLink>
+              <NavLink to="/">Pages</NavLink>
             </Breadcrumb.Item>
-            <Breadcrumb.Item 
-            >
-              {!vietRouteNames[name] && name.replace("admin/", "")}
-              {vietRouteNames[name]}
-            </Breadcrumb.Item>
+            <Breadcrumb.Item>{name}</Breadcrumb.Item>
           </Breadcrumb>
           <div className="ant-page-header-heading">
-            <span
-              className="ant-page-header-heading-title"
-              style={{ textTransform: "capitalize" }}
-            >
-              {!vietRouteNames[subName] && subName.replace("admin/", "")}
-              {vietRouteNames[subName]}
-            </span>
+            <span className="ant-page-header-heading-title">{subName}</span>
           </div>
         </Col>
         <Col span={24} md={18} className="header-control">
-          <Link to="#" onClick={handleLogout} className="btn-sign-in">
+          <Badge size="small" count={4}>
+            <Dropdown overlay={menu} trigger={["click"]}>
+              <a
+                href="#pablo"
+                className="ant-dropdown-link"
+                onClick={(e) => e.preventDefault()}
+              >
+                {bell}
+              </a>
+            </Dropdown>
+          </Badge>
+          <Button type="link" onClick={showDrawer}>
+            {logsetting}
+          </Button>
+          <Button
+            type="link"
+            className="sidebar-toggler"
+            onClick={() => onPress()}
+          >
+            {toggler}
+          </Button>
+          <Drawer
+            className="settings-drawer settings-drawer-rtl"
+            mask={true}
+            width={360}
+            onClose={hideDrawer}
+            placement={placement}
+            visible={visible}
+          >
+            <div>
+              <div className="header-top">
+                <Title level={4}>
+                  Configurator
+                  <Text className="subtitle">See our dashboard options.</Text>
+                </Title>
+              </div>
+
+              <div className="sidebar-color">
+                <Title level={5}>Sidebar Color</Title>
+                <div className="theme-color mb-2">
+                  <ButtonContainer>
+                    <Button
+                      type="default"
+                      style={{ backgroundColor: "#1890ff" }}
+                      onClick={() => handleSidenavColor("#1890ff")}
+                    >
+                      1
+                    </Button>
+                    <Button
+                      type="primary"
+                      style={{ background: "#52c41a"}}
+                      onClick={() => handleSidenavColor("#52c41a")}
+                    >
+                      1
+                    </Button>
+                    <Button
+                      type="primary"
+                      style={{ background: "#d9363e" }}
+                      onClick={() => handleSidenavColor("#d9363e")}
+                    >
+                      1
+                    </Button>
+                    <Button
+                      type="primary"
+                      style={{ background: "#fadb14" }}
+                      onClick={() => handleSidenavColor("#fadb14")}
+                    >
+                      1
+                    </Button>
+
+                    <Button
+                      type="primary"
+                      style={{ background: "black" }}
+                      onClick={() => handleSidenavColor("black")}
+                    >
+                      1
+                    </Button>
+                  </ButtonContainer>
+                </div>
+
+                <div className="sidebarnav-color mb-2">
+                  <Title level={5}>Sidenav Type</Title>
+                  <Text>Choose between 2 different sidenav types.</Text>
+                  <ButtonContainer className="trans">
+                    <Button
+                      type={sidenavType === "default" ? "primary" : "default"}
+                      onClick={() => {
+                        handleSidenavType("transparent");
+                        setSidenavType("transparent");
+                      }}
+                    >
+                      TRANSPARENT
+                    </Button>
+                    <Button
+                      type={sidenavType === "default" ? "primary" : "default"}
+                      onClick={() => {
+                        handleSidenavType("#fff");
+                        setSidenavType("white");
+                      }}
+                    >
+                      WHITE
+                    </Button>
+                  </ButtonContainer>
+                </div>
+                <div className="fixed-nav mb-2">
+                  <Title level={5}>Navbar Fixed </Title>
+                  <Switch onChange={(e) => handleFixedNavbar(e)} />
+                </div>
+                <div className="ant-docment">
+                  <ButtonContainer>
+                    <Button type="default" size="large">
+                      FREE DOWNLOAD
+                    </Button>
+                    <Button size="large">VIEW DOCUMENTATION</Button>
+                  </ButtonContainer>
+                </div>
+                <div className="viewstar">
+                  <a href="#pablo">{<StarOutlined />} Star</a>
+                  <a href="#pablo"> 190</a>
+                </div>
+
+                <div className="ant-thank">
+                  <Title level={5} className="mb-2">
+                    Thank you for sharing!
+                  </Title>
+                  <ButtonContainer className="social">
+                    <Button type="default">{<TwitterOutlined />}TWEET</Button>
+                    <Button type="default">{<FacebookFilled />}SHARE</Button>
+                  </ButtonContainer>
+                </div>
+              </div>
+            </div>
+          </Drawer>
+          <Link to="/sign-in" className="btn-sign-in">
             {profile}
-            <span>Log out</span>
+            <span>Sign in</span>
           </Link>
           <Input
             className="header-search"

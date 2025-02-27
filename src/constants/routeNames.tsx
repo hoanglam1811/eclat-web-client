@@ -22,7 +22,7 @@ const RouteNames = {
   PAYMENT: "/cart/payment",
   CATEGORIES_MANAGEMENT: "/staff/categories-management",
   BRANDS_MANAGEMENT: "/staff/brands-management",
-  TAGS_MANAGEMENT: "staff/tags-management",
+  TAGS_MANAGEMENT: "/staff/tags-management",
   SKIN_TYPES_MANAGEMENT: "/staff/skin-types-management",
   PRODUCTS_MANAGEMENT: "/staff/products-management",
   PRODUCT_ADDITION: "/staff/product-addition",

@@ -55,38 +55,38 @@ const publicRoutes: RouteObject[] = [
     path: RouteNames.PAYMENT,
     element: <Payment />,
   },
-  {
-    path: RouteNames.CATEGORIES_MANAGEMENT,
-    element: <CategoriesManagement />,
-  },
-  {
-    path: RouteNames.SKIN_TYPES_MANAGEMENT,
-    element: <SkinTypesManagement />,
-  },
-  {
-    path: RouteNames.BRANDS_MANAGEMENT,
-    element: <BrandsManagement />,
-  },
-  {
-    path: RouteNames.PRODUCTS_MANAGEMENT,
-    element: <ProductsManagement />,
-  },
-  {
-    path: RouteNames.PRODUCT_ADDITION,
-    element: <FormCreateProduct />,
-  },
-  {
-    path: RouteNames.PRODUCT_VIEW,
-    element: <FormViewProduct />,
-  },
+  // {
+  //   path: RouteNames.CATEGORIES_MANAGEMENT,
+  //   element: <CategoriesManagement />,
+  // },
+  // {
+  //   path: RouteNames.SKIN_TYPES_MANAGEMENT,
+  //   element: <SkinTypesManagement />,
+  // },
+  // {
+  //   path: RouteNames.BRANDS_MANAGEMENT,
+  //   element: <BrandsManagement />,
+  // },
+  // {
+  //   path: RouteNames.PRODUCTS_MANAGEMENT,
+  //   element: <ProductsManagement />,
+  // },
+  // {
+  //   path: RouteNames.PRODUCT_ADDITION,
+  //   element: <FormCreateProduct />,
+  // },
+  // {
+  //   path: RouteNames.PRODUCT_VIEW,
+  //   element: <FormViewProduct />,
+  // },
   {
     path: RouteNames.BRANDS,
     element: <Brands />,
   },
-  {
-    path: RouteNames.TAGS_MANAGEMENT,
-    element: <TagsManagement />,
-  },
+  // {
+  //   path: RouteNames.TAGS_MANAGEMENT,
+  //   element: <TagsManagement />,
+  // },
   
   {
     path: RouteNames.SKIN_QUIZ,

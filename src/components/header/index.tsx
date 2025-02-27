@@ -6,12 +6,17 @@ import LogoImage from "@/assets/Éclat.png";
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { LoginOutlined, ShoppingCartOutlined, UserAddOutlined, UserOutlined } from '@ant-design/icons';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { removeToken, removeUser } from "../../reducers/tokenSlice";
 import RoleNames from "../../constants/roleNames";
 import { CgProfile } from "react-icons/cg";
 import { AlertDialog, AlertDialogTrigger } from "@radix-ui/react-alert-dialog";
 import { LogOut } from "lucide-react";
+import { ChatOutlined } from "@mui/icons-material";
+import { Button, Input, Modal, notification, Popover } from "antd";
+import { GEMINI_CONTEXT_PROMPT } from "../../constants/gemini";
+import { gemini } from "../../services/ApiServices/geminiService";
+import ReactMarkdown from "react-markdown";
 
 const Header = () => {
   const user = useSelector((state: RootState) => state.token.user);
@@ -20,6 +25,62 @@ const Header = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
   const [cartCount, setCartCount] = useState(0);
+  const aiChatRef = useRef<any>(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+  // const [userMessage, setUserMessage] = useState("");
+  const [aiChatHistory, setAiChatHistory] = useState<any>(GEMINI_CONTEXT_PROMPT);
+  const [aiInput, setAiInput] = useState<string>("");
+
+  const handleAiInput = async () => {
+      try{
+        //When first open
+        if(aiChatHistory == GEMINI_CONTEXT_PROMPT) {
+          const response = await gemini(aiChatHistory);
+          // console.log(response)
+          setAiChatHistory({
+            ...aiChatHistory,
+            contents: [
+              ...aiChatHistory.contents,
+              response?.candidates?.[0]?.content,
+            ]
+          })
+          return
+        }
+        if(aiInput == "") {
+          notification.error({ message: "Bạn cần nhập vào trước khi gửi!!" })
+          return;
+        }
+        setAiInput("");
+        const updatedHistory = {
+          ...aiChatHistory,
+          contents: [
+            ...aiChatHistory.contents,
+            { role: "user", parts: [{ text: aiInput }] }
+          ]
+        };
+        // console.log(updatedHistory);
+        
+        setAiChatHistory(updatedHistory);
+        const response = await gemini(updatedHistory);
+        // console.log(response)
+        setAiChatHistory({
+          ...updatedHistory,
+          contents: [
+            ...updatedHistory.contents,
+            response?.candidates?.[0]?.content,
+          ]
+        })
+        
+      } catch (error: any) {
+          // setError(error.toString());
+          console.error("Error fetching skin types", error);
+      }
+      finally {
+          setIsLoading(false);
+      }
+    }
+
 
   const updateCartCount = () => {
     const storedCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
@@ -32,11 +93,18 @@ const Header = () => {
 
     const handleCartChange = () => updateCartCount();
     window.addEventListener("cartUpdated", handleCartChange);
+    handleAiInput()
 
     return () => {
       window.removeEventListener("cartUpdated", handleCartChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (aiChatRef.current) {
+      aiChatRef.current.scrollTop = aiChatRef.current.scrollHeight;
+    }
+  }, [aiChatHistory])
 
   const handleMouseEnter = () => {
     setIsDropdownVisible(true);
@@ -74,6 +142,7 @@ const Header = () => {
   };
   console.log(user)
   return (
+  <>
     <header
       style={{
         display: "flex",
@@ -187,7 +256,68 @@ const Header = () => {
           </li>}
         </ul>
       </nav>
+      
+
     </header>
+    <div className="flex justify-center items-center">
+      {/* Popover - Appears Above Button */}
+      <Popover
+        content={
+          <div className="w-[324px] h-[455px] p-2">
+            <h3 className="text-sm font-bold text-center">AI Chat</h3>
+
+            {/* Chat Messages (Placeholder) */}
+            <div className="h-[85%] overflow-y-auto p-2" ref={aiChatRef}>
+                <div>
+                  {aiChatHistory?.contents.map((chat: any, index: number) => (
+                    <>
+                     {index ? 
+                        chat.role=="user" ? (
+                          <div className="flex justify-end mt-2" key={index}>
+                            <p className="max-w-[200px] p-[10px] border bg-[#0084FF] text-white rounded-[18px]">{chat?.parts?.[0]?.text}</p>
+                          </div>
+                        ) : (
+                          <div className="flex justify-start mt-2" key={index}>
+                            <p className="max-w-[200px] p-[10px] border bg-[#E4E6EB] text-black rounded-[18px]" >
+                              <ReactMarkdown>{chat?.parts?.[0]?.text}</ReactMarkdown>
+                            </p>
+                          </div>
+                        )
+                      : <></>}
+                    </>
+                  ))}
+                </div>
+            </div>
+
+            {/* Chat Input */}
+            <form className="h-[15%] mt-2 flex" onSubmit={(e) => {
+              e.preventDefault();
+              handleAiInput();
+            }}>
+              <Input
+                value={aiInput}
+                onChange={(e) => setAiInput(e.target.value)}
+                placeholder="Type a message..."
+              />
+              <Button htmlType="submit" type="primary" className="ml-2">
+                Send
+              </Button>
+            </form>
+          </div>
+        }
+        title={null}
+        trigger="click"
+        placement="topLeft" 
+        open={isOpen}
+        onOpenChange={setIsOpen} 
+      >
+        {/* Button to Toggle Popover */}
+        <div className="setting-drwer flex justify-center items-center">
+          <ChatOutlined style={{ fontSize: "22px", cursor: "pointer" }} />
+        </div>
+      </Popover>
+    </div>
+  </>
   );
 };
 

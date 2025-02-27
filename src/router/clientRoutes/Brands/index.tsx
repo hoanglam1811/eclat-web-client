@@ -9,6 +9,7 @@ import { BrandCard } from "../../../components/footer/components/Brand";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
+import { FaceMesh } from "@mediapipe/face_mesh";
 
 const Brands = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +18,6 @@ const Brands = () => {
     const navigate = useNavigate();
     const [brands, setBrands] = useState<any>([]);
     const ITEMS_PER_PAGE = 10;
-    // const videoRef = useRef<any>(null);
 
     useEffect(() => {
         const fetchBrands = async () => {
@@ -36,14 +36,8 @@ const Brands = () => {
                 setIsLoading(false);
             }
         };
-
-    // const startCamera = async () => {
-    //   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    //   videoRef.current.srcObject = stream;
-    // };
-
+    
         fetchBrands();
-        // startCamera();
     }, []);
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -105,7 +99,6 @@ const Brands = () => {
 
                         </menu>
 
-            {/* <video ref={videoRef} autoPlay playsInline style={{ display: "none" }} /> */}
                         <div style={{ marginTop: "20px", marginBottom: '10px', textAlign: 'right' }}>
                             {Array.from({ length: totalPages }, (_, index) => (
                                 <button

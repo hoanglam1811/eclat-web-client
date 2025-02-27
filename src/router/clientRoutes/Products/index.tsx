@@ -17,6 +17,8 @@ import { Search } from "lucide-react";
 
 const Products = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
+    
+
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
     };
@@ -129,6 +131,7 @@ const Products = () => {
         }
     };
 
+    
     useEffect(() => {
         fetchProducts();
     }, []);

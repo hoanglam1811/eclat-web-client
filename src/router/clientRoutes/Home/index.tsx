@@ -33,16 +33,16 @@ const Home = () => {
                     getAllSkinTypes(),
                 ]);
                 console.log(products);
-
-                let productsData = products.map((product: any) => ({
+                const allProducts = products.data
+                let productsData = allProducts.map((product: any) => ({
                     id: product.productId,
                     name: product.productName,
                     origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
                     disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
                     origin_country: product.originCountry,
-                    skinTypeId: product.skinType.skinName,
-                    brandId: product.brand.brandName,
-                    imageUrl: product.images[0]?.imageUrl,
+                    skinTypeId: product.skinTypeId,
+                    brandId: product.brandId,
+                    imageUrl: product.productImages[0]?.imageUrl,
                 }));
 
                 setProducts(productsData);

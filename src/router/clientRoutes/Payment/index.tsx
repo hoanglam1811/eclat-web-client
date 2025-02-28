@@ -92,7 +92,6 @@ function Payment() {
     );
     setTotalPrice(calculatedTotal);
 
-    // Tính giảm giá và phí vận chuyển
     let discountValue = 0;
     let shippingCost = 30000;
     let recommendationMessage = "";

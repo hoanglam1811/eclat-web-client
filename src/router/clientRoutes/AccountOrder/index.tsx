@@ -72,7 +72,7 @@ const AccountOrder = () => {
             product: "Sản phẩm A",
             quantity: 2,
             date: "2023-12-25",
-            status: "Đang giao",
+            status: "Thành công",
             imageUrl: "https://www.guardian.com.vn/media/catalog/product/cache/30b2b44eba57cd45fd3ef9287600968e/3/0/3016843_z7akcsj6o0ihd3hb.jpg",
             option: "Màu xanh - 500ml"
         },
@@ -81,7 +81,7 @@ const AccountOrder = () => {
             product: "Sản phẩm B",
             quantity: 1,
             date: "2023-12-20",
-            status: "Hoàn thành",
+            status: "Đã huỷ",
             imageUrl: "https://www.guardian.com.vn/media/catalog/product/cache/30b2b44eba57cd45fd3ef9287600968e/3/0/3016843_z7akcsj6o0ihd3hb.jpg",
             option: "Loại dưỡng ẩm - 200ml"
         },
@@ -95,14 +95,20 @@ const AccountOrder = () => {
         {
             title: "Trạng Thái", dataIndex: "status", key: "status",
             render: (status: any) => {
-                let color = status === "Hoàn thành" ? "green" : status === "Đã hủy" ? "red" : "blue";
+                let color = status === "Thành công" ? "green" : status === "Đã huỷ" ? "red" : "blue";
                 return <Tag color={color}>{status}</Tag>;
             }
         },
         {
             title: "Hành động", key: "action",
             render: (_: any, record: any) => (
-                <Button type="primary" onClick={() => handleReview(record)}>Đánh giá</Button>
+                <Button 
+                    type="primary" 
+                    onClick={() => handleReview(record)} 
+                    disabled={record.status !== "Thành công"} 
+                >
+                    Đánh giá
+                </Button>
             )
         }
     ];

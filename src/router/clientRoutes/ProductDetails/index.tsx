@@ -66,15 +66,16 @@ const ProductDetails = () => {
                 const productData = await getProductById(id);
                 console.log(productData)
                 setProduct(productData.data);
-                setCurrentImage(productData.data.productImages?.[0]?.imageUrl || "");
-                if (productData.data.brandId) {
-                    const brandData = await getBrandById(productData.data.brandId);
+                console.log(productData.data)
+                setCurrentImage(productData.data.images?.[0] || "");
+                if (productData.data.brand) {
+                    const brandData = await getBrandById(productData.data.brand.brandId);
                     setBrandName(brandData.data.brandName);
                     setBrandImageUrl(brandData.data.imgUrl);
                 }
 
-                if (productData.data.skinTypeId) {
-                    const skinTypeData = await getSkinTypeById(productData.data.skinTypeId);
+                if (productData.data.skinType) {
+                    const skinTypeData = await getSkinTypeById(productData.data.skinType.id);
                     setSkinTypeName(skinTypeData.result.skinName);
                 }
             } catch (err: any) {
@@ -92,7 +93,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchRelatedProducts = async () => {
             // if (!token) return;
-            console.log("product",product)
+            console.log("product", product)
             if (!product.brandId || !product.skinTypeId) {
                 console.error("Thiếu dữ liệu brand hoặc skinType:", product);
                 return;
@@ -100,7 +101,7 @@ const ProductDetails = () => {
             try {
                 const allProducts = await getAllProducts();
                 console.log(allProducts)
-                const filteredProducts = allProducts.filter(
+                const filteredProducts = allProducts.data.filter(
                     (item: any) =>
                         item.productId !== product.productId &&
                         (item.brand.brandId === product.brandId ||
@@ -111,13 +112,14 @@ const ProductDetails = () => {
                     origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
                     disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
                     origin_country: product.originCountry,
-                    skinTypeId: product.skinType.skinName,
-                    brandId: product.brand.brandName,
-                    imageUrl: product.images[0]?.imageUrl,
+                    skinTypeId: product.skinTypeId,
+                    brandId: product.brandId,
+                    imageUrl: product.images,
+                    feedback: product.feedbacks,
                 }));
 
                 setRelatedProducts(filteredProducts);
-                console.log("filteredProducts",filteredProducts)
+                console.log("filteredProducts", filteredProducts)
             } catch (error) {
                 console.error("Lỗi khi tải sản phẩm liên quan:", error);
             }
@@ -139,10 +141,6 @@ const ProductDetails = () => {
     };
 
     const handleAddToCart = () => {
-        if (!token) {
-          notification.error({ message: "Bạn cần phải đăng nhập!!" });
-          return;
-        }
         if (!selectedOption) {
             notification.error({ message: "Vui lòng chọn một tùy chọn sản phẩm!" });
             return;
@@ -232,16 +230,16 @@ const ProductDetails = () => {
                                         </button>
 
                                         <div ref={sliderRef} className="keen-slider" >
-                                            {product?.productImages.map((img: any, index: number) => (
-                                                <div key={index} className={`keen-slider__slide ${currentImage == img.imageUrl && "border-4 border-orange-500 rounded-lg"}`}
+                                            {product?.images.map((img: any, index: number) => (
+                                                <div key={index} className={`keen-slider__slide ${currentImage == img && "border-4 border-orange-500 rounded-lg"}`}
                                                     style={{ padding: "10px" }}>
                                                     <img
                                                         className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
-                                                        src={img.imageUrl}
-                                                        onClick={() => setCurrentImage(img.imageUrl)}
+                                                        src={img}
+                                                        onClick={() => setCurrentImage(img)}
                                                         alt={`Slide ${index}`}
                                                     />
-                                                    {currentImage === img.imageUrl && (
+                                                    {currentImage === img && (
                                                         <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
                                                             ✔
                                                         </div>
@@ -535,26 +533,30 @@ const ProductDetails = () => {
                     {tabIndex === 2 && (
                         <div className="p-6 bg-gray-100 rounded-lg shadow">
                             <h2 className="text-xl font-bold text-gray-700 mb-4">Đánh giá sản phẩm</h2>
-                            <div className="space-y-4">
-                                {sampleReviews.map((review, index) => (
-                                    <div key={index} className="p-4 bg-white rounded-lg shadow-sm flex items-start space-x-4">
-                                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-semibold">
-                                            {review.userId.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div className="flex-1">
-                                            <div className="flex justify-between items-center mb-2">
-                                                <span className="text-gray-600 text-sm">{review.create_at}</span>
-                                                <div className="flex">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <Star key={i} size={18} className={i < review.rating ? "text-yellow-500" : "text-gray-300"} fill={i < review.rating ? "currentColor" : "none"} />
-                                                    ))}
-                                                </div>
+                            {product?.feedbacks && product.feedbacks.length > 0 ? (
+                                <div className="space-y-4">
+                                    {product.feedbacks.map((review: any, index: number) => (
+                                        <div key={index} className="p-4 bg-white rounded-lg shadow-sm flex items-start space-x-4">
+                                            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-semibold">
+                                                {review.username?.charAt(0).toUpperCase()}
                                             </div>
-                                            <p className="text-gray-800 text-sm">{review.text}</p>
+                                            <div className="flex-1">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <span className="text-gray-600 text-sm">{review.create_at}</span>
+                                                    <div className="flex">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <Star key={i} size={18} className={i < review.rating ? "text-yellow-500" : "text-gray-300"} fill={i < review.rating ? "currentColor" : "none"} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <p className="text-gray-800 text-md">{review.text}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-gray-500 text-sm">Chưa có đánh giá nào.</p>
+                            )}
                         </div>
                     )}
 

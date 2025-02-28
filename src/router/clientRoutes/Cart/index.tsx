@@ -4,13 +4,22 @@ import RouteNames from "../../../constants/routeNames";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "../../../store/store";
+import { useSelector } from "react-redux";
+import { notification } from "antd";
 
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState<any[]>([]);
     const navigate = useNavigate();
+    const token = useSelector((state: RootState) => state.token.token);
 
     const handlePayment = () => {
+        if (!token) {
+            navigate("/login");
+            notification.error({message: "Bạn cần đăng nhập để mua hàng!"})
+            return;
+        }
         navigate("/cart/payment/");
     };
 

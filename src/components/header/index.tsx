@@ -256,15 +256,13 @@ const Header = () => {
           </li>}
         </ul>
       </nav>
-      
-
     </header>
+
     <div className="flex justify-center items-center">
-      {/* Popover - Appears Above Button */}
       <Popover
         content={
           <div className="w-[324px] h-[455px] p-2">
-            <h3 className="text-sm font-bold text-center">AI Chat</h3>
+            <h3 className="text-sm font-bold text-center">Trợ lý AI Eclat</h3>
 
             {/* Chat Messages (Placeholder) */}
             <div className="h-[85%] overflow-y-auto p-2" ref={aiChatRef}>
@@ -297,10 +295,10 @@ const Header = () => {
               <Input
                 value={aiInput}
                 onChange={(e) => setAiInput(e.target.value)}
-                placeholder="Type a message..."
+                placeholder="Hãy nhập tin nhắn..."
               />
               <Button htmlType="submit" type="primary" className="ml-2">
-                Send
+                Gửi
               </Button>
             </form>
           </div>
@@ -311,7 +309,6 @@ const Header = () => {
         open={isOpen}
         onOpenChange={setIsOpen} 
       >
-        {/* Button to Toggle Popover */}
         <div className="setting-drwer flex justify-center items-center">
           <ChatOutlined style={{ fontSize: "22px", cursor: "pointer" }} />
         </div>
@@ -322,52 +319,4 @@ const Header = () => {
 };
 
 export default Header;
-
-const categories = [
-  {
-    name: "Làm Sạch Da",
-    items: [
-      "Tẩy Trang Mặt",
-      "Sữa Rửa Mặt",
-      "Tẩy Tế Bào Chết Da Mặt",
-      "Toner / Nước Cân Bằng Da",
-    ],
-  },
-  {
-    name: "Đặc Trị",
-    items: ["Serum / Tinh Chất", "Hỗ Trợ Trị Mụn"],
-  },
-  {
-    name: "Dưỡng Ẩm",
-    items: [
-      "Xịt Khoáng",
-      "Lotion / Sữa Dưỡng",
-      "Kem / Gel / Dầu Dưỡng",
-    ],
-  },
-  {
-    name: "Chống Nắng",
-    items: [],
-  },
-  {
-    name: "Dưỡng Mắt",
-    items: [],
-  },
-  {
-    name: "Dưỡng Môi",
-    items: [],
-  },
-  {
-    name: "Mặt Nạ",
-    items: [],
-  },
-  {
-    name: "Dụng Cụ Chăm Sóc Da",
-    items: [
-      "Bông Tẩy Trang",
-      "Dụng Cụ / Máy Rửa Mặt",
-      "Máy Xông Mặt / Đẩy Tinh Chất",
-    ],
-  },
-];
 

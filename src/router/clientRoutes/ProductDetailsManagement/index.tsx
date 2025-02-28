@@ -253,13 +253,13 @@ const FormViewProduct = () => {
             try {
                 if (!token) return null;
 
-                const brandsData = await getAllBrands(token);
+                const brandsData = await getAllBrands();
                 setBrands(brandsData);
 
                 const categoriesData = await getAllCategories(token);
                 setCategories(categoriesData);
 
-                const skinTypesData = await getAllSkinTypes(token);
+                const skinTypesData = await getAllSkinTypes();
                 setSkinTypes(skinTypesData.result);
 
                 const tagsData = await getAllTags(token);
@@ -276,20 +276,20 @@ const FormViewProduct = () => {
         try {
             if (!token) return null;
             if (!id) return;
-            const productData = await getProductById(Number(id), token);
+            const productData = await getProductById(Number(id));
             console.log(productData)
             setProduct(productData.data);
-            setProductImageFiles(productData.data.productImages.map((image: any) => image.imageUrl));
+            setProductImageFiles(productData.data.images.map((image: any) => image));
 
             setValue('productName', productData.data.productName);
             setValue('description', productData.data.description);
             setValue('usageInstruct', productData.data.usageInstruct);
             setValue('status', productData.data.status);
             setValue('originCountry', productData.data.originCountry);
-            setValue('skinType.id', productData.data.skinTypeId);
-            setValue('brand.brandId', productData.data.brandId);
+            setValue('skinType.id', productData.data.skinType.id);
+            setValue('brand.brandId', productData.data.brand.brandId);
             // setValue('productType', productData.data.categoryId);
-            setValue('tag.tagId', productData.data.tagId);
+            setValue('tag.tagId', productData.data.tag.tagId);
             setValue('attribute', productData.data.attribute || "N/A");
             // setValue('options', productData.data.options || []);
 

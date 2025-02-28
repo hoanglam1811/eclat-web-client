@@ -51,9 +51,9 @@ const ProductsManagement = () => {
             navigate("/login");
             return;
         }
-        getAllProducts(token)
+        getAllProducts()
             .then((data) => {
-                setProducts(data.map((product: any) => {
+                setProducts(data.data.map((product: any) => {
                     const totalQuantity = product.options.reduce((total: number, option: any) => total + option.quantity, 0);
                     
                     return {

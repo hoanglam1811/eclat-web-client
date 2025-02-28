@@ -40,9 +40,9 @@ const Home = () => {
                     origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
                     disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
                     origin_country: product.originCountry,
-                    skinTypeId: product.skinTypeId,
-                    brandId: product.brandId,
-                    imageUrl: product.productImages[0]?.imageUrl,
+                    skinTypeId: product.skinType.skinName,
+                    brandId: product.brand.brandName,
+                    imageUrl: product.images[0],
                 }));
 
                 setProducts(productsData);

@@ -8,19 +8,11 @@ import AccountChangePassword from "./AccountChangePassword/index.tsx";
 import Products from "./Products/index.tsx";
 import AccountOrder from "./AccountOrder/index.tsx";
 import Payment from "./Payment/index.tsx";
-import CategoriesManagement from "./CategoriesManagement/index.tsx";
-import BrandsManagement from "./BrandManagement/index.tsx";
-import SkinTypesManagement from "./SkinTypeManagement/index.tsx";
-import ProductsManagement from "./ProductsManagement/index.tsx";
-import FormCreateProduct from "./FormAddProduct/index.tsx";
-import FormViewProduct from "./ProductDetailsManagement/index.tsx";
 import Brands from "./Brands/index.tsx";
-import TagsManagement from "./TagManagement/index.tsx";
-import SkincareQuiz from "./QuizManagement/index.tsx";
 import SkinQuiz from "./SkinQuiz/index.tsx";
 import SkincareBlog from "./Blog/index.tsx";
-import SkincareBlogManagement from "./BlogManagement/index.tsx";
 import SkincareBlogDetails from "./BlogDetails/index.tsx";
+import { PaymentError, PaymentFailed, PaymentNotFound, PaymentSuccess, VnPayReturn } from "./PaymentReturn/index.tsx";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -87,7 +79,7 @@ const publicRoutes: RouteObject[] = [
   //   path: RouteNames.TAGS_MANAGEMENT,
   //   element: <TagsManagement />,
   // },
-  
+
   {
     path: RouteNames.SKIN_QUIZ,
     element: <SkinQuiz />,
@@ -99,7 +91,24 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.BLOG_DETAILS,
     element: <SkincareBlogDetails />,
-  }
+  },
+  {
+    path: RouteNames.PAYMENT_SUCCESS,
+    element: <PaymentSuccess />,
+  },
+  {
+    path: RouteNames.PAYMENT_FAILED,
+    element: <PaymentFailed />,
+  }, {
+    path: RouteNames.PAYMENT_ERROR,
+    element: <PaymentError />,
+  }, {
+    path: RouteNames.PAYMENT_NOT_FOUND,
+    element: <PaymentNotFound />,
+  }, {
+    path: RouteNames.PAYMENT_RETURN,
+    element: <VnPayReturn />,
+  },
 ];
 
 const privateRoutes: RouteObject[] = [

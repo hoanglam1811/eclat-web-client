@@ -1,9 +1,8 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { GetAllDistrictsByProvince, GetAllProvinces, GetAllWardsByDistrict, GetDistrictByCode, GetProvinceByCode, GetWardByCode } from "../../../services/AddressService";
-import { Button, Card, Checkbox, Input, List, Radio, Typography, Upload } from "antd";
-import { Button as ShadButton } from "../../../components/ui/button";
+import { Button, notification, Radio, Typography } from "antd";
 import { Textarea } from "../../../components/ui/textarea";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
@@ -13,19 +12,16 @@ import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import { FaCheckCircle, FaCity, FaEnvelope, FaHome, FaMapMarkerAlt, FaMoneyBillWave, FaPhone, FaTimes, FaUser } from "react-icons/fa";
 import { MdLocationCity } from "react-icons/md";
+import { createOrder } from "../../../services/ApiServices/orderService";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { createVnPayPayment } from "../../../services/ApiServices/vnpayService";
 
 
 function Payment() {
-
-  //const {id} = useParams();
-  const location = useLocation();
   const navigate = useNavigate();
-
-  const [addAddress, setAddAddress] = useState(false);
-  const [saveAddress, setSaveAddress] = useState(false);
-
-  const [deliveryFee, setDeliveryFee] = useState(0);
-
+  const token = useSelector((state: RootState) => state.token.token);
+  const user = useSelector((state: RootState) => state.token.user);
   const [provinces, setProvinces] = useState([] as any[]);
   const [districts, setDistricts] = useState([] as any[]);
   const [wards, setWards] = useState([] as any[]);
@@ -103,7 +99,6 @@ function Payment() {
       discountValue = 50000;
     }
 
-    // Gợi ý mua thêm để đạt ưu đãi
     if (calculatedTotal < 500000) {
       recommendationMessage = `Bạn chỉ cần mua thêm ${(500000 - calculatedTotal).toLocaleString()}₫ để được giảm 50.000₫`;
     } else if (calculatedTotal < 1000000) {
@@ -115,90 +110,65 @@ function Payment() {
     setRecommendation(recommendationMessage);
   }, []);
 
+  const handleSubmit = async (data: z.infer<typeof formSchema>) => {
+    if (!token) {
+      navigate("/login");
+      notification.error({ message: "Bạn cần đăng nhập để thực hiện thanh toán!" });
+      return;
+    }
 
-  const handleSubmit = () => {
+    try {
+      const cart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
+      const userInfo = user?.userId;
+      console.log(user);
+      console.log(userInfo);
 
-  }
+      if (!cart.length || !userInfo) {
+        notification.error({ message: "Giỏ hàng hoặc thông tin người dùng không hợp lệ." });
+        return;
+      }
 
-  // const openAddressForm = () => setAddAddress(!addAddress);
-  // const uid = token ? parseJwt(token).id : null
+      const totalPrices = totalPrice - discount + shippingFee;
 
-  // const handleButtonClick = () => {
-  //   setIsDialogOpen(true);
-  // };
+      const fullAddress = `${data.address}, ${data.ward}, ${data.district}, ${data.province}`;
 
-  // const handleYes = async () => {
-  //   const result = await saveUserInfo();
-  //   if (result) {
-  //     setSelectedProducts([]);
-  //   }
-  //   setIsDialogOpen(false);
-  // };
+      const orderData = {
+        userId: userInfo,
+        totalPrices,
+        address: fullAddress,
+        status: "PENDING",
+        orderDetails: cart.map((item: any) => ({
+          optionId: item.id,
+          quantity: item.quantity,
+          price: item.discountPrice
+        })),
+      };
 
-  // const handleNo = () => {
-  //   setIsDialogOpen(false);
-  // };
+      console.log("Dữ liệu gửi lên API:", orderData);
 
-  // const handleOpenTerms = () => {
-  //   setIsTermsDialogOpen(true);
-  // };
+      const orderResponse = await createOrder(orderData, token);
+      console.log(orderResponse)
 
-  // const [imageFile, setImageFile] = useState("");
-  // const handleImageChange = (event: any) => {
-  //   setImageFile(event.target.files[0]);
-  //   //setBrandImageFileName(event.target.files[0].name);
-  // };
+        notification.success({ message: "Đặt hàng thành công! Tiếp đến bạn sẽ phải thanh toán" });
 
-  // const handleCloseTerms = () => {
-  //   setIsTermsDialogOpen(false);
-  // };
+        if (selectedOption === "vnpay") {
+          const orderId = orderResponse.orderId;
+          const orderInfo = `Thanh toán đơn hàng #${orderId}`;
 
-  // const fetchUserInfos = async () => {
-  //   let userInfos = null;
-  //   try {
-  //     userInfos = await GetUserInfoById(uid);
-  //     let addressInfos = userInfos.addressInfo.split(", ");
-  //     let p = await GetProvinceByName(addressInfos[0]);
-  //     let d = await GetDistrictByName(addressInfos[1]);
-  //     let w = await GetWardByName(addressInfos[2]);
-
-  //     setDeliveryFee(calculateExpectedShippingFee(p.name_with_type));
-
-  //     setProvince(p);
-  //     setDistrict(d);
-  //     setWard(w);
-  //     //console.log(p)
-  //     //console.log(d);
-  //     //console.log(w);
-
-  //     setUserInfo(userInfos);
-  //   } catch (error: any) {
-  //     if (error.response && error.response.data && error.response.data.message) {
-  //       // If the error response contains a message, set it as the error message
-  //       setErrorMessage(error.response.data.message);
-  //     } else {
-  //       // If the error is something else, set a generic error message
-  //       setErrorMessage('An error occurred. Please try again later.');
-  //     }
-  //     return;
-  //   }
-  // }
-
-  // const calculateExpectedShippingDate = (address: string) => {
-  //   if (address.includes("Thành phố Hồ Chí Minh")) {
-  //     return moment().add(3, 'days').format('YYYY-MM-DDT00:00:00');
-  //   } else {
-  //     return moment().add(7, 'days').format('YYYY-MM-DDT00:00:00');
-  //   }
-  // };
-
-  // const calculateExpectedShippingFee = (address: string) => {
-  //   if (address.includes("Thành phố Hồ Chí Minh")) {
-  //     return 0;
-  //   } else {
-  //     return 30000;
-  //   }
-  // };
+          const paymentResponse = await createVnPayPayment(totalPrices, orderInfo, orderId, token);
+          notification.success({ message: "Tạo thành công đơn thanh toán VNPay" });
+          if (paymentResponse?.paymentUrl) {
+            sessionStorage.setItem("awaitingPayment", "true");
+            window.location.href = paymentResponse.paymentUrl;
+          } else {
+            notification.error({ message: "Lỗi khi tạo thanh toán VNPay." });
+          }
+        }
+    } catch (error) {
+      console.error("Lỗi:", error);
+      notification.error({ message: "Có lỗi xảy ra, vui lòng thử lại." });
+    }
+  };
 
   const fetchProvinces = async () => {
     let provinces = null;
@@ -207,10 +177,8 @@ function Payment() {
       setProvinces(provinces);
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.message) {
-        // If the error response contains a message, set it as the error message
         setErrorMessage(error.response.data.message);
       } else {
-        // If the error is something else, set a generic error message
         setErrorMessage('An error occurred. Please try again later.');
       }
       return;
@@ -224,10 +192,8 @@ function Payment() {
       setDistricts(userInfos);
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.message) {
-        // If the error response contains a message, set it as the error message
         setErrorMessage(error.response.data.message);
       } else {
-        // If the error is something else, set a generic error message
         setErrorMessage('An error occurred. Please try again later.');
       }
       return;
@@ -241,19 +207,13 @@ function Payment() {
       setWards(userInfos);
     } catch (error: any) {
       if (error.response && error.response.data && error.response.data.message) {
-        // If the error response contains a message, set it as the error message
         setErrorMessage(error.response.data.message);
       } else {
-        // If the error is something else, set a generic error message
         setErrorMessage('An error occurred. Please try again later.');
       }
       return;
     }
   }
-
-  // useEffect(() => {
-  //   fetchUserInfos();
-  // }, [])
 
   useEffect(() => {
     console.log(province);
@@ -380,7 +340,7 @@ function Payment() {
                       setProvince(selectedProvince);
                       setDistrict("")
                       setWard("")
-                      form.setValue("province", selectedProvince.name)
+                      form.setValue("province", selectedProvince.name_with_type)
                       form.setValue("district", "")
                       form.setValue("ward", "")
                     }}
@@ -405,7 +365,7 @@ function Payment() {
                       const selectedDistrict = await GetDistrictByCode(e.currentTarget.value);
                       setDistrict(selectedDistrict);
                       setWard("")
-                      form.setValue("district", selectedDistrict.name)
+                      form.setValue("district", selectedDistrict.name_with_type)
                       form.setValue("ward", "")
                     }}
                     value={district.code || ""}
@@ -427,7 +387,7 @@ function Payment() {
                     onChange={async (e) => {
                       const selectedWard = await GetWardByCode(e.currentTarget.value);
                       setWard(selectedWard);
-                      form.setValue("ward", selectedWard.name)
+                      form.setValue("ward", selectedWard.name_with_type)
                     }}
                     value={ward.code || ""}
                   >
@@ -441,15 +401,6 @@ function Payment() {
                   {form.formState.errors.ward && <p className="text-red-500 text-sm">{form.formState.errors.ward.message}</p>}
                 </div>
               </div>
-
-              <Textarea
-                placeholder="Ghi chú"
-                // value={userInfo?.additionalInfo}
-                {...form.register("additionalInfo")}
-                // onChange={(e) => setUserInfo({ ...userInfo, additionalInfo: e.target.value })}
-                className="w-full border rounded-md px-3 py-2"
-              />
-              {form.formState.errors.additionalInfo && <p className="text-red-500 text-sm">{form.formState.errors.additionalInfo.message}</p>}
             </div>
           </div>
 
@@ -479,7 +430,7 @@ function Payment() {
                   onChange={(e) => setSelectedOption(e.target.value)}
                   value={selectedOption}
                 >
-                  <Radio value="BankTransfer" style={{ display: "flex", alignItems: "center" }}>
+                  <Radio value="vnpay" style={{ display: "flex", alignItems: "center" }}>
                     <img
                       src="/nganhang.png"
                       alt="Thanh toán qua VNPAY"
@@ -549,7 +500,6 @@ function Payment() {
                 >
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-2xl font-semibold text-gray-700 flex items-center gap-2">
-                      {/* <FaPen className="text-sky-500" /> */}
                       {"Xác nhận đặt hàng"}
                     </h3>
                     <button onClick={() => setIsDialogOpen(false)} className="text-3xl text-gray-700 hover:text-sky-500 transition-all">
@@ -571,12 +521,18 @@ function Payment() {
                     <Button
                       variant="dashed"
                       color="primary"
-                      onClick={() => {
-                        setIsDialogOpen(false);
+                      onClick={async () => {
+                        const valid = await form.trigger(); // Kiểm tra form hợp lệ
+                        if (valid) {
+                          const formData = form.getValues(); // Lấy dữ liệu từ form
+                          await handleSubmit(formData); // Gọi handleSubmit với dữ liệu form
+                          setIsDialogOpen(false);
+                        }
                       }}
                     >
                       Tôi đồng ý
                     </Button>
+
                     <Button
                       variant="outlined"
                       onClick={() => setIsDialogOpen(false)}
@@ -612,9 +568,7 @@ function Payment() {
             </DialogActions>
           </Dialog>
         </div>
-
       </div>
-
     </>
   )
 }

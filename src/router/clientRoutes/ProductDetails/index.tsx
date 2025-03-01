@@ -40,15 +40,6 @@ const ProductDetails = () => {
         setTabIndex(Number(key));
     };
 
-    const sampleReviews = [
-        { text: "Sản phẩm rất tốt, dùng thích lắm!", rating: 5, userId: "user1", create_at: "2025-02-18" },
-        { text: "Dùng khá ổn, sẽ mua lại!", rating: 4, userId: "user2", create_at: "2025-02-17" },
-        { text: "Không hợp da mình lắm", rating: 3, userId: "user3", create_at: "2025-02-16" },
-        { text: "Chất lượng tuyệt vời, đáng tiền!", rating: 5, userId: "user4", create_at: "2025-02-15" },
-        { text: "Sản phẩm không như mong đợi", rating: 2, userId: "user5", create_at: "2025-02-14" },
-        { text: "Được tặng quà kèm theo rất thích!", rating: 4, userId: "user6", create_at: "2025-02-13" }
-    ];
-
     const handleQuantityChange = (change: any) => {
         setQuantity((prevQuantity) => Math.max(1, prevQuantity + change));
     };
@@ -58,11 +49,6 @@ const ProductDetails = () => {
             setIsLoading(true);
             setError(null);
             try {
-                // if (!token) {
-                //     notification.error({ message: "Bạn chưa đăng nhập!" });
-                //     navigate("/login");
-                //     return;
-                // }
                 const productData = await getProductById(id);
                 console.log(productData)
                 setProduct(productData.data);

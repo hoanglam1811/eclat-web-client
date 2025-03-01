@@ -251,8 +251,6 @@ function Header({
   handleSidenavType,
   handleFixedNavbar,
 }:any) {
-  const { Title, Text } = Typography;
-
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
 
@@ -311,13 +309,8 @@ function Header({
         <Col span={24} md={18} className="header-control">
           <Link to="#" onClick={handleLogout} className="btn-sign-in">
             {profile}
-            <span>Log out</span>
+            <span>Đăng xuất</span>
           </Link>
-          <Input
-            className="header-search"
-            placeholder="Type here..."
-            prefix={<SearchOutlined />}
-          />
         </Col>
       </Row>
     </>

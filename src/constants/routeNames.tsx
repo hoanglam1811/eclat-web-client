@@ -38,6 +38,11 @@ const RouteNames = {
   STAFF_MANAGEMENT: "/admin/staff-management",
   BLOG_MANAGEMENT: "/admin/blog-management",
   BLOG_DETAILS: "blog-details/:id",
+  PAYMENT_SUCCESS: "/payment-success",
+  PAYMENT_FAILED: "/payment-failed",
+  PAYMENT_ERROR: "/payment-error",
+  PAYMENT_RETURN: "/vnpay-return",
+  PAYMENT_NOT_FOUND: "/payment-not-found",
 };
 
 export default RouteNames;

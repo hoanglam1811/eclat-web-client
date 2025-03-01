@@ -8,7 +8,6 @@ import { RootState } from "../../../store/store";
 import { useSelector } from "react-redux";
 import { notification } from "antd";
 
-
 const Cart = () => {
     const [cartItems, setCartItems] = useState<any[]>([]);
     const navigate = useNavigate();

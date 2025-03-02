@@ -138,7 +138,7 @@ function Payment() {
         address: fullAddress,
         status: "PENDING",
         orderDetails: cart.map((item: any) => ({
-          optionId: item.id,
+          optionId: item.optionId,
           quantity: item.quantity,
           price: item.discountPrice
         })),

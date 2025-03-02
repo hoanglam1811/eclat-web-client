@@ -29,6 +29,9 @@ const PaymentSuccess = () => {
                 extra={[
                     <Button type="primary" onClick={() => navigate('/')} style={buttonStyle}>
                         💖 Về Trang Chủ
+                    </Button>,
+                    <Button onClick={() => navigate('/account/orders')} style={buttonStyle}>
+                        📜 Xem lịch sử giao dịch
                     </Button>
                 ]}
             />

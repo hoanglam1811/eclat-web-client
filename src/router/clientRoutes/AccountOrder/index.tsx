@@ -2,7 +2,7 @@ import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../compon
 import { Link } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
 import { KeyOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
-import { Button, Modal, notification, Rate, Table, Tag } from "antd";
+import { Button, Input, Modal, notification, Rate, Table, Tag } from "antd";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { useEffect, useState } from "react";
 import { Textarea } from "../../../components/ui/textarea";
@@ -10,6 +10,9 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { getUserById } from "../../../services/ApiServices/userService";
 import { createFeedback } from "../../../services/ApiServices/feedbackService";
+import { getTransactionsByUserId } from "../../../services/ApiServices/vnpayService";
+
+const { TextArea } = Input;
 
 const AccountOrder = () => {
     const users = useSelector((state: RootState) => state.token.user);
@@ -17,35 +20,65 @@ const AccountOrder = () => {
     const [error, setError] = useState<any>("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
-    const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState("");
+    const [ratings, setRatings] = useState<Record<string, number>>({});
+    const [comments, setComments] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<any>();
+    const [orders, setOrders] = useState<any[]>([]);
 
     const fetchAccount = async () => {
         try {
             setIsLoading(true);
             if (!users) return;
             const response = await getUserById(users.userId, token);
-            console.log(response)
             if (response.code == 0) {
                 setUser(response.result);
             }
-        }
-        catch (err: any) {
+        } catch (err: any) {
             setError(err.toString());
-        }
-        finally {
+        } finally {
             setIsLoading(false);
         }
-    }
+    };
+
+    const fetchOrders = async () => {
+        try {
+            if (!users) return;
+            const response = await getTransactionsByUserId(users.userId, token);
+            const formattedOrders = response.map((transaction: any) => ({
+                id: transaction.order.orderId,
+                product: transaction.order.orderDetails.map((detail: any) => `Sản phẩm ${detail.optionId}`).join(", "),
+                quantity: transaction.order.orderDetails.reduce((sum: number, item: any) => sum + item.quantity, 0),
+                date: transaction.createAt,
+                status: transaction.status === "SUCCESS" ? "Thành công" : "Đã huỷ",
+                imageUrl: "https://www.guardian.com.vn/media/catalog/product/cache/30b2b44eba57cd45fd3ef9287600968e/3/0/3016843_z7akcsj6o0ihd3hb.jpg",
+                option: "Chi tiết sản phẩm"
+            }));
+            setOrders(formattedOrders);
+        } catch (error) {
+            console.error("Lỗi khi tải danh sách đơn hàng:", error);
+        }
+    };
 
     useEffect(() => {
         fetchAccount();
+        fetchOrders();
     }, []);
 
-    const handleSubmit = async () => {
-        if (!rating || !comment.trim()) {
+    const handleRatingChange = (productId: string, value: number) => {
+        setRatings((prev) => ({ ...prev, [productId]: value }));
+    };
+
+    const handleCommentChange = (productId: string, value: string) => {
+        setComments((prev) => ({ ...prev, [productId]: value }));
+    };
+
+
+    const handleSubmit = async (productId: any) => {
+        const selectedRating = ratings[productId];
+        const selectedComment = comments[productId];
+
+        if (!selectedRating || !selectedComment.trim()) {
             notification.error({ message: "Vui lòng nhập đánh giá và chọn sao" });
             return;
         }
@@ -56,42 +89,37 @@ const AccountOrder = () => {
             await createFeedback({
                 userId: user.id,
                 orderId: selectedOrder.id,
-                rating,
-                comment,
+                productId,
+                rating: selectedRating,
+                comment: selectedComment,
             }, token);
             notification.success({ message: "Đánh giá thành công!" });
+            setRatings((prev) => ({ ...prev, [productId]: 0 }));
+            setComments((prev) => ({ ...prev, [productId]: "" }));
             handleCancel();
         } catch (error) {
             notification.error({ message: "Gửi đánh giá thất bại!" });
         }
     };
 
-    const orders = [
-        {
-            id: "ORD12345",
-            product: "Sản phẩm A",
-            quantity: 2,
-            date: "2023-12-25",
-            status: "Thành công",
-            imageUrl: "https://www.guardian.com.vn/media/catalog/product/cache/30b2b44eba57cd45fd3ef9287600968e/3/0/3016843_z7akcsj6o0ihd3hb.jpg",
-            option: "Màu xanh - 500ml"
-        },
-        {
-            id: "ORD12346",
-            product: "Sản phẩm B",
-            quantity: 1,
-            date: "2023-12-20",
-            status: "Đã huỷ",
-            imageUrl: "https://www.guardian.com.vn/media/catalog/product/cache/30b2b44eba57cd45fd3ef9287600968e/3/0/3016843_z7akcsj6o0ihd3hb.jpg",
-            option: "Loại dưỡng ẩm - 200ml"
-        },
-    ];
-
     const columns: any = [
         { title: "ID Đơn Hàng", dataIndex: "id", key: "id" },
         { title: "Sản Phẩm", dataIndex: "product", key: "product" },
         { title: "Số Lượng", dataIndex: "quantity", key: "quantity", align: "center" },
-        { title: "Ngày Mua", dataIndex: "date", key: "date" },
+        {
+            title: "Ngày Mua",
+            dataIndex: "date",
+            key: "date",
+            render: (date: string) => {
+                const formattedDate = new Date(date).toLocaleDateString("vi-VN", {
+                    month: "2-digit",
+                    day: "2-digit",
+                    year: "numeric"
+                });
+                return formattedDate;
+            }
+        },
+
         {
             title: "Trạng Thái", dataIndex: "status", key: "status",
             render: (status: any) => {
@@ -102,10 +130,10 @@ const AccountOrder = () => {
         {
             title: "Hành động", key: "action",
             render: (_: any, record: any) => (
-                <Button 
-                    type="primary" 
-                    onClick={() => handleReview(record)} 
-                    disabled={record.status !== "Thành công"} 
+                <Button
+                    type="primary"
+                    onClick={() => handleReview(record)}
+                    disabled={record.status !== "Thành công"}
                 >
                     Đánh giá
                 </Button>
@@ -120,8 +148,8 @@ const AccountOrder = () => {
 
     const handleCancel = () => {
         setIsModalOpen(false);
-        setRating(0);
-        setComment("");
+        setRatings({});
+        setComments({});
     };
 
     return (
@@ -193,48 +221,58 @@ const AccountOrder = () => {
                     </div>
 
                     <section className="bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-5 col-end-12">
-                        <div className="p-6">
-                            <h2 className="text-lg font-bold mb-6">Đơn hàng của bạn</h2>
-                            <Table dataSource={orders} columns={columns} rowKey="id" pagination={{ pageSize: 5 }} bordered />
+                        <h2 className="text-lg font-bold mb-6">Đơn hàng của bạn</h2>
+                        <Table dataSource={orders} columns={columns} rowKey="id" pagination={{ pageSize: 5 }} bordered />
 
-                            {/* Modal Đánh Giá */}
-                            <Modal title="Đánh giá sản phẩm" open={isModalOpen} onCancel={handleCancel} footer={null}>
-                                {selectedOrder && (
-                                    <div className="space-y-4 mt-5">
-                                        <div className="grid grid-cols-5 gap-4 items-center">
-                                            <div className="col-span-1 flex justify-center">
-                                                <img src={selectedOrder.imageUrl} alt={selectedOrder.product} className="w-20 h-20 rounded-lg object-cover" />
+                        <Modal title="Đánh giá sản phẩm" open={isModalOpen} onCancel={handleCancel} footer={null}>
+                            {selectedOrder && (
+                                <div className="space-y-6">
+                                    {selectedOrder.product.split(", ").map((product: any, index: any) => (
+                                        <div key={index} className="border-b pb-4 mb-4">
+                                            <div className="grid grid-cols-5 gap-4 items-center">
+                                                <div className="col-span-1 flex justify-center">
+                                                    <img src={selectedOrder.imageUrl} alt={product} className="w-20 h-20 rounded-lg object-cover" />
+                                                </div>
+                                                <div className="col-span-4">
+                                                    <h3 className="text-lg font-semibold">{product}</h3>
+                                                </div>
                                             </div>
-                                            <div className="col-span-4">
-                                                <h3 className="text-lg font-semibold">{selectedOrder.product}</h3>
-                                                <p className="text-gray-600">{selectedOrder.option}</p>
+
+                                            <div className="flex justify-center mt-4">
+                                                <Rate
+                                                    allowHalf
+                                                    value={ratings[product] || 0}
+                                                    onChange={(value) => handleRatingChange(product, value)}
+                                                    className="text-3xl"
+                                                />
+                                            </div>
+
+                                            <div className="mt-4">
+                                                <span className="font-medium">Viết đánh giá:</span>
+                                                <TextArea
+                                                    value={comments[product] || ""}
+                                                    onChange={(e) => handleCommentChange(product, e.target.value)}
+                                                    placeholder="Nhập đánh giá của bạn..."
+                                                    className="mt-2"
+                                                />
+                                            </div>
+
+                                            <div className="flex justify-end mt-4 gap-3">
+                                                <Button type="primary" onClick={() => handleSubmit(product)} disabled={!ratings[product] || !comments[product]?.trim()}>
+                                                    Gửi
+                                                </Button>
                                             </div>
                                         </div>
+                                    ))}
 
-                                        <div className="flex justify-center mt-6">
-                                            <Rate allowHalf value={rating} onChange={setRating} className="text-3xl" />
-                                        </div>
-
-                                        <div className="mt-4">
-                                            <span className="font-medium">Viết đánh giá:</span>
-                                            <Textarea
-                                                value={comment}
-                                                onChange={(e) => setComment(e.target.value)}
-                                                placeholder="Nhập đánh giá của bạn..."
-                                                className="mt-2"
-                                            />
-                                        </div>
-
-                                        {/* Nút Hủy và Gửi */}
-                                        <div className="flex justify-end mt-4 gap-3">
-                                            <Button onClick={handleCancel}>Huỷ</Button>
-                                            <Button type="primary" onClick={handleSubmit} disabled={rating === 0 || !comment.trim()}>Gửi</Button>
-                                        </div>
+                                    {/* Nút Huỷ chỉ hiển thị một lần, nằm dưới cùng bên phải */}
+                                    <div className="flex justify-end mt-6">
+                                        <Button onClick={handleCancel}>Huỷ</Button>
                                     </div>
-                                )}
-                            </Modal>
+                                </div>
+                            )}
+                        </Modal>
 
-                        </div>
                     </section>
                 </div>
             </div>

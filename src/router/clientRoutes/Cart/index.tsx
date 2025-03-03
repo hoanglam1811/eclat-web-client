@@ -16,7 +16,7 @@ const Cart = () => {
     const handlePayment = () => {
         if (!token) {
             navigate("/login");
-            notification.error({message: "Bạn cần đăng nhập để mua hàng!"})
+            notification.error({ message: "Bạn cần đăng nhập để mua hàng!" })
             return;
         }
         navigate("/cart/payment/");

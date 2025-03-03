@@ -191,38 +191,41 @@ export default function SkinQuiz() {
                     onCancel={() => navigate("/home")}
                 >
                     <p className="text-lg font-semibold mb-4">Dưới đây là câu trả lời bạn đã chọn:</p>
-                    <ul className="mb-4">
-                        {quizzes.map((quiz, index) => {
-                            const selectedAnswer = quiz.answers.find((a: any) => a.id === selectedAnswers[quiz.id]);
-                            console.log(selectedAnswer);
-                            return (
-                                <li key={quiz.id} className="mb-2">
-                                    <strong>Câu {index + 1}: </strong> {quiz.question_text}
-                                    <br />
-                                    <span className="text-blue-600">
-                                        ➜ Đáp án của bạn: {selectedAnswer?.answerText || "Chưa chọn"}
-                                    </span>
-                                    {selectedAnswer?.skinName && (
-                                        <div className="text-gray-700 text-sm">
-                                            🔹 Loại da liên quan: <strong className="text-green-600">{selectedAnswer.skinName}</strong>
-                                        </div>
-                                    )}
-                                </li>
-                            );
-                        })}
-                    </ul>
-                    <p className="text-lg">
-                        Sau khi thu thập đáp án của bạn, có thể da của bạn thuộc loại{" "}
-                        <strong className="text-green-600">{skinType}</strong>.
-                    </p>
+                    <div className="max-h-[400px] overflow-y-auto pr-2">
 
-                    {skinType.includes(",") && (
-                        <p className="text-sm text-gray-600 mt-2">
-                            Chúng tôi chỉ được gợi ý cho bạn 1 loại da, nếu có thắc mắc gì thêm, chúng tôi khuyên bạn nên đến phòng khám da liễu để được tư vấn chi tiết hơn.
+                        <ul className="mb-4">
+                            {quizzes.map((quiz, index) => {
+                                const selectedAnswer = quiz.answers.find((a: any) => a.id === selectedAnswers[quiz.id]);
+                                console.log(selectedAnswer);
+                                return (
+                                    <li key={quiz.id} className="mb-2">
+                                        <strong>Câu {index + 1}: </strong> {quiz.question_text}
+                                        <br />
+                                        <span className="text-blue-600">
+                                            ➜ Đáp án của bạn: {selectedAnswer?.answerText || "Chưa chọn"}
+                                        </span>
+                                        {selectedAnswer?.skinName && (
+                                            <div className="text-gray-700 text-sm">
+                                                🔹 Loại da liên quan: <strong className="text-green-600">{selectedAnswer.skinName}</strong>
+                                            </div>
+                                        )}
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        <p className="text-lg">
+                            Sau khi thu thập đáp án của bạn, có thể da của bạn thuộc loại{" "}
+                            <strong className="text-green-600">{skinType}</strong>.
                         </p>
-                    )}
 
-                    <p>Bạn có muốn xem thử các sản phẩm phù hợp với loại da này không?</p>
+                        {skinType.includes(",") && (
+                            <p className="text-sm text-gray-600 mt-2">
+                                Chúng tôi chỉ được gợi ý cho bạn 1 loại da, nếu có thắc mắc gì thêm, chúng tôi khuyên bạn nên đến phòng khám da liễu để được tư vấn chi tiết hơn.
+                            </p>
+                        )}
+
+                        <p>Bạn có muốn xem thử các sản phẩm phù hợp với loại da này không?</p>
+                    </div>
                 </Modal>
             )}
 

@@ -149,21 +149,21 @@ function Payment() {
       const orderResponse = await createOrder(orderData, token);
       console.log(orderResponse)
 
-        notification.success({ message: "Đặt hàng thành công! Tiếp đến bạn sẽ phải thanh toán" });
+      notification.success({ message: "Đặt hàng thành công! Tiếp đến bạn sẽ phải thanh toán" });
 
-        if (selectedOption === "vnpay") {
-          const orderId = orderResponse.orderId;
-          const orderInfo = `Thanh toán đơn hàng #${orderId}`;
+      if (selectedOption === "vnpay") {
+        const orderId = orderResponse.orderId;
+        const orderInfo = `Thanh toán đơn hàng #${orderId}`;
 
-          const paymentResponse = await createVnPayPayment(totalPrices, orderInfo, orderId, token);
-          notification.success({ message: "Tạo thành công đơn thanh toán VNPay" });
-          if (paymentResponse?.paymentUrl) {
-            sessionStorage.setItem("awaitingPayment", "true");
-            window.location.href = paymentResponse.paymentUrl;
-          } else {
-            notification.error({ message: "Lỗi khi tạo thanh toán VNPay." });
-          }
+        const paymentResponse = await createVnPayPayment(totalPrices, orderInfo, orderId, token);
+        notification.success({ message: "Tạo thành công đơn thanh toán VNPay" });
+        if (paymentResponse?.paymentUrl) {
+          sessionStorage.setItem("awaitingPayment", "true");
+          window.location.href = paymentResponse.paymentUrl;
+        } else {
+          notification.error({ message: "Lỗi khi tạo thanh toán VNPay." });
         }
+      }
     } catch (error) {
       console.error("Lỗi:", error);
       notification.error({ message: "Có lỗi xảy ra, vui lòng thử lại." });

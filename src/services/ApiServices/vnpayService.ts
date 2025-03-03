@@ -1,6 +1,18 @@
 import axios from "axios";
 import { BASE_URL } from "../../constants/api";
 
+export async function getAllPayments() {
+  try {
+    const response = await axios.get(`${BASE_URL}/api/payment`, {
+      // headers: { Authorization: "Bearer " + token },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to create staff:", error);
+    throw error;
+  }
+}
+
 export async function createVnPayPayment(amount: number, orderInfo: string, orderId: number, token: string) {
     try {
         const response = await axios.get(`${BASE_URL}/api/payment/create`, {

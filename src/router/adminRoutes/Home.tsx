@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, Col, Row, Typography, Radio, Modal } from "antd";
 import { FaShoppingCart, FaUserCircle, FaPhone, FaIdBadge, FaCheckCircle } from "react-icons/fa";
 import { MdDateRange, MdOutlinePayment } from "react-icons/md";
 import LineChart from "../../components/chart/LineChart";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
+import { getAllPayments } from "../../services/ApiServices/vnpayService";
 
 
 interface Customer {
@@ -247,6 +248,7 @@ function Home() {
   ];
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [transactions, setTransactions] = useState<any[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   console.log(selectedProduct)
 
@@ -271,6 +273,20 @@ function Home() {
     setSelectedCustomer(customer);
     setIsModalOpen(true);
   };
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await getAllPayments()
+      setTransactions(response);
+      console.log(response);
+    } catch (error) {
+      console.error("Failed to fetch transactions:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTransactions();
+  }, [])
 
   return (
     <div className="w-full">
@@ -304,9 +320,8 @@ function Home() {
               <table className="width-100">
                 <thead >
                   <tr>
-                    <th>#</th>
                     <th>Mã đơn</th>
-                    <th>Sản phẩm</th>
+                    <th style={{ maxWidth: "250px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Sản phẩm</th>
                     <th>Số lượng mua</th>
                     <th>Khách hàng</th>
                     <th>Trạng thái đơn</th>
@@ -315,42 +330,44 @@ function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredOrders.map((order, index) => (
+                  {transactions.map((order, index) => (
                     <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td><h6>{order.orderId}</h6></td>
+                      <td><h6>{order.order.orderId}</h6></td>
                       <td
                         className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
-                        onClick={() => showProductModal(order.productDetails)}
+                        style={{ maxWidth: "250px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
+                        // onClick={() => showProductModal(order.productDetails)}
                       >
-                        {order.product}
+                        {order.order.orderDetails.map((item: any) => item.optionResponse[0].product.productName+" "
+                          +item.optionResponse[0].optionValue).join(", ")}
                       </td>
-                      <td><span className="text-xs font-weight-bold">{order.quantity}</span></td>
+                      <td><span className="text-xs font-weight-bold">{order.order.orderDetails
+                        .reduce((sum: number, item: any) => sum + item.quantity, 0)}</span></td>
                       <td>
                         <span
                           className="cursor-pointer text-blue-500 font-semibold flex items-center gap-1 hover:underline"
-                          onClick={() => showModal(order.customer)}
+                          // onClick={() => showModal(order.customer)}
                         >
-                          {order.customer.username}
+                          {order.order.userId}
                         </span>
                       </td>
                       <td>
                         <span
-                          className={`px-2 py-1 rounded font-semibold ${order.status === "Thành công"
+                          className={`px-2 py-1 rounded font-semibold ${order.status === "SUCCESS"
                             ? "bg-green-500 text-white"
-                            : order.status === "Thất bại"
+                            : order.status === "Đã hủy"
                               ? "bg-red-500 text-white"
                               : "bg-gray-300 text-black"
                             }`}
                         >
-                          {order.status}
+                          {order.status === "SUCCESS" ? "Thành công" : "Đã huỷ"}
                         </span>
                       </td>
 
                       <td >
                         <div className="flex items-center gap-2">
                           <MdDateRange style={{ fontSize: "16px", color: "#1890ff" }} />
-                          {order.purchaseDate}
+                          {order.createAt.split(" ")[0]}
                         </div>
 
                       </td>
@@ -358,7 +375,7 @@ function Home() {
                       <td >
                         <div className="flex items-center gap-2">
                           <MdOutlinePayment style={{ fontSize: "16px" }} />
-                          {order.paymentMethod}
+                          {order?.paymentMethod}
                         </div>
 
                       </td>

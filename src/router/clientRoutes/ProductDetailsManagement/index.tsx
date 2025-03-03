@@ -286,10 +286,10 @@ const FormViewProduct = () => {
             setValue('usageInstruct', productData.data.usageInstruct);
             setValue('status', productData.data.status);
             setValue('originCountry', productData.data.originCountry);
-            setValue('skinType.id', productData.data.skinType.id);
-            setValue('brand.brandId', productData.data.brand.brandId);
+            setValue('skinTypeId', productData.data.skinType.id);
+            setValue('brandId', productData.data.brand.brandId);
             // setValue('productType', productData.data.categoryId);
-            setValue('tag.tagId', productData.data.tag.tagId);
+            setValue('tagId', productData.data.tag.tagId);
             setValue('attribute', productData.data.attribute || "N/A");
             // setValue('options', productData.data.options || []);
 

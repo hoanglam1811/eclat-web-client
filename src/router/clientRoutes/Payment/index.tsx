@@ -16,6 +16,7 @@ import { createOrder } from "../../../services/ApiServices/orderService";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { createVnPayPayment } from "../../../services/ApiServices/vnpayService";
+import { getUserById } from "../../../services/ApiServices/userService";
 
 
 function Payment() {
@@ -105,10 +106,32 @@ function Payment() {
       recommendationMessage = `Bạn chỉ cần mua thêm ${(1000000 - calculatedTotal).toLocaleString()}₫ để được miễn phí vận chuyển và giảm 100.000₫`;
     }
 
+    fetchUser()
+
     setDiscount(discountValue);
     setShippingFee(shippingCost);
     setRecommendation(recommendationMessage);
   }, []);
+
+  const fetchUser = async () => {
+    try {
+      if(!token || !user) {
+        return;
+      }
+      const response = await getUserById(user?.userId, token);
+      console.log(response);
+      form.setValue("receiverName", response.result.username);
+      form.setValue("email", response.result.email);
+      form.setValue("phoneNumber", response.result.phone);
+    } catch (error: any) {
+      if (error.response && error.response.data && error.response.data.message) {
+        setErrorMessage(error.response.data.message);
+      } else {
+        setErrorMessage('An error occurred. Please try again later.');
+      }
+      return;
+    }
+  }
 
   const handleSubmit = async (data: z.infer<typeof formSchema>) => {
     if (!token) {
@@ -281,8 +304,10 @@ function Payment() {
                   <FaUser className="text-gray-500 mr-2" />
                   <input
                     placeholder="Họ và tên"
-                    {...form.register("receiverName")}
-                    className="w-full border rounded-md px-3 py-2"
+                    value={form.watch("receiverName")}
+                    disabled
+                    //...form.register("receiverName")
+                    className="w-full border rounded-md px-3 py-2 bg-gray-200"
                   />
                   {form.formState.errors.receiverName && <p className="text-red-500 text-sm">{form.formState.errors.receiverName.message}</p>}
                 </div>
@@ -292,10 +317,12 @@ function Payment() {
                   <FaEnvelope className="text-gray-500 mr-2" />
                   <input
                     placeholder="Email"
+                    value={form.watch("email")}
+                    disabled
                     // value={userInfo?.email}
-                    {...form.register("email")}
+                    //{...form.register("email")}
                     // onChange={(e) => setUserInfo({ ...userInfo, email: e.target.value })}
-                    className="w-full border rounded-md px-3 py-2"
+                    className="w-full border rounded-md px-3 py-2 bg-gray-200"
                   />
                   {form.formState.errors.email && <p className="text-red-500 text-sm">{form.formState.errors.email.message}</p>}
                 </div>
@@ -320,10 +347,11 @@ function Payment() {
                   <FaPhone className="text-gray-500 mr-2" />
                   <input
                     placeholder="Số Điện Thoại"
-                    // value={userInfo?.phoneNumber}
-                    {...form.register("phoneNumber")}
+                    disabled
+                    value={form.watch("phoneNumber")}
+                    //{...form.register("phoneNumber")}
                     // onChange={(e) => setUserInfo({ ...userInfo, phoneNumber: e.target.value })}
-                    className="w-full border rounded-md px-3 py-2"
+                    className="w-full border rounded-md px-3 py-2 bg-gray-200"
                   />
                   {form.formState.errors.phoneNumber && <p className="text-red-500 text-sm">{form.formState.errors.phoneNumber.message}</p>}
                 </div>

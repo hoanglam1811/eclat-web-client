@@ -8,7 +8,7 @@ import { Input } from "../../components/ui/input";
 import { getAllPayments } from "../../services/ApiServices/vnpayService";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { getOrders } from "../../services/ApiServices/orderService";
+import { getAllOrders } from "../../services/ApiServices/orderService";
 
 
 interface Customer {
@@ -271,7 +271,7 @@ function Home() {
   };
 
   const filteredOrders =
-    filter === "all" ? orders : orders.filter((order) => order.paymentMethod === filter);
+    filter === "all" ? order : order.filter((order) => order.paymentMethod === filter);
 
   const showModal = (customer: any) => {
     setSelectedCustomer(customer);
@@ -283,7 +283,7 @@ function Home() {
       if(!token) {
         return;
       }
-      const response = await getOrders(token)
+      const response = await getAllOrders(token)
       console.log(response);
       
       setOrders(response);
@@ -330,7 +330,7 @@ function Home() {
                 <thead >
                   <tr>
                     <th>Mã đơn</th>
-                    <th style={{ maxWidth: "250px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>Sản phẩm</th>
+                    <th>Sản phẩm</th>
                     <th>Số lượng mua</th>
                     <th>Khách hàng</th>
                     <th>Trạng thái đơn</th>
@@ -339,12 +339,11 @@ function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {order.map((order, index) => (
+                  {filteredOrders.map((order, index) => (
                     <tr key={index}>
                       <td><h6>{order.orderId}</h6></td>
                       <td
                         style={{ maxWidth: "1000px", display: "block", wordWrap: "break-word", whiteSpace: "normal" }}
-                        // onClick={() => showProductModal(orders[index].productDetails)}
                       >
                         {order.orderDetails.map((item: any, index: number) => (
                           <span key={index}
@@ -471,49 +470,49 @@ function Home() {
 
             {/* Tùy chọn sản phẩm */}
             <div className="mt-6">
-              {/* <h3 className="text-lg font-semibold text-blue-700">Tùy chọn sản phẩm:</h3> */}
-              {/* {selectedProduct.options.map((_option:any, index:number) => ( */}
-              {/*   <div key={index} className="border p-4 rounded-lg shadow-sm mt-2"> */}
+              <h3 className="text-lg font-semibold text-blue-700">Tùy chọn sản phẩm:</h3>
+              {selectedProduct.options.map((_option:any, index:number) => (
+                <div key={index} className="border p-4 rounded-lg shadow-sm mt-2">
 
-              {/*     <div className="grid grid-cols-2 gap-4 ml-12"> */}
-              {/*       <div className="col-span-1"> */}
-              {/*         <Label className="block text-sm font-bold text-blue-500 text-left mb-1"> */}
-              {/*           Tên tùy chọn */}
-              {/*         </Label> */}
-              {/*         <p className="w-full">{_option.optionValue}</p> */}
-              {/*       </div> */}
-              {/*       <div className="col-span-1"> */}
-              {/*         <Label className="block text-sm font-bold text-blue-500 text-left mb-1"> */}
-              {/*           Số lượng */}
-              {/*         </Label> */}
-              {/*         <p className="w-full">{_option.quantity}</p> */}
-              {/*       </div> */}
-              {/*     </div> */}
+                  <div className="grid grid-cols-2 gap-4 ml-12">
+                    <div className="col-span-1">
+                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Tên tùy chọn
+                      </Label>
+                      <p className="w-full">{_option.optionValue}</p>
+                    </div>
+                    <div className="col-span-1">
+                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Số lượng
+                      </Label>
+                      <p className="w-full">{_option.quantity}</p>
+                    </div>
+                  </div>
 
 
-              {/*     <div className="grid grid-cols-2 gap-4 mt-3 ml-12"> */}
-              {/*       <div className="col-span-1"> */}
-              {/*         <Label className="block text-sm font-bold text-blue-500 text-left mb-1"> */}
-              {/*           Giá gốc */}
-              {/*         </Label> */}
-              {/*         <p className="w-full">{_option.optionPrice}</p> */}
-              {/*       </div> */}
-              {/*       <div className="col-span-1"> */}
-              {/*         <Label className="block text-sm font-bold text-blue-500 text-left mb-1"> */}
-              {/*           Giá khuyến mãi */}
-              {/*         </Label> */}
-              {/*         <p className="w-full">{_option.discPrice}</p> */}
-              {/*       </div> */}
-              {/*     </div> */}
+                  <div className="grid grid-cols-2 gap-4 mt-3 ml-12">
+                    <div className="col-span-1">
+                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Giá gốc
+                      </Label>
+                      <p className="w-full">{_option.optionPrice}</p>
+                    </div>
+                    <div className="col-span-1">
+                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
+                        Giá khuyến mãi
+                      </Label>
+                      <p className="w-full">{_option.discPrice}</p>
+                    </div>
+                  </div>
 
-              {/*     <div className="flex justify-center gap-2 mt-6"> */}
-              {/*       {_option.images.map((img, idx) => ( */}
-              {/*         <img key={idx} src={img} alt="Hình ảnh" className="w-16 h-16 rounded-lg" /> */}
-              {/*       ))} */}
-              {/*     </div> */}
+                  <div className="flex justify-center gap-2 mt-6">
+                    {_option.optionImages.map((img:any, idx:number) => (
+                      <img key={idx} src={img} alt="Hình ảnh" className="w-16 h-16 rounded-lg" />
+                    ))}
+                  </div>
 
-              {/*   </div> */}
-              {/* ))} */}
+                </div>
+              ))}
             </div>
           </div>
         )}

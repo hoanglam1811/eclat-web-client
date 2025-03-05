@@ -232,8 +232,8 @@ const ProductDetails = () => {
                                                     )}
                                                 </div>
                                             ))}
-                                            {product?.options.map((option: any, index: number) => (
-                                                <div key={index} className={`keen-slider__slide ${currentImage == option.optionImages?.[0] && "border-4 border-orange-500 rounded-lg"}`}
+                                            {product?.options?.map((option: any, index: number) => (
+                                                <div key={index} className={`keen-slider__slide ${currentImage == option?.optionImages[0] && "border-4 border-orange-500 rounded-lg"}`}
                                                     style={{ padding: "10px" }}>
                                                     <img
                                                         className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"

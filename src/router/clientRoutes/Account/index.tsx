@@ -163,13 +163,17 @@ const Account = () => {
 
                     {/* Profile Details */}
                     <section className=" bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-5 col-end-12">
-                        <div className="flex justify-center items-center gap-2">
-                            <h2 className="text-lg font-bold text-gray-800">Thông Tin Tài Khoản</h2>
+                        <div className="flex justify-between items-center border-b-2 border-gray-300 pb-2">
+                            <h2 className="text-2xl font-extrabold text-gray-800 flex items-center gap-2">
+                                <UserOutlined className="text-blue-500" />
+                                Thông Tin Tài Khoản
+                            </h2>
                             <EditOutlined
                                 className="text-blue-500 cursor-pointer text-xl hover:text-blue-700 transition"
                                 onClick={handleOpenModal}
                             />
                         </div>
+
 
                         <div className="space-y-6 mt-3">
                             {/* Name */}

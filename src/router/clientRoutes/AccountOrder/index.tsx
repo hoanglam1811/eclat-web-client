@@ -8,8 +8,9 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { getUserById } from "../../../services/ApiServices/userService";
-import { createFeedback } from "../../../services/ApiServices/feedbackService";
-import { getTransactionsByUserId } from "../../../services/ApiServices/vnpayService";
+import { createFeedback, getFeedbackByUserId } from "../../../services/ApiServices/feedbackService";
+import { getOrdersByUserId } from "../../../services/ApiServices/orderService";
+import { ShoppingCartIcon } from "lucide-react";
 
 const { TextArea } = Input;
 
@@ -24,6 +25,9 @@ const AccountOrder = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [user, setUser] = useState<any>();
     const [orders, setOrders] = useState<any[]>([]);
+    const [submitting, setSubmitting] = useState(false);
+    const [feedbacks, setFeedbacks] = useState<Record<number, any>>({});
+    const [showReviewed, setShowReviewed] = useState(false);
 
     const fetchAccount = async () => {
         try {
@@ -43,26 +47,28 @@ const AccountOrder = () => {
     const fetchOrders = async () => {
         try {
             if (!users) return;
-            const response = await getTransactionsByUserId(users.userId, token);
+            const response = await getOrdersByUserId(users.userId, token);
 
-            const formattedOrders = response.map((transaction: any) => {
-                const hasFeedback = transaction.order.orderDetails.some((detail: any) =>
-                    detail.optionResponse.some((option: any) => option.product.feedbacks?.length > 0)
+            const formattedOrders = response.map((order: any) => {
+                const hasFeedback = order.orderDetails.some((detail: any) =>
+                    detail.optionResponse.some((option: any) => option.product?.feedbacks?.length > 0)
                 );
 
                 return {
-                    id: transaction.order.orderId,
-                    product: transaction.order.orderDetails
+                    id: order.orderId,
+                    product: order.orderDetails
                         .map((detail: any) =>
-                            `Sản phẩm ${detail.optionResponse[0].product.productName} - ${detail.optionResponse[0].optionValue}`
+                            `Sản phẩm ${detail.optionResponse[0]?.product?.productName} - ${detail.optionResponse[0]?.optionValue}`
                         )
                         .join(", "),
-                    quantity: transaction.order.orderDetails.reduce((sum: number, item: any) => sum + item.quantity, 0),
-                    date: transaction.createAt,
-                    status: transaction.status === "SUCCESS" ? "Thành công" : "Đã huỷ",
-                    imageUrl: transaction.order.orderDetails[0]?.optionResponse[0]?.optionImages[0],
+                    quantity: order.orderDetails.reduce((sum: number, item: any) => sum + item.quantity, 0),
+                    date: order.createAt,
+                    status: order.status === "SUCCESS" || "PAID" ? "Thành công" : "Đã huỷ",
+                    imageUrl: order.orderDetails[0]?.optionResponse[0]?.optionImages[0],
                     hasFeedback,
-                    orderDetails: transaction.order.orderDetails,
+                    orderDetails: order.orderDetails,
+                    paymentMethod: order.paymentMethod === "Cash" ? "Tiền mặt" : order.paymentMethod === "vnpay" ? "VNPay" : "Khác",
+                    totalPrices: order.totalPrices
                 };
             });
 
@@ -72,9 +78,25 @@ const AccountOrder = () => {
         }
     };
 
+    const fetchFeedbacks = async () => {
+        try {
+            const response = await getFeedbackByUserId(user.id, token);
+            if (response.code === 0) {
+                const feedbackData = response.result.reduce((acc: any, feedback: any) => {
+                    acc[feedback.orderDetailId] = feedback;
+                    return acc;
+                }, {});
+                setFeedbacks(feedbackData);
+            }
+        } catch (error) {
+            notification.error({ message: "Lỗi khi tải đánh giá!" });
+        }
+    };
+
     useEffect(() => {
         fetchAccount();
         fetchOrders();
+        fetchFeedbacks();
     }, []);
 
     const handleRatingChange = (productId: string, optionId: string, value: number) => {
@@ -85,7 +107,16 @@ const AccountOrder = () => {
         setComments((prev) => ({ ...prev, [`${productId}-${optionId}`]: value }));
     };
 
-    const handleSubmit = async (productId: string, optionId: string) => {
+    const handleOpenModal = async (order: any) => {
+        setIsModalOpen(true);
+        setSelectedOrder(order);
+        await fetchFeedbacks();
+    };
+
+    const handleSubmit = async (productId: string, optionId: string, orderDetailId: number) => {
+        if (submitting) return;
+        setSubmitting(true);
+
         const key = `${productId}-${optionId}`;
         const selectedRating = ratings[key];
         const selectedComment = comments[key];
@@ -105,6 +136,7 @@ const AccountOrder = () => {
                 userId: user.id,
                 productId,
                 optionId,
+                orderDetailId,
                 rating: selectedRating,
                 text: selectedComment,
                 create_at: new Date().toISOString().split("T")[0],
@@ -113,16 +145,18 @@ const AccountOrder = () => {
 
             notification.success({ message: "Đánh giá thành công!" });
 
-            // Xóa đánh giá sau khi gửi
+            await fetchFeedbacks();
+
             setRatings((prev) => ({ ...prev, [key]: 0 }));
             setComments((prev) => ({ ...prev, [key]: "" }));
 
             handleCancel();
         } catch (error) {
             notification.error({ message: "Gửi đánh giá thất bại!" });
+        } finally {
+            setSubmitting(false);
         }
     };
-
 
     const columns: any = [
         {
@@ -130,23 +164,22 @@ const AccountOrder = () => {
             key: "index",
             render: (_: any, __: any, index: number) => index + 1,
         },
-        { title: "ID Đơn Hàng", dataIndex: "id", key: "id" },
+        { title: "Mã đơn", dataIndex: "id", key: "id" },
         {
             title: "Sản Phẩm",
             dataIndex: "product",
             key: "product",
             render: (text: string) => {
-                const isLong = text.length > 25;
+                const isLong = text.length > 15;
                 return (
                     <Tooltip title={isLong ? text : ""}>
                         <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", maxWidth: 250 }}>
-                            {isLong ? text.slice(0, 25) + "..." : text}
+                            {isLong ? text.slice(0, 15) + "..." : text}
                         </span>
                     </Tooltip>
                 );
             }
         },
-        { title: "Số Lượng", dataIndex: "quantity", key: "quantity", align: "center" },
         {
             title: "Ngày Mua",
             dataIndex: "date",
@@ -161,11 +194,26 @@ const AccountOrder = () => {
             }
         },
         {
-            title: "Trạng Thái", dataIndex: "status", key: "status",
+            title: "Trạng Thái",
+            dataIndex: "status",
+            key: "status",
             render: (status: any) => {
                 let color = status === "Thành công" ? "green" : status === "Đã huỷ" ? "red" : "blue";
                 return <Tag color={color}>{status}</Tag>;
             }
+        },
+        {
+            title: "Hình thức",
+            dataIndex: "paymentMethod",
+            key: "paymentMethod",
+            render: (method: any) => <Tag color="blue">{method}</Tag>
+        },
+        {
+            title: "Tổng đơn",
+            dataIndex: "totalPrices",
+            key: "totalPrices",
+            align: "right",
+            render: (price: number) => price.toLocaleString("vi-VN", { style: "currency", currency: "VND" })
         },
         {
             title: "",
@@ -173,13 +221,13 @@ const AccountOrder = () => {
             render: (_: any, record: any) => (
                 <>
                     {record.hasFeedback ? (
-                        <Button type="default" onClick={() => handleViewReview(record)}>
+                        <Button type="default" onClick={() => handleOpenModal(record)}>
                             Xem đánh giá
                         </Button>
                     ) : (
                         <Button
                             type="primary"
-                            onClick={() => handleReview(record)}
+                            onClick={() => handleOpenModal(record)}
                             disabled={record.status !== "Thành công"}
                         >
                             Đánh giá
@@ -189,16 +237,6 @@ const AccountOrder = () => {
             )
         }
     ];
-
-    const handleViewReview = (order: any) => {
-        setSelectedOrder(order);
-        setIsModalOpen(true);
-    };
-
-    const handleReview = (order: any) => {
-        setSelectedOrder(order);
-        setIsModalOpen(true);
-    };
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -275,7 +313,10 @@ const AccountOrder = () => {
                     </div>
 
                     <section className="bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-5 col-end-12">
-                        <h2 className="text-lg font-bold mb-6">Đơn hàng của bạn</h2>
+                        <h2 className="text-2xl font-extrabold mb-6 text-gray-800 flex items-center gap-2 border-b-2 border-gray-300 pb-2">
+                            <ShoppingCartIcon className="w-6 h-6 text-blue-500" />
+                            Lịch sử mua hàng
+                        </h2>
                         <Table dataSource={orders} columns={columns} rowKey="id" pagination={{ pageSize: 5 }} bordered />
 
                         <Modal
@@ -287,62 +328,77 @@ const AccountOrder = () => {
                             {selectedOrder && (
                                 <div className="space-y-6">
                                     <div className="max-h-[500px] overflow-y-auto pr-2">
-                                        {selectedOrder.orderDetails
-                                            .filter((orderDetail: any) => !orderDetail.optionResponse?.[0]?.hasFeedback)
-                                            .map((orderDetail: any) => {
-                                                const productData = orderDetail.optionResponse?.[0]?.product;
-                                                const imageUrl = orderDetail.optionResponse?.[0]?.optionImages?.[0] || "";
-                                                const optionId = orderDetail.optionResponse?.[0]?.optionId;
-                                                if (!productData || !optionId) return null;
+                                        {selectedOrder.orderDetails.map((orderDetail: any) => {
+                                            const productData = orderDetail.optionResponse?.[0]?.product;
+                                            const imageUrl = orderDetail.optionResponse?.[0]?.optionImages?.[0] || "";
+                                            const optionId = orderDetail.optionResponse?.[0]?.optionId;
+                                            const orderDetailId = orderDetail.orderDetailId;
 
-                                                return (
-                                                    <div key={orderDetail.orderDetailId} className="border-b pb-4 mb-4">
-                                                        <div className="grid grid-cols-5 gap-4 items-center">
-                                                            <div className="col-span-1 flex justify-center">
-                                                                <img
-                                                                    src={imageUrl}
-                                                                    alt={productData.productName}
-                                                                    className="w-20 h-20 rounded-lg object-cover"
-                                                                />
-                                                            </div>
-                                                            <div className="col-span-4">
-                                                                <h3 className="text-lg font-semibold">
-                                                                    {productData.productName} - {orderDetail.optionResponse?.[0]?.optionValue}
-                                                                </h3>
-                                                            </div>
+                                            if (!productData || !optionId) return null;
+
+                                            // Lấy feedback nếu có
+                                            const existingFeedback = feedbacks[orderDetailId];
+
+                                            return (
+                                                <div key={orderDetailId} className="border-b pb-4 mb-4">
+                                                    <div className="grid grid-cols-5 gap-4 items-center">
+                                                        <div className="col-span-1 flex justify-center">
+                                                            <img src={imageUrl} alt={productData.productName} className="w-20 h-20 rounded-lg object-cover" />
                                                         </div>
-
-                                                        <div className="flex justify-center mt-4">
-                                                            <Rate
-                                                                allowHalf
-                                                                value={ratings[`${productData.productId}-${optionId}`] || 0}
-                                                                onChange={(value) => handleRatingChange(productData.productId, optionId, value)}
-                                                                className="text-3xl"
-                                                            />
-                                                        </div>
-
-                                                        <div className="mt-4">
-                                                            <span className="font-medium">Viết đánh giá:</span>
-                                                            <TextArea
-                                                                value={comments[`${productData.productId}-${optionId}`] || ""}
-                                                                onChange={(e) => handleCommentChange(productData.productId, optionId, e.target.value)}
-                                                                placeholder="Nhập đánh giá của bạn..."
-                                                                className="mt-2"
-                                                            />
-                                                        </div>
-
-                                                        <div className="flex justify-end mt-4 gap-3">
-                                                            <Button
-                                                                type="primary"
-                                                                onClick={() => handleSubmit(productData.productId, optionId)}
-                                                                disabled={!ratings[`${productData.productId}-${optionId}`] || !comments[`${productData.productId}-${optionId}`]?.trim()}
-                                                            >
-                                                                Gửi
-                                                            </Button>
+                                                        <div className="col-span-4">
+                                                            <h3 className="text-lg font-semibold">
+                                                                {productData.productName} - {orderDetail.optionResponse?.[0]?.optionValue}
+                                                            </h3>
+                                                            <p className="text-gray-600">Số lượng: {orderDetail.quantity}</p>
                                                         </div>
                                                     </div>
-                                                );
-                                            })}
+
+                                                    {existingFeedback ? (
+                                                        <div className="mt-4">
+                                                            <p className="font-medium">Đánh giá của bạn:</p>
+                                                            <Rate disabled value={existingFeedback.rating} className="text-3xl" />
+                                                            <p className="mt-2 italic">
+                                                                {existingFeedback.text.charAt(0).toUpperCase() + existingFeedback.text.slice(1)}
+                                                            </p>
+
+                                                        </div>
+                                                    ) : (
+                                                        <>
+                                                            <div className="flex justify-center mt-4">
+                                                                <Rate
+                                                                    allowHalf
+                                                                    value={ratings[`${productData.productId}-${optionId}`] || 0}
+                                                                    onChange={(value) => handleRatingChange(productData.productId, optionId, value)}
+                                                                    className="text-3xl"
+                                                                />
+                                                            </div>
+
+                                                            <div className="mt-4">
+                                                                <span className="font-medium">Viết đánh giá:</span>
+                                                                <TextArea
+                                                                    value={comments[`${productData.productId}-${optionId}`] || ""}
+                                                                    onChange={(e) => handleCommentChange(productData.productId, optionId, e.target.value)}
+                                                                    placeholder="Nhập đánh giá của bạn..."
+                                                                    className="mt-2"
+                                                                />
+                                                            </div>
+
+                                                            <div className="flex justify-end mt-4 gap-3">
+                                                                <Button
+                                                                    type="primary"
+                                                                    loading={submitting}
+                                                                    onClick={() => handleSubmit(productData.productId, optionId, orderDetailId)}
+                                                                    disabled={!ratings[`${productData.productId}-${optionId}`] || !comments[`${productData.productId}-${optionId}`]?.trim()}
+                                                                >
+                                                                    Gửi
+                                                                </Button>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+
 
 
                                         <div className="flex justify-end mt-6">

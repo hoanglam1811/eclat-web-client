@@ -115,7 +115,7 @@ function Payment() {
 
   const fetchUser = async () => {
     try {
-      if(!token || !user) {
+      if (!token || !user) {
         return;
       }
       const response = await getUserById(user?.userId, token);
@@ -143,37 +143,44 @@ function Payment() {
     try {
       const cart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
       const userInfo = user?.userId;
-      console.log(user);
-      console.log(userInfo);
 
       if (!cart.length || !userInfo) {
         notification.error({ message: "Giỏ hàng hoặc thông tin người dùng không hợp lệ." });
         return;
       }
 
-      const totalPrices = totalPrice - discount + shippingFee;
+      if (!selectedOption) {
+        notification.error({ message: "Vui lòng chọn phương thức thanh toán!" });
+        return;
+      }
 
+      const totalPrices = totalPrice - discount + shippingFee;
       const fullAddress = `${data.address}, ${data.ward}, ${data.district}, ${data.province}`;
 
       const orderData = {
         userId: userInfo,
         totalPrices,
         address: fullAddress,
-        status: "PENDING",
+        status: selectedOption === "Cash" ? "SUCCESS" : "SUCCESS",
         paymentMethod: selectedOption.toUpperCase(),
         orderDetails: cart.map((item: any) => ({
           optionId: item.optionId,
           quantity: item.quantity,
-          price: item.discountPrice
+          price: item.discountPrice,
         })),
       };
 
       console.log("Dữ liệu gửi lên API:", orderData);
 
       const orderResponse = await createOrder(orderData, token);
-      console.log(orderResponse)
+      console.log(orderResponse);
 
-      notification.success({ message: "Đặt hàng thành công! Tiếp đến bạn sẽ phải thanh toán" });
+      if (selectedOption === "Cash") {
+        notification.success({ message: "Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng." });
+        sessionStorage.removeItem("cartItems"); 
+        navigate("/account/orders");
+        return;
+      }
 
       if (selectedOption === "vnpay") {
         const orderId = orderResponse.orderId;
@@ -181,9 +188,11 @@ function Payment() {
 
         const paymentResponse = await createVnPayPayment(totalPrices, orderInfo, orderId, token);
         notification.success({ message: "Tạo thành công đơn thanh toán VNPay" });
+
         if (paymentResponse?.paymentUrl) {
           sessionStorage.setItem("awaitingPayment", "true");
           window.location.href = paymentResponse.paymentUrl;
+          sessionStorage.removeItem("cartItems"); 
         } else {
           notification.error({ message: "Lỗi khi tạo thanh toán VNPay." });
         }
@@ -193,6 +202,7 @@ function Payment() {
       notification.error({ message: "Có lỗi xảy ra, vui lòng thử lại." });
     }
   };
+
 
   const fetchProvinces = async () => {
     let provinces = null;

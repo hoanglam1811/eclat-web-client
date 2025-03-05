@@ -132,7 +132,11 @@ const AccountChangePassword = () => {
 
                     {/* Change Password Section */}
                     <section className="bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-5 col-end-12">
-                        <h2 className="text-lg font-bold text-gray-800">Đổi mật khẩu</h2>
+                        <h2 className="text-2xl font-extrabold text-gray-800 flex items-center gap-2 border-b-2 border-gray-300 pb-2">
+                            <KeyOutlined className="text-red-500" />
+                            Đổi Mật Khẩu
+                        </h2>
+
                         <form className="space-y-6">
                             <div className="max-w-5xl mx-auto p-6 bg-[rgba(255,255,255,0.75)] rounded-md">
                                 {/* Old Password */}

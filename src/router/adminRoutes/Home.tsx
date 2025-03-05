@@ -259,7 +259,7 @@ function Home() {
   console.log(selectedProduct)
 
   const totalQuantity = selectedProduct?.options
-    ? selectedProduct.options.reduce((total:any, option:any) => total + (option.quantity || 0), 0)
+    ? selectedProduct.options.reduce((total: any, option: any) => total + (option.quantity || 0), 0)
     : 0;
 
   const showProductModal = (product: Product) => {
@@ -282,7 +282,7 @@ function Home() {
 
   const fetchOrders = async () => {
     try {
-      if(!token) {
+      if (!token) {
         return;
       }
       const [response, users] = await Promise.all([
@@ -326,8 +326,8 @@ function Home() {
                 <div className="antd-pro-pages-dashboard-analysis-style-salesExtra">
                   <Radio.Group onChange={(e) => setFilter(e.target.value)} defaultValue="all">
                     <Radio.Button value="all">Tất cả</Radio.Button>
-                    <Radio.Button value="VNPAY">VNPAY</Radio.Button>
-                    <Radio.Button value="Tiền mặt">Tiền mặt</Radio.Button>
+                    <Radio.Button value="vnpay">VNPAY</Radio.Button>
+                    <Radio.Button value="Cash">Tiền mặt</Radio.Button>
                   </Radio.Group>
                 </div>
               </div>
@@ -357,9 +357,9 @@ function Home() {
                             className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
                             onClick={() => showProductModal(item.optionResponse[0].product)}
                           >
-                            {item.optionResponse[0].product.productName+" "
-                            +item.optionResponse[0].optionValue + 
-                            (index < order.orderDetails.length - 1 ? ", " : "")}
+                            {item.optionResponse[0].product.productName + " "
+                              + item.optionResponse[0].optionValue +
+                              (index < order.orderDetails.length - 1 ? ", " : "")}
                           </span>
                         ))}
 
@@ -376,14 +376,14 @@ function Home() {
                       </td>
                       <td>
                         <span
-                          className={`px-2 py-1 rounded font-semibold ${order.status === "PAID"
+                          className={`px-2 py-1 rounded font-semibold ${order.status === "PAID" || "SUCCESS"
                             ? "bg-green-500 text-white"
                             : order.status === "Đã hủy"
                               ? "bg-red-500 text-white"
                               : "bg-gray-300 text-black"
                             }`}
                         >
-                          {order.status === "PAID" ? "Thành công" : "Đã huỷ"}
+                          {order.status === "PAID" || "SUCCESS" ? "Thành công" : "Đã huỷ"}
                         </span>
                       </td>
 
@@ -398,7 +398,7 @@ function Home() {
                       <td >
                         <div className="flex items-center gap-2">
                           <MdOutlinePayment style={{ fontSize: "16px" }} />
-                          {order?.paymentMethod}
+                          {order.paymentMethod === "Cash" ? "Tiền mặt" : order.paymentMethod === "vnpay" ? "VNPay" : "Khác"}
                         </div>
 
                       </td>
@@ -446,7 +446,7 @@ function Home() {
 
             {/* Hiển thị nhiều hình ảnh sản phẩm */}
             <div className="flex gap-2 overflow-x-auto mb-4">
-              {selectedProduct.images.map((img:any, index:number) => (
+              {selectedProduct.images.map((img: any, index: number) => (
                 <img
                   key={index}
                   src={img}
@@ -478,7 +478,7 @@ function Home() {
             {/* Tùy chọn sản phẩm */}
             <div className="mt-6">
               <h3 className="text-lg font-semibold text-blue-700">Tùy chọn sản phẩm:</h3>
-              {selectedProduct.options.map((_option:any, index:number) => (
+              {selectedProduct.options.map((_option: any, index: number) => (
                 <div key={index} className="border p-4 rounded-lg shadow-sm mt-2">
 
                   <div className="grid grid-cols-2 gap-4 ml-12">
@@ -513,7 +513,7 @@ function Home() {
                   </div>
 
                   <div className="flex justify-center gap-2 mt-6">
-                    {_option.optionImages.map((img:any, idx:number) => (
+                    {_option.optionImages.map((img: any, idx: number) => (
                       <img key={idx} src={img} alt="Hình ảnh" className="w-16 h-16 rounded-lg" />
                     ))}
                   </div>

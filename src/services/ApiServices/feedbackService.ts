@@ -70,3 +70,17 @@ export async function deleteFeedbackById(feedbackId: number, token: string) {
         throw error;
     }
 }
+
+export async function getFeedbackByProductId(productId: any, token: any) {
+    try {
+        const response = await axios.get(`${BASE_URL}/feedback/product/${productId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Failed to fetch feedback by product ID:", error);
+        throw error;
+    }
+}

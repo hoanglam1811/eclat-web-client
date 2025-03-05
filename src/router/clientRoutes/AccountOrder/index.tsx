@@ -89,7 +89,7 @@ const AccountOrder = () => {
                 setFeedbacks(feedbackData);
             }
         } catch (error) {
-            notification.error({ message: "Lỗi khi tải đánh giá!" });
+            console.error("Lỗi khi tải danh sách đơn hàng:", error);
         }
     };
 

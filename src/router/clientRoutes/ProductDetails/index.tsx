@@ -14,6 +14,14 @@ import { useKeenSlider } from "keen-slider/react";
 import "keen-slider/keen-slider.min.css";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Star } from "lucide-react";
+import { getFeedbackByProductId } from "../../../services/ApiServices/feedbackService";
+import { format } from "date-fns";
+
+
+const getRandomColor = () => {
+    const colors = ["bg-blue-500", "bg-red-500", "bg-green-500", "bg-yellow-500", "bg-purple-500"];
+    return colors[Math.floor(Math.random() * colors.length)];
+};
 
 const ProductDetails = () => {
     const { TabPane } = Tabs;
@@ -31,6 +39,9 @@ const ProductDetails = () => {
     const [tabIndex, setTabIndex] = useState(1);
     const [selectedOption, setSelectedOption] = useState<any>(null);
     const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+    const [feedbacks, setFeedbacks] = useState<any[]>([]);
+    const [averageRating, setAverageRating] = useState<number | null>(null);
+    const [totalReviews, setTotalReviews] = useState<number>(0);
 
     const [sliderRef, instanceRef] = useKeenSlider({
         slides: { perView: 5 },
@@ -77,8 +88,31 @@ const ProductDetails = () => {
     }, [id]);
 
     useEffect(() => {
+        const fetchFeedbacks = async () => {
+            try {
+                const response = await getFeedbackByProductId(id, token);
+                if (response.result) {
+                    setFeedbacks(response.result);
+
+                    const totalRating = response.result.reduce((sum: number, feedback: any) => sum + feedback.rating, 0);
+                    const totalFeedbacks = response.result.length;
+                    const avgRating = totalFeedbacks > 0 ? totalRating / totalFeedbacks : 0;
+
+                    setAverageRating(avgRating);
+                    setTotalReviews(totalFeedbacks);
+                }
+            } catch (error) {
+                console.error("Lỗi khi tải feedbacks:", error);
+            }
+        };
+
+        if (id) {
+            fetchFeedbacks();
+        }
+    }, [id, token]);
+
+    useEffect(() => {
         const fetchRelatedProducts = async () => {
-            // if (!token) return;
             console.log("product", product)
             if (!product.brandId || !product.skinTypeId) {
                 console.error("Thiếu dữ liệu brand hoặc skinType:", product);
@@ -101,7 +135,6 @@ const ProductDetails = () => {
                     skinTypeId: product.skinTypeId,
                     brandId: product.brandId,
                     imageUrl: product.images,
-                    feedback: product.feedbacks,
                 }));
 
                 setRelatedProducts(filteredProducts);
@@ -215,7 +248,7 @@ const ProductDetails = () => {
                                             />
                                         </button>
 
-                                        <div ref={sliderRef} className="keen-slider" >
+                                        <div ref={sliderRef} className="keen-slider mt-3" >
                                             {product?.images.map((img: any, index: number) => (
                                                 <div key={index} className={`keen-slider__slide ${currentImage == img && "border-4 border-orange-500 rounded-lg"}`}
                                                     style={{ padding: "10px" }}>
@@ -268,23 +301,17 @@ const ProductDetails = () => {
                                     {/* Ratings & Reviews */}
                                     <div className="flex ml-20 items-center space-x-3 mb-6">
                                         <span className="text-xl font-bold text-yellow-600">
-                                            {product?.average_rating ? `${product.average_rating.toFixed(1)}` : "Chưa có đánh giá"}
+                                            {averageRating !== null ? `${averageRating.toFixed(1)}` : "Chưa có đánh giá"}
                                         </span>
                                         <div className="flex space-x-1">
                                             {Array.from({ length: 5 }, (_, index) => {
-                                                const rating = product?.average_rating ?? 0;
-                                                const isFullStar = index < Math.floor(rating);
-                                                const isHalfStar = index === Math.floor(rating) && rating % 1 >= 0.5;
+                                                const isFullStar = index < Math.floor(averageRating ?? 0);
+                                                const isHalfStar = index === Math.floor(averageRating ?? 0) && (averageRating ?? 0) % 1 >= 0.5;
 
                                                 return (
                                                     <span
                                                         key={index}
-                                                        className={`text-lg ${isFullStar
-                                                            ? "text-yellow-500"
-                                                            : isHalfStar
-                                                                ? "text-yellow-300"
-                                                                : "text-gray-400"
-                                                            }`}
+                                                        className={`text-lg ${isFullStar ? "text-yellow-500" : isHalfStar ? "text-yellow-300" : "text-gray-400"}`}
                                                     >
                                                         {!isFullStar ? "☆" : "⭐"}
                                                     </span>
@@ -292,8 +319,8 @@ const ProductDetails = () => {
                                             })}
                                         </div>
                                         <span className="text-xl text-gray-600">|</span>
-                                        {product?.total_reviews ? (
-                                            <span className="text-lg text-gray-600 font-medium">{product.total_reviews} đánh giá</span>
+                                        {totalReviews > 0 ? (
+                                            <span className="text-lg text-gray-600 font-medium">{totalReviews} đánh giá</span>
                                         ) : (
                                             <span className="text-lg text-gray-400">Chưa có đánh giá</span>
                                         )}
@@ -517,31 +544,31 @@ const ProductDetails = () => {
                     )}
 
                     {tabIndex === 2 && (
-                        <div className="p-6 bg-gray-100 rounded-lg shadow">
-                            <h2 className="text-xl font-bold text-gray-700 mb-4">Đánh giá sản phẩm</h2>
-                            {product?.feedbacks && product.feedbacks.length > 0 ? (
-                                <div className="space-y-4">
-                                    {product.feedbacks.map((review: any, index: number) => (
-                                        <div key={index} className="p-4 bg-white rounded-lg shadow-sm flex items-start space-x-4">
-                                            <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-700 font-semibold">
+                        <div className="p-6 bg-white rounded-xl">
+                            {feedbacks.length > 0 ? (
+                                <div className="space-y-6">
+                                    {feedbacks.map((review, index) => (
+                                        <div key={index} className="p-6 bg-gray-50 rounded-lg flex items-start space-x-5 transition-shadow duration-300">
+                                            {/* Avatar ngẫu nhiên */}
+                                            <div className={`w-12 h-12 ${getRandomColor()} rounded-full flex items-center justify-center text-white font-bold text-lg`}>
                                                 {review.username?.charAt(0).toUpperCase()}
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-gray-600 text-sm">{review.create_at}</span>
+                                                    <span className="text-gray-500 text-sm">{format(new Date(review.createAt), "dd/MM/yyyy")}</span>
                                                     <div className="flex">
                                                         {[...Array(5)].map((_, i) => (
-                                                            <Star key={i} size={18} className={i < review.rating ? "text-yellow-500" : "text-gray-300"} fill={i < review.rating ? "currentColor" : "none"} />
+                                                            <Star key={i} size={20} className={i < review.rating ? "text-yellow-400" : "text-gray-300"} fill={i < review.rating ? "currentColor" : "none"} />
                                                         ))}
                                                     </div>
                                                 </div>
-                                                <p className="text-gray-800 text-md">{review.text}</p>
+                                                <p className="text-gray-900 text-lg font-medium">{review.text.charAt(0).toUpperCase() + review.text.slice(1)}</p>
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-gray-500 text-sm">Chưa có đánh giá nào.</p>
+                                <p className="text-gray-500 text-center text-md">Chưa có đánh giá nào.</p>
                             )}
                         </div>
                     )}

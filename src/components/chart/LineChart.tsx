@@ -63,7 +63,8 @@ function LineChart({ }) {
           colors: Array(9).fill("#8c8c8c"),
         },
       },
-      categories: ["Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+      // categories: ["Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+      categories: chartData?.dates,
     },
     tooltip: {
       y: {
@@ -82,18 +83,22 @@ function LineChart({ }) {
 
     orders.forEach((order: any) => {
       const date = new Date(order.createAt).toLocaleDateString("vi-VN");
-      const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * 0.2, 0);
+      
+      const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity * 0.2, 0);
+      console.log("revenue", revenue);
 
       if (!revenueByDate[date]) {
         revenueByDate[date] = { vnpay: 0, cash: 0 };
       }
 
-      if (order.paymentMethod === "vnpay") {
+      if (order.paymentMethod.toLowerCase() === "vnpay") {
         revenueByDate[date].vnpay += revenue;
-      } else if (order.paymentMethod === "Cash") {
+      } else if (order.paymentMethod.toLowerCase() === "cash") {
         revenueByDate[date].cash += revenue;
       }
     });
+    console.log("revenueByDate", revenueByDate);
+    
 
     const dates = Object.keys(revenueByDate).sort();
     const vnpayData = dates.map((date) => revenueByDate[date].vnpay);

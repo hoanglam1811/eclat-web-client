@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Row, Typography, Radio, Modal } from "antd";
+import { Card, Col, Row, Typography, Radio, Modal, Tooltip } from "antd";
 import { FaShoppingCart, FaUserCircle, FaPhone, FaIdBadge, FaCheckCircle } from "react-icons/fa";
 import { MdDateRange, MdOutlinePayment } from "react-icons/md";
 import LineChart from "../../components/chart/LineChart";
@@ -43,213 +43,6 @@ function Home() {
   const [filter, setFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-
-  const orders = [
-    {
-      orderId: "DH001",
-      product: "Serum Vitamin C",
-      quantity: 5,
-      status: "Thành công",
-      paymentMethod: "VNPAY",
-      purchaseDate: "2025-02-26",
-      customer: {
-        id: "KH001",
-        username: "Nguyễn Văn A",
-        phone: "0987654321",
-        status: "Active",
-      },
-      productDetails: {
-        productName: "Serum Vitamin C",
-        brand: "Skincare Pro",
-        origin: "Hàn Quốc",
-        category: "Serum",
-        skinType: "Mọi loại da",
-        description: "Serum dưỡng da giúp làm sáng và đều màu da, giàu vitamin C.",
-        images: [
-          "https://example.com/serum-vitamin-c-1.jpg",
-          "https://example.com/serum-vitamin-c-2.jpg",
-        ],
-        options: [
-          {
-            optionValue: "30ml",
-            quantity: 10,
-            optionPrice: 500000,
-            discPrice: 450000,
-            images: ["https://example.com/serum-vitamin-c-30ml.jpg"],
-          },
-          {
-            optionValue: "50ml",
-            quantity: 5,
-            optionPrice: 700000,
-            discPrice: 650000,
-            images: ["https://example.com/serum-vitamin-c-50ml.jpg"],
-          },
-        ],
-      },
-    },
-    {
-      orderId: "DH002",
-      product: "Kem dưỡng ẩm",
-      purchaseDate: "2025-02-26",
-      quantity: 3,
-      status: "Thành công",
-      paymentMethod: "Tiền mặt",
-      customer: {
-        id: "KH002",
-        username: "Trần Thị B",
-        phone: "0978123456",
-        status: "Pending",
-      },
-      productDetails: {
-        productName: "Kem dưỡng ẩm",
-        brand: "AquaSkin",
-        origin: "Nhật Bản",
-        category: "Kem dưỡng",
-        skinType: "Da khô",
-        description: "Kem dưỡng ẩm giúp cấp nước và giữ ẩm cho da trong 24h.",
-        images: [
-          "https://example.com/kem-duong-am-1.jpg",
-          "https://example.com/kem-duong-am-2.jpg",
-        ],
-        options: [
-          {
-            optionValue: "50g",
-            quantity: 8,
-            optionPrice: 350000,
-            discPrice: 320000,
-            images: ["https://example.com/kem-duong-am-50g.jpg"],
-          },
-          {
-            optionValue: "100g",
-            quantity: 4,
-            optionPrice: 600000,
-            discPrice: 550000,
-            images: ["https://example.com/kem-duong-am-100g.jpg"],
-          },
-        ],
-      },
-    },
-    {
-      orderId: "DH003",
-      product: "Toner Hoa Hồng",
-      purchaseDate: "2025-02-26",
-      quantity: 2,
-      status: "Thành công",
-      paymentMethod: "VNPAY",
-      customer: {
-        id: "KH003",
-        username: "Lê Quốc C",
-        phone: "0912345678",
-        status: "Inactive",
-      },
-      productDetails: {
-        productName: "Toner Hoa Hồng",
-        brand: "NatureCare",
-        origin: "Pháp",
-        category: "Toner",
-        skinType: "Da nhạy cảm",
-        description: "Toner chiết xuất từ hoa hồng giúp cân bằng độ pH và làm dịu da.",
-        images: [
-          "https://example.com/toner-hoa-hong-1.jpg",
-          "https://example.com/toner-hoa-hong-2.jpg",
-        ],
-        options: [
-          {
-            optionValue: "150ml",
-            quantity: 6,
-            optionPrice: 250000,
-            discPrice: 220000,
-            images: ["https://example.com/toner-hoa-hong-150ml.jpg"],
-          },
-        ],
-      },
-    },
-    {
-      orderId: "DH004",
-      product: "Sữa rửa mặt dịu nhẹ",
-      purchaseDate: "2025-02-26",
-      quantity: 6,
-      status: "Thành công",
-      paymentMethod: "Tiền mặt",
-      customer: {
-        id: "KH004",
-        username: "Phạm Minh D",
-        phone: "0901234567",
-        status: "Active",
-      },
-      productDetails: {
-        productName: "Sữa rửa mặt dịu nhẹ",
-        brand: "FreshSkin",
-        origin: "Mỹ",
-        category: "Sữa rửa mặt",
-        skinType: "Da dầu",
-        description: "Sữa rửa mặt giúp làm sạch bụi bẩn và kiểm soát dầu nhờn.",
-        images: [
-          "https://example.com/sua-rua-mat-1.jpg",
-          "https://example.com/sua-rua-mat-2.jpg",
-        ],
-        options: [
-          {
-            optionValue: "100ml",
-            quantity: 15,
-            optionPrice: 300000,
-            discPrice: 270000,
-            images: ["https://example.com/sua-rua-mat-100ml.jpg"],
-          },
-          {
-            optionValue: "200ml",
-            quantity: 8,
-            optionPrice: 500000,
-            discPrice: 450000,
-            images: ["https://example.com/sua-rua-mat-200ml.jpg"],
-          },
-        ],
-      },
-    },
-    {
-      orderId: "DH005",
-      product: "Mặt nạ dưỡng da",
-      purchaseDate: "2025-02-26",
-      quantity: 4,
-      status: "Thành công",
-      paymentMethod: "VNPAY",
-      customer: {
-        id: "KH005",
-        username: "Ngô Thị E",
-        phone: "0967123456",
-        status: "Active",
-      },
-      productDetails: {
-        productName: "Mặt nạ dưỡng da",
-        brand: "GlowUp",
-        origin: "Hàn Quốc",
-        category: "Mặt nạ",
-        skinType: "Da thường",
-        description: "Mặt nạ cấp ẩm sâu, giúp da căng bóng và mịn màng.",
-        images: [
-          "https://example.com/mat-na-1.jpg",
-          "https://example.com/mat-na-2.jpg",
-        ],
-        options: [
-          {
-            optionValue: "Hộp 5 miếng",
-            quantity: 12,
-            optionPrice: 150000,
-            discPrice: 130000,
-            images: ["https://example.com/mat-na-5-mieng.jpg"],
-          },
-          {
-            optionValue: "Hộp 10 miếng",
-            quantity: 6,
-            optionPrice: 280000,
-            discPrice: 250000,
-            images: ["https://example.com/mat-na-10-mieng.jpg"],
-          },
-        ],
-      },
-    },
-  ];
-
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [order, setOrders] = useState<any[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
@@ -331,10 +124,11 @@ function Home() {
                   <tr>
                     <th>Mã đơn</th>
                     <th>Sản phẩm</th>
-                    <th>Số lượng mua</th>
+                    <th>Số lượng</th>
                     <th>Khách hàng</th>
                     <th>Trạng thái đơn</th>
                     <th>Ngày mua</th>
+                    <th>Tổng đơn</th>
                     <th>Hình thức thanh toán</th>
                   </tr>
                 </thead>
@@ -343,7 +137,7 @@ function Home() {
                     <tr key={index}>
                       <td><h6>{order.orderId}</h6></td>
                       <td
-                        style={{ maxWidth: "1000px", display: "block", wordWrap: "break-word", whiteSpace: "normal" }}
+                        style={{ maxWidth: "1000px", wordWrap: "break-word", whiteSpace: "normal" }}
                       >
                         {order.orderDetails.map((item: any, index: number) => (
                           <span key={index}
@@ -369,17 +163,17 @@ function Home() {
                       </td>
                       <td>
                         <span
-                          className={`px-2 py-1 rounded font-semibold ${order.status === "PAID" || "SUCCESS"
+                          className={`px-2 py-1 rounded font-semibold ${order.status === "PAID" || order.status === "SUCCESS" || order.status === "success"
                             ? "bg-green-500 text-white"
                             : order.status === "Đã hủy"
                               ? "bg-red-500 text-white"
                               : "bg-gray-300 text-black"
                             }`}
                         >
-                          {order.status === "PAID" || "SUCCESS" ? "Thành công" : "Đã huỷ"}
+                          {order.status === "PAID" || order.status === "success" || order.status === "SUCCESS" ? "Thành công" : "Đã huỷ"}
                         </span>
-                      </td>
 
+                      </td>
                       <td >
                         <div className="flex items-center gap-2">
                           <MdDateRange style={{ fontSize: "16px", color: "#1890ff" }} />
@@ -387,6 +181,30 @@ function Home() {
                         </div>
 
                       </td>
+                      <td>
+                        <Tooltip
+                          title={
+                            <div>
+                              {order.orderDetails.map((item: any, index: number) => (
+                                <div key={index}>
+                                  {`${item.optionResponse[0].optionValue} x ${item.quantity}: `}
+                                  <strong>
+                                    {(item.price * item.quantity).toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}
+                                  </strong>
+                                </div>
+                              ))}
+                            </div>
+                          }
+                        >
+                          <span className="cursor-pointer text-blue-500 font-semibold flex items-center gap-1 hover:underline">
+                            {order.totalPrices.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}
+                          </span>
+                        </Tooltip>
+                      </td>
+
 
                       <td >
                         <div className="flex items-center gap-2">
@@ -418,15 +236,15 @@ function Home() {
             </p>
             <p className="flex items-center gap-2">
               <FaUserCircle className="text-blue-500" />
-              <b>Username:</b> {selectedCustomer.username}
+              <b>Tên người dùng:</b> {selectedCustomer.username}
             </p>
             <p className="flex items-center gap-2">
               <FaPhone className="text-blue-500" />
-              <b>Phone:</b> {selectedCustomer.phone}
+              <b>SĐT:</b> {selectedCustomer.phone}
             </p>
             <p className="flex items-center gap-2">
               <FaCheckCircle className="text-green-500" />
-              <b>Status:</b> {selectedCustomer.status}
+              <b>Trạng thái:</b> {selectedCustomer.status}
             </p>
           </div>
         )}

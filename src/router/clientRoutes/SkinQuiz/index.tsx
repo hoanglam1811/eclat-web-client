@@ -62,8 +62,8 @@ export default function SkinQuiz() {
 
         if (skinTypeNames.length > 0) {
             setSkinType(skinTypeNames.join(", "));
-            const randomSkinType = skinTypeNames[Math.floor(Math.random() * skinTypeNames.length)];
-            sessionStorage.setItem("selectedSkinType", JSON.stringify([randomSkinType]));
+            const firstSkinType = skinTypeNames[0];
+            sessionStorage.setItem("selectedSkinType", JSON.stringify([firstSkinType]));
         } else {
             setSkinType(null);
         }

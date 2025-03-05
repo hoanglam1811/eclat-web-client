@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import ProductSkeleton from "./ProductSkeleton";
 import { ProductCard } from "../../../components/footer/components/Home";
 import { Button, Input, Select, Slider } from "antd";
-import { Carousel } from 'antd';
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { getAllProducts } from "../../../services/ApiServices/productService";
@@ -17,7 +16,7 @@ import { Search } from "lucide-react";
 
 const Products = () => {
     const [searchTerm, setSearchTerm] = useState<string>("");
-    
+
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value);
@@ -73,7 +72,7 @@ const Products = () => {
         if (storedBrand) {
             setSelectedBrands([JSON.parse(storedBrand)]);
         }
-    
+
         const storedSkinType = sessionStorage.getItem("selectedSkinType");
         if (storedSkinType) {
             setSelectedSkinTypes(JSON.parse(storedSkinType));
@@ -131,7 +130,7 @@ const Products = () => {
         }
     };
 
-    
+
     useEffect(() => {
         fetchProducts();
     }, []);

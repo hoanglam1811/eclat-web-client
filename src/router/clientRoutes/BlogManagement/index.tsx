@@ -37,7 +37,7 @@ export default function SkincareBlogManagement() {
                 navigate("/login");
                 return;
             }
-            const response = await getAllBlogs(token);
+            const response = await getAllBlogs();
             if (response.status === "ok") {
                 setArticles(response.data);
             } else {

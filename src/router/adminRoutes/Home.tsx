@@ -84,7 +84,7 @@ function Home() {
       ]);
 
       console.log(response);
-      console.log("users",users);
+      console.log("users", users);
       setUsers(users.result);
       setOrders(response);
       console.log(response);
@@ -251,7 +251,7 @@ function Home() {
             </p>
             <p className="flex items-center gap-2">
               <FaCheckCircle className="text-green-500" />
-              <b>Status:</b> {selectedCustomer.status ? "Hoạt động" : "Không hoạt động"}
+              <b>Trạng thái:</b> {selectedCustomer.status ? "Hoạt động" : "Không hoạt động"}
             </p>
           </div>
         )}

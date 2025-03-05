@@ -75,7 +75,7 @@ function LineChart({ }) {
 
   const series = [
     { name: "VNPAY", data: chartData.vnpayData, offsetY: 0 },
-    { name: "Cash", data: chartData.cashData, offsetY: 0 },
+    { name: "Tiền mặt", data: chartData.cashData, offsetY: 0 },
   ];
 
   const processChartData = (orders: any) => {

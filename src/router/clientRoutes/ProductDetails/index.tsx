@@ -547,7 +547,7 @@ const ProductDetails = () => {
                         <div className="p-6 bg-white rounded-xl">
                             {feedbacks.length > 0 ? (
                                 <div className="space-y-6">
-                                    {feedbacks.map((review, index) => (
+                                    {feedbacks.map((review: any, index: any) => (
                                         <div key={index} className="p-6 bg-gray-50 rounded-lg flex items-start space-x-5 transition-shadow duration-300">
                                             {/* Avatar ngẫu nhiên */}
                                             <div className={`w-12 h-12 ${getRandomColor()} rounded-full flex items-center justify-center text-white font-bold text-lg`}>
@@ -555,13 +555,24 @@ const ProductDetails = () => {
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex justify-between items-center mb-2">
-                                                    <span className="text-gray-500 text-sm">{format(new Date(review.createAt), "dd/MM/yyyy")}</span>
+                                                    <div className="text-gray-500 text-sm">
+                                                        <span>{format(new Date(review.createAt), "dd/MM/yyyy")}</span>
+                                                        <div className="text-left">
+                                                            <strong>{review.orderDetail.optionValue}</strong>
+                                                        </div>
+                                                    </div>
                                                     <div className="flex">
                                                         {[...Array(5)].map((_, i) => (
-                                                            <Star key={i} size={20} className={i < review.rating ? "text-yellow-400" : "text-gray-300"} fill={i < review.rating ? "currentColor" : "none"} />
+                                                            <Star
+                                                                key={i}
+                                                                size={20}
+                                                                className={i < review.rating ? "text-yellow-400" : "text-gray-300"}
+                                                                fill={i < review.rating ? "currentColor" : "none"}
+                                                            />
                                                         ))}
                                                     </div>
                                                 </div>
+
                                                 <p className="text-gray-900 text-lg font-medium">{review.text.charAt(0).toUpperCase() + review.text.slice(1)}</p>
                                             </div>
                                         </div>

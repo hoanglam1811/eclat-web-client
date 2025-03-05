@@ -6,6 +6,9 @@ import LineChart from "../../components/chart/LineChart";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { getAllPayments } from "../../services/ApiServices/vnpayService";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { getOrders } from "../../services/ApiServices/orderService";
 
 
 interface Customer {
@@ -248,12 +251,13 @@ function Home() {
   ];
 
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [transactions, setTransactions] = useState<any[]>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [order, setOrders] = useState<any[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const token = useSelector((state: RootState) => state.token.token);
   console.log(selectedProduct)
 
   const totalQuantity = selectedProduct?.options
-    ? selectedProduct.options.reduce((total, option) => total + (option.quantity || 0), 0)
+    ? selectedProduct.options.reduce((total:any, option:any) => total + (option.quantity || 0), 0)
     : 0;
 
   const showProductModal = (product: Product) => {
@@ -274,10 +278,15 @@ function Home() {
     setIsModalOpen(true);
   };
 
-  const fetchTransactions = async () => {
+  const fetchOrders = async () => {
     try {
-      const response = await getAllPayments()
-      setTransactions(response);
+      if(!token) {
+        return;
+      }
+      const response = await getOrders(token)
+      console.log(response);
+      
+      setOrders(response);
       console.log(response);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
@@ -285,7 +294,7 @@ function Home() {
   };
 
   useEffect(() => {
-    fetchTransactions();
+    fetchOrders();
   }, [])
 
   return (
@@ -330,37 +339,45 @@ function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {transactions.map((order, index) => (
+                  {order.map((order, index) => (
                     <tr key={index}>
-                      <td><h6>{order.order.orderId}</h6></td>
+                      <td><h6>{order.orderId}</h6></td>
                       <td
-                        className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
-                        style={{ maxWidth: "250px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}
-                        // onClick={() => showProductModal(order.productDetails)}
+                        style={{ maxWidth: "1000px", display: "block", wordWrap: "break-word", whiteSpace: "normal" }}
+                        // onClick={() => showProductModal(orders[index].productDetails)}
                       >
-                        {order.order.orderDetails.map((item: any) => item.optionResponse[0].product.productName+" "
-                          +item.optionResponse[0].optionValue).join(", ")}
+                        {order.orderDetails.map((item: any, index: number) => (
+                          <span key={index}
+                            className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
+                            onClick={() => showProductModal(item.optionResponse[0].product)}
+                          >
+                            {item.optionResponse[0].product.productName+" "
+                            +item.optionResponse[0].optionValue + 
+                            (index < order.orderDetails.length - 1 ? ", " : "")}
+                          </span>
+                        ))}
+
                       </td>
-                      <td><span className="text-xs font-weight-bold">{order.order.orderDetails
+                      <td><span className="text-xs font-weight-bold">{order.orderDetails
                         .reduce((sum: number, item: any) => sum + item.quantity, 0)}</span></td>
                       <td>
                         <span
                           className="cursor-pointer text-blue-500 font-semibold flex items-center gap-1 hover:underline"
                           // onClick={() => showModal(order.customer)}
                         >
-                          {order.order.userId}
+                          {order.userId}
                         </span>
                       </td>
                       <td>
                         <span
-                          className={`px-2 py-1 rounded font-semibold ${order.status === "SUCCESS"
+                          className={`px-2 py-1 rounded font-semibold ${order.status === "PAID"
                             ? "bg-green-500 text-white"
                             : order.status === "Đã hủy"
                               ? "bg-red-500 text-white"
                               : "bg-gray-300 text-black"
                             }`}
                         >
-                          {order.status === "SUCCESS" ? "Thành công" : "Đã huỷ"}
+                          {order.status === "PAID" ? "Thành công" : "Đã huỷ"}
                         </span>
                       </td>
 
@@ -423,7 +440,7 @@ function Home() {
 
             {/* Hiển thị nhiều hình ảnh sản phẩm */}
             <div className="flex gap-2 overflow-x-auto mb-4">
-              {selectedProduct.images.map((img, index) => (
+              {selectedProduct.images.map((img:any, index:number) => (
                 <img
                   key={index}
                   src={img}
@@ -435,10 +452,10 @@ function Home() {
 
             {/* Thông tin chi tiết */}
             <div className="grid grid-cols-2 gap-4">
-              <p><b>Thương hiệu:</b> {selectedProduct.brand}</p>
-              <p><b>Xuất xứ:</b> {selectedProduct.origin}</p>
-              <p><b>Loại sản phẩm:</b> {selectedProduct.category}</p>
-              <p><b>Loại da:</b> {selectedProduct.skinType}</p>
+              <p><b>Thương hiệu:</b> {selectedProduct.brand.brandName}</p>
+              <p><b>Xuất xứ:</b> {selectedProduct.originCountry}</p>
+              <p><b>Loại sản phẩm:</b> {selectedProduct.tag?.category?.categoryName}</p>
+              <p><b>Loại da:</b> {selectedProduct.skinType.skinName}</p>
             </div>
 
             {/* Mô tả sản phẩm */}
@@ -454,49 +471,49 @@ function Home() {
 
             {/* Tùy chọn sản phẩm */}
             <div className="mt-6">
-              <h3 className="text-lg font-semibold text-blue-700">Tùy chọn sản phẩm:</h3>
-              {selectedProduct.options.map((_option, index) => (
-                <div key={index} className="border p-4 rounded-lg shadow-sm mt-2">
+              {/* <h3 className="text-lg font-semibold text-blue-700">Tùy chọn sản phẩm:</h3> */}
+              {/* {selectedProduct.options.map((_option:any, index:number) => ( */}
+              {/*   <div key={index} className="border p-4 rounded-lg shadow-sm mt-2"> */}
 
-                  <div className="grid grid-cols-2 gap-4 ml-12">
-                    <div className="col-span-1">
-                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
-                        Tên tùy chọn
-                      </Label>
-                      <p className="w-full">{_option.optionValue}</p>
-                    </div>
-                    <div className="col-span-1">
-                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
-                        Số lượng
-                      </Label>
-                      <p className="w-full">{_option.quantity}</p>
-                    </div>
-                  </div>
+              {/*     <div className="grid grid-cols-2 gap-4 ml-12"> */}
+              {/*       <div className="col-span-1"> */}
+              {/*         <Label className="block text-sm font-bold text-blue-500 text-left mb-1"> */}
+              {/*           Tên tùy chọn */}
+              {/*         </Label> */}
+              {/*         <p className="w-full">{_option.optionValue}</p> */}
+              {/*       </div> */}
+              {/*       <div className="col-span-1"> */}
+              {/*         <Label className="block text-sm font-bold text-blue-500 text-left mb-1"> */}
+              {/*           Số lượng */}
+              {/*         </Label> */}
+              {/*         <p className="w-full">{_option.quantity}</p> */}
+              {/*       </div> */}
+              {/*     </div> */}
 
 
-                  <div className="grid grid-cols-2 gap-4 mt-3 ml-12">
-                    <div className="col-span-1">
-                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
-                        Giá gốc
-                      </Label>
-                      <p className="w-full">{_option.optionPrice}</p>
-                    </div>
-                    <div className="col-span-1">
-                      <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
-                        Giá khuyến mãi
-                      </Label>
-                      <p className="w-full">{_option.discPrice}</p>
-                    </div>
-                  </div>
+              {/*     <div className="grid grid-cols-2 gap-4 mt-3 ml-12"> */}
+              {/*       <div className="col-span-1"> */}
+              {/*         <Label className="block text-sm font-bold text-blue-500 text-left mb-1"> */}
+              {/*           Giá gốc */}
+              {/*         </Label> */}
+              {/*         <p className="w-full">{_option.optionPrice}</p> */}
+              {/*       </div> */}
+              {/*       <div className="col-span-1"> */}
+              {/*         <Label className="block text-sm font-bold text-blue-500 text-left mb-1"> */}
+              {/*           Giá khuyến mãi */}
+              {/*         </Label> */}
+              {/*         <p className="w-full">{_option.discPrice}</p> */}
+              {/*       </div> */}
+              {/*     </div> */}
 
-                  <div className="flex justify-center gap-2 mt-6">
-                    {_option.images.map((img, idx) => (
-                      <img key={idx} src={img} alt="Hình ảnh" className="w-16 h-16 rounded-lg" />
-                    ))}
-                  </div>
+              {/*     <div className="flex justify-center gap-2 mt-6"> */}
+              {/*       {_option.images.map((img, idx) => ( */}
+              {/*         <img key={idx} src={img} alt="Hình ảnh" className="w-16 h-16 rounded-lg" /> */}
+              {/*       ))} */}
+              {/*     </div> */}
 
-                </div>
-              ))}
+              {/*   </div> */}
+              {/* ))} */}
             </div>
           </div>
         )}

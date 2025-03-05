@@ -146,7 +146,7 @@ const ProductDetails = () => {
                 price: selectedOption.origin_price,
                 discountPrice: selectedOption.discPrice,
                 quantity: quantity,
-                imageUrl: selectedOption.optionImages[0],
+                imageUrl: selectedOption.optionImages?.[0],
                 optionValue: product.productName + " - " + selectedOption.optionValue,
             });
         }
@@ -233,15 +233,15 @@ const ProductDetails = () => {
                                                 </div>
                                             ))}
                                             {product?.options.map((option: any, index: number) => (
-                                                <div key={index} className={`keen-slider__slide ${currentImage == option.optionImages[0] && "border-4 border-orange-500 rounded-lg"}`}
+                                                <div key={index} className={`keen-slider__slide ${currentImage == option.optionImages?.[0] && "border-4 border-orange-500 rounded-lg"}`}
                                                     style={{ padding: "10px" }}>
                                                     <img
                                                         className="w-20 h-20 rounded-lg shadow-md cursor-pointer object-cover"
-                                                        src={option.optionImages[0]}
-                                                        onClick={() => setCurrentImage(option.optionImages[0])}
+                                                        src={option.optionImages?.[0]}
+                                                        onClick={() => setCurrentImage(option.optionImages?.[0])}
                                                         alt={`Slide ${index}`}
                                                     />
-                                                    {currentImage === option.optionImages[0] && (
+                                                    {currentImage === option.optionImages?.[0] && (
                                                         <div className="absolute top-0 right-0 bg-orange-500 rounded-sm text-white w-6 h-6 flex items-center justify-center shadow-md">
                                                             ✔
                                                         </div>
@@ -361,7 +361,7 @@ const ProductDetails = () => {
                                                             >
                                                                 <div className="w-2/3 h-8">
                                                                     <img
-                                                                        src={option.optionImages[0]}
+                                                                        src={option.optionImages?.[0]}
                                                                         alt={option.optionValue}
                                                                         className="w-full h-full object-cover rounded-lg"
                                                                     />

@@ -160,6 +160,7 @@ function Payment() {
         totalPrices,
         address: fullAddress,
         status: "PENDING",
+        paymentMethod: selectedOption.toUpperCase(),
         orderDetails: cart.map((item: any) => ({
           optionId: item.optionId,
           quantity: item.quantity,

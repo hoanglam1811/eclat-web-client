@@ -9,6 +9,7 @@ import { getAllPayments } from "../../services/ApiServices/vnpayService";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { getAllOrders } from "../../services/ApiServices/orderService";
+import { getAllUsers } from "../../services/ApiServices/userService";
 
 
 interface Customer {
@@ -45,6 +46,7 @@ function Home() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [order, setOrders] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const token = useSelector((state: RootState) => state.token.token);
   console.log(selectedProduct)
@@ -76,9 +78,14 @@ function Home() {
       if (!token) {
         return;
       }
-      const response = await getAllOrders(token)
-      console.log(response);
+      const [response, users] = await Promise.all([
+        getAllOrders(token),
+        getAllUsers(token)
+      ]);
 
+      console.log(response);
+      console.log("users",users);
+      setUsers(users.result);
       setOrders(response);
       console.log(response);
     } catch (error) {
@@ -156,9 +163,9 @@ function Home() {
                       <td>
                         <span
                           className="cursor-pointer text-blue-500 font-semibold flex items-center gap-1 hover:underline"
-                        // onClick={() => showModal(order.customer)}
+                          onClick={() => showModal(users.find((user: any) => user.id === order.userId))}
                         >
-                          {order.userId}
+                          {users.find((user: any) => user.id === order.userId)?.username || order.userId}
                         </span>
                       </td>
                       <td>
@@ -244,7 +251,7 @@ function Home() {
             </p>
             <p className="flex items-center gap-2">
               <FaCheckCircle className="text-green-500" />
-              <b>Trạng thái:</b> {selectedCustomer.status}
+              <b>Status:</b> {selectedCustomer.status ? "Hoạt động" : "Không hoạt động"}
             </p>
           </div>
         )}

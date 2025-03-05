@@ -66,7 +66,7 @@ function Home() {
   };
 
   const filteredOrders =
-    filter === "all" ? order : order.filter((order) => order.paymentMethod === filter);
+    filter === "all" ? order : order.filter((order) => order.paymentMethod.toUpperCase() === filter.toUpperCase());
 
   const showModal = (customer: any) => {
     setSelectedCustomer(customer);
@@ -131,7 +131,6 @@ function Home() {
                   <tr>
                     <th>Mã đơn</th>
                     <th>Sản phẩm</th>
-                    <th>Số lượng</th>
                     <th>Khách hàng</th>
                     <th>Trạng thái đơn</th>
                     <th>Ngày mua</th>
@@ -147,19 +146,21 @@ function Home() {
                         style={{ maxWidth: "1000px", wordWrap: "break-word", whiteSpace: "normal" }}
                       >
                         {order.orderDetails.map((item: any, index: number) => (
-                          <span key={index}
-                            className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
-                            onClick={() => showProductModal(item.optionResponse[0].product)}
+                          <div key={index}
                           >
-                            {item.optionResponse[0].product.productName + " "
-                              + item.optionResponse[0].optionValue +
-                              (index < order.orderDetails.length - 1 ? ", " : "")}
-                          </span>
+                            <span>{item.quantity+ " x "}</span>
+                            <span className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
+                              onClick={() => showProductModal(item.optionResponse[0].product)}
+                            >
+                              {item.optionResponse[0].product.productName + " "
+                              + item.optionResponse[0].optionValue + 
+                              (index < order.orderDetails.length - 1 ? ", " : "") }</span>
+                          </div>
                         ))}
 
                       </td>
-                      <td><span className="text-xs font-weight-bold">{order.orderDetails
-                        .reduce((sum: number, item: any) => sum + item.quantity, 0)}</span></td>
+                      {/* <td><span className="text-xs font-weight-bold">{order.orderDetails */}
+                      {/*   .reduce((sum: number, item: any) => sum + item.quantity, 0)}</span></td> */}
                       <td>
                         <span
                           className="cursor-pointer text-blue-500 font-semibold flex items-center gap-1 hover:underline"
@@ -216,7 +217,10 @@ function Home() {
                       <td >
                         <div className="flex items-center gap-2">
                           <MdOutlinePayment style={{ fontSize: "16px" }} />
-                          {order.paymentMethod === "Cash" ? "Tiền mặt" : order.paymentMethod === "vnpay" ? "VNPay" : "Khác"}
+                          {(order.paymentMethod === "Cash" ||  order.paymentMethod === "CASH")
+                            ? "Tiền mặt" :
+                          (order.paymentMethod === "VNPAY" || order.paymentMethod === "vnpay")
+                            ? "VNPay" : "Khác"}
                         </div>
 
                       </td>
@@ -320,13 +324,19 @@ function Home() {
                       <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
                         Giá gốc
                       </Label>
-                      <p className="w-full">{_option.optionPrice}</p>
+                      <p className="w-full">{_option.optionPrice.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}</p>
                     </div>
                     <div className="col-span-1">
                       <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
                         Giá khuyến mãi
                       </Label>
-                      <p className="w-full">{_option.discPrice}</p>
+                      <p className="w-full">{_option.discPrice.toLocaleString("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                    })}</p>
                     </div>
                   </div>
 

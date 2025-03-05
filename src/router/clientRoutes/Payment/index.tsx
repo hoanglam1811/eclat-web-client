@@ -254,6 +254,9 @@ function Payment() {
     if (province?.name_with_type === "Thành phố Hồ Chí Minh") {
       setShippingFee(0);
     }
+    else {
+      setShippingFee(30000);
+    }
   }, [province]);
 
 

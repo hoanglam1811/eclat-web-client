@@ -14,7 +14,7 @@ import { Button } from "../../../components/ui/button";
 import { DeleteOutlined, EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
-import { Input } from "antd";
+import { Input, Select } from "antd";
 import { getAllProducts } from "../../../services/ApiServices/productService";
 import { RootState } from "../../../store/store";
 import { useSelector } from "react-redux";
@@ -29,11 +29,24 @@ const ProductsManagement = () => {
     const navigate = useNavigate();
     const token = useSelector((state: RootState) => state.token.token);
     const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState<string>("all");
+    const statusOptions = [
+      { value: "all", label: 'Tất cả' },
+      { value: "true", label: 'Hoạt động' },
+      { value: "false", label: 'Không hoạt động' }
+    ]
 
     const [currentPage, setCurrentPage] = useState<number>(1);
+    
     const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        (product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.brandId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.skinTypeId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.origin_country.toLowerCase().includes(searchQuery.toLowerCase())
+    ) &&
+        (statusFilter === "all" || product.status === (statusFilter === "true" ? "Hoạt động" : "Không hoạt động"))
     );
+
 
     const totalPages = Math.ceil(filteredProducts?.length / ITEMS_PER_PAGE);
 
@@ -61,12 +74,12 @@ const ProductsManagement = () => {
                         name: product.productName,
                         origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
                         disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
-                        quantity: totalQuantity,
+                        quantity: totalQuantity == 0 ? "Hết hàng" : totalQuantity,
                         origin_country: product.originCountry,
                         skinTypeId: product.skinType.skinName,
                         brandId: product.brand.brandName,
                         imageUrl: product.images[0]?.imageUrl,
-                        status: totalQuantity > 0 ? "Còn hàng" : "Hết hàng",
+                        status: product.status ? "Hoạt động" : "Không hoạt động",
                     };
                 }));                
             })
@@ -88,12 +101,12 @@ const ProductsManagement = () => {
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Input
-                        placeholder="Tìm kiếm theo tên sản phẩm"
+                        placeholder="Tìm kiếm theo tên sản phẩm, loại da, xuất xứ, thương hiệu.."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
                         style={{
-                            width: '400px',
+                            width: '600px',
                             padding: '10px',
                             borderRadius: "8px",
                             border: "1px solid #ddd",
@@ -111,7 +124,21 @@ const ProductsManagement = () => {
                     >
                         <DeleteOutlined />
                     </Button>
+                    <div className="text-left ml-[100px]">
+                      <span>Trạng thái: </span>
+                      <Select
+                        options={statusOptions}
+                        value={statusOptions.find((option) => option.value == statusFilter)}
+                        onChange={(e:any) => {
+                          setStatusFilter(e)
+                        }}
+                        style={{ width: '100%' }}
+                        placeholder="Chọn trang thái"
+                        />
+                    </div>
                 </div>
+
+                
 
                 <Button
                     onClick={() => navigate(RouteNames.PRODUCT_ADDITION)}
@@ -150,6 +177,8 @@ const ProductsManagement = () => {
                 <div style={{ flex: 2 }}>Tên</div>
                 <div style={{ flex: 1 }}>Số lượng</div>
                 <div style={{ flex: 1 }}>Thương hiệu</div>
+                <div style={{ flex: 1 }}>Xuất xứ</div>
+                <div style={{ flex: 1 }}>Loại da</div>
                 <div style={{ flex: 1 }}>Trạng thái</div>
                 <div style={{ flex: 1, textAlign: "center" }}>Hành động</div>
             </div>
@@ -177,6 +206,8 @@ const ProductsManagement = () => {
                     <div style={{ flex: 2 }}>{account.name}</div>
                     <div style={{ flex: 1 }}>{account.quantity}</div>
                     <div style={{ flex: 1 }}>{account.brandId}</div>
+                    <div style={{ flex: 1 }}>{account.origin_country}</div>
+                    <div style={{ flex: 1 }}>{account.skinTypeId}</div>
                     <div style={{ flex: 1 }}>{account.status}</div>
                     <div style={{ flex: 1, textAlign: "center" }}>
                         <Tooltip title="Xem chi tiết">

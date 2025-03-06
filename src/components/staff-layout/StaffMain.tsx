@@ -26,6 +26,8 @@ function StaffMain({ children }:any) {
   let { pathname } = useLocation();
   pathname = pathname.replace("/", "");
 
+  pathname = pathname.replace(/\/\d+$/, "/:id");;
+
   useEffect(() => {
     if (pathname === "rtl") {
       setPlacement("left");

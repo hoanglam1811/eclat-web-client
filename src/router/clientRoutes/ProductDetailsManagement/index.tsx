@@ -9,7 +9,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { originCountries } from "./originCountries";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
-import { getProductById, updateProduct, uploadImage } from "../../../services/ApiServices/productService";
+import { getProductById, updateProduct, updateProductStatus, uploadImage } from "../../../services/ApiServices/productService";
 import { addOption, deleteOption, getOptionById, updateOption } from "../../../services/ApiServices/optionService";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
 import { getAllCategories } from "../../../services/ApiServices/categoryService";
@@ -169,6 +169,7 @@ const FormViewProduct = () => {
             setLoading(true);
 
             await updateProduct(Number(id), data, token);
+            await updateProductStatus(Number(id), data.status, token);
             console.log(imageFiles)
 
             //Update product images
@@ -463,9 +464,20 @@ const FormViewProduct = () => {
                                         </Label>
                                         <Select
                                             value={{
-                                                label: product.status == true ? "Còn hàng" : "Tạm ẩn",
-                                                value: product.status == true
+                                                label: watch("status") == true ? "Hoạt động" : "Không hoạt động",
+                                                value: watch("status")
                                             }}
+                                            options={[
+                                              {
+                                                  label: "Hoạt động",
+                                                  value: true
+                                              },
+                                              {
+                                                  label: "Không hoạt động",
+                                                  value: false
+                                              },
+                                            ]}
+                                            onChange={(e: any) => setValue("status", e.value)}
                                             isDisabled={!isEditing}
                                             isSearchable
                                             placeholder="Chọn trạng thái"
@@ -498,9 +510,9 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={skinTypes.map((skinType: any) => ({ value: skinType.id, label: skinType.skinName }))}
-                                                onChange={(e: any) => setValue("skinType.id", e.value)}
+                                                onChange={(e: any) => setValue("skinTypeId", e.value)}
                                                 value={skinTypes.map((tag: any) => ({ value: tag.id, label: tag.skinName }))
-                                                    .find((tag: any) => tag.value == watch("skinType.id"))}
+                                                    .find((tag: any) => tag.value == watch("skinTypeId"))}
                                                 isSearchable
                                                 isDisabled={!isEditing}
                                                 placeholder="Chọn loại da"
@@ -516,9 +528,9 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={brands.map((brand: any) => ({ value: brand.brandId, label: brand.brandName }))}
-                                                onChange={(e: any) => setValue("brand.brandId", e.value)}
+                                                onChange={(e: any) => setValue("brandId", e.value)}
                                                 value={brands.map((tag: any) => ({ value: tag.brandId, label: tag.brandName }))
-                                                    .find((tag: any) => tag.value == watch("brand.brandId"))}
+                                                    .find((tag: any) => tag.value == watch("brandId"))}
                                                 isSearchable
                                                 isDisabled={!isEditing}
                                                 placeholder="Chọn thương hiệu"
@@ -534,13 +546,16 @@ const FormViewProduct = () => {
                                         <>
                                             <Select
                                                 options={categories.map((category: any) => ({ value: category.categoryId, label: category.categoryName }))}
-                                                onChange={(e: any) => setValue("tag.tagId", e.value)}
-                                                value={tags.find((tag: any) => tag.tagId == watch("tag.tagId")) &&
-                                                    tags.filter((tag: any) => tag.tagId == watch("tag.tagId")).map((tag: any) => {
+                                                onChange={(selected: any) => {
+                                                  setValue("categoryId", selected?.value)
+                                                  setValue("tagId", tags.find((tag: any) => tag.category.categoryId == selected?.value)?.tagId)
+                                                }}
+                                                value={tags.find((tag: any) => tag.tagId == watch("tagId")) &&
+                                                    tags.filter((tag: any) => tag.tagId == watch("tagId")).map((tag: any) => {
                                                         return { label: tag.category.categoryName, value: tag.category.categoryId };
                                                     })}
+                                                isDisabled={!isEditing}
                                                 isSearchable
-                                                isDisabled
                                                 placeholder="Chọn loại sản phẩm"
                                                 className="mt-1"
                                             />
@@ -553,10 +568,18 @@ const FormViewProduct = () => {
                                         </Label>
                                         <>
                                             <Select
-                                                options={tags.map((tag: any) => ({ value: tag.tagId, label: tag.tagName }))}
-                                                onChange={(e: any) => setValue("tag.tagId", e.value)}
+                                                options={watch("categoryId") ? 
+                                                  tags.filter((tag: any) => tag.category.categoryId == watch("categoryId"))
+                                                    .map((tag: any) => ({ value: tag.tagId, label: tag.tagName })) :
+                                                  tags.map((tag: any) => ({ value: tag.tagId, label: tag.tagName }))
+                                                }                  
+                                                onChange={(e: any) => {
+                                                  setValue("tagId", e.value)
+                                                  setValue("categoryId", tags.find((tag: any) => tag.tagId == e?.value)
+                                                    .category.categoryId)
+                                                }}
                                                 value={tags.map((tag: any) => ({ value: tag.tagId, label: tag.tagName }))
-                                                    .find((tag: any) => tag.value == watch("tag.tagId"))}
+                                                    .find((tag: any) => tag.value == watch("tagId"))}
                                                 //{ label: product.tag.tagName, value: product.tag.tagId }}
                                                 isSearchable
                                                 isDisabled={!isEditing}

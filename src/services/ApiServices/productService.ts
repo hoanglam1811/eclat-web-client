@@ -62,6 +62,22 @@ export async function updateProduct(id: number, productData: any, token: string)
   }
 }
 
+
+export async function updateProductStatus(id: number, status: any, token: string) {
+  try {
+    const response = await axios.patch(`${BASE_URL}/api/Products/${id}/status?status=${status}`, null , {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        AccessControlAllowOrigin: "*",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to update product with ID ${id}:`, error);
+    throw error;
+  }
+}
+
 // Xóa sản phẩm theo ID
 export async function deleteProduct(id: number, token: string) {
   try {

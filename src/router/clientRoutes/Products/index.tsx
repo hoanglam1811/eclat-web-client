@@ -99,7 +99,7 @@ const Products = () => {
             ]);
             console.log(products)
             const allProducts = products.data
-            let productsData = allProducts.map((product: any) => ({
+            let productsData = allProducts.filter((product: any) => product.status === true).map((product: any) => ({
                 id: product.productId,
                 name: product.productName,
                 origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),

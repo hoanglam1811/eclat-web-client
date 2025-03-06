@@ -8,4 +8,6 @@ export const vietRouteNames: any = {
   "staff/skin-types-management": "Quản lý loại da",
   "staff/brands-management": "Quản lý thương hiệu",
   "staff/tags-management": "Quản lý thẻ tên",
+  "staff/product-addition": "Tạo sản phẩm",
+  "staff/product-update/:id": "Cập nhật sản phẩm",
 }

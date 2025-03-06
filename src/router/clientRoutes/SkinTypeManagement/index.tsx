@@ -56,7 +56,7 @@ const SkinTypesManagement = () => {
             navigate("/login");
             return;
         }
-        getAllSkinTypes(token)
+        getAllSkinTypes()
             .then((data: any) => {
                 setSkintypes(data.result.map((skintype: any) => ({
                     id: skintype.id,

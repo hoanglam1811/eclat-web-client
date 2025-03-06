@@ -91,7 +91,7 @@ const Account = () => {
     return (
         <>
             {isLoading && <CircularProgress />}
-            <section className="bg-gray-100 p-6">
+            <section className="bg-gray-100 pt-40">
 
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
@@ -168,10 +168,6 @@ const Account = () => {
                                 <UserOutlined className="text-blue-500" />
                                 Thông Tin Tài Khoản
                             </h2>
-                            <EditOutlined
-                                className="text-blue-500 cursor-pointer text-xl hover:text-blue-700 transition"
-                                onClick={handleOpenModal}
-                            />
                         </div>
 
 
@@ -191,6 +187,15 @@ const Account = () => {
                             <div className="flex justify-between items-center">
                                 <span className="text-black font-bold">Số điện thoại:</span>
                                 <span className="font-medium text-black">{user.phone || "N/a"}</span>
+                            </div>
+
+                            <div className="flex justify-end mt-8">
+                                <Button
+                                    onClick={handleOpenModal}
+                                    className="bg-[#316ad3] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
+                                >
+                                    Cập nhật
+                                </Button>
                             </div>
                         </div>
 

@@ -62,7 +62,7 @@ const AccountChangePassword = () => {
 
     return (
         <>
-            <section className="bg-gray-100 p-6">
+            <section className="bg-gray-100 pt-40">
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
                         <Breadcrumb className="">
@@ -200,7 +200,7 @@ const AccountChangePassword = () => {
                                 <div className="flex justify-end mt-8">
                                     <Button
                                         onClick={handleUpdatePassword}
-                                        className="bg-[#f8f7da] text-black px-4 py-2 rounded hover:bg-[#51b8af]"
+                                        className="bg-[#316ad3] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
                                     >
                                         {isSubmitting ? "Đang lưu..." : "Lưu"}
                                     </Button>

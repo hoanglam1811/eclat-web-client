@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { GetAllDistrictsByProvince, GetAllProvinces, GetAllWardsByDistrict, GetDistrictByCode, GetProvinceByCode, GetWardByCode } from "../../../services/AddressService";
-import { Button, notification, Radio, Typography } from "antd";
+import { Button, notification, Radio, Tooltip, Typography } from "antd";
 import { Textarea } from "../../../components/ui/textarea";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
@@ -10,7 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
-import { FaCheckCircle, FaCity, FaEnvelope, FaHome, FaMapMarkerAlt, FaMoneyBillWave, FaPhone, FaTimes, FaUser } from "react-icons/fa";
+import { FaCheckCircle, FaCity, FaEnvelope, FaHome, FaMapMarkerAlt, FaMoneyBillWave, FaPhone, FaPlusCircle, FaProductHunt, FaTimes, FaUser } from "react-icons/fa";
 import { MdLocationCity } from "react-icons/md";
 import { createOrder } from "../../../services/ApiServices/orderService";
 import { useSelector } from "react-redux";
@@ -80,6 +80,12 @@ function Payment() {
   const [shippingFee, setShippingFee] = useState(30000);
   const [discount, setDiscount] = useState(0);
   const [recommendation, setRecommendation] = useState("");
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  useEffect(() => {
+    const storedCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
+    console.log(storedCart)
+    setCartItems(storedCart);
+  }, []);
 
   useEffect(() => {
     const storedCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
@@ -177,7 +183,7 @@ function Payment() {
 
       if (selectedOption === "Cash") {
         notification.success({ message: "Đặt hàng thành công! Bạn sẽ thanh toán khi nhận hàng." });
-        sessionStorage.removeItem("cartItems"); 
+        sessionStorage.removeItem("cartItems");
         navigate("/account/orders");
         return;
       }
@@ -192,7 +198,7 @@ function Payment() {
         if (paymentResponse?.paymentUrl) {
           sessionStorage.setItem("awaitingPayment", "true");
           window.location.href = paymentResponse.paymentUrl;
-          sessionStorage.removeItem("cartItems"); 
+          sessionStorage.removeItem("cartItems");
         } else {
           notification.error({ message: "Lỗi khi tạo thanh toán VNPay." });
         }
@@ -446,6 +452,66 @@ function Payment() {
             </div>
           </div>
 
+          <div className="address-form-wrapper bg-white shadow-md p-7 mb-5">
+            <div className="flex space-x-2">
+              {/* Phần giỏ hàng */}
+              <div className="w-full">
+                <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <FaPlusCircle className="text-blue-500" /> Thông tin sản phẩm
+                </h2>
+                <div className="overflow-hidden border border-gray-200 rounded-lg">
+                  <table className="min-w-full bg-white">
+                    <thead className="bg-gray-100 border-b">
+                      <tr>
+                        <th className="text-left p-4 text-sm font-bold text-gray-700 w-1/2">SẢN PHẨM</th>
+                        <th className="text-right p-4 text-sm font-bold text-gray-700 w-1/6">ĐƠN GIÁ</th>
+                        <th className="text-center p-4 text-sm font-bold text-gray-700 w-1/6">SỐ LƯỢNG</th>
+                        <th className="text-right p-4 text-sm font-bold text-gray-700 w-1/6">THÀNH TIỀN</th>
+                        <th className="text-right p-4 text-sm font-bold text-gray-700 w-1/6"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cartItems.map((item: any) => (
+                        <tr key={item.optionId} className="border-b">
+                          {/* Tên sản phẩm */}
+                          <td className="p-4 flex items-start space-x-4">
+                            <img src={item.imageUrl} alt={item.optionValue} className="w-16 h-16 rounded object-cover" />
+                            <div className="mt-5">
+                              <Tooltip title={item.optionValue}>
+                                <span className="text-sm font-medium text-blue-600 hover:underline">
+                                  {item.optionValue.length > 30 ? item.optionValue.substring(0, 45) + "..." : item.optionValue}
+                                </span>
+                              </Tooltip>
+                            </div>
+                          </td>
+                          {/* Giá */}
+                          <td className="text-right p-4 text-sm text-gray-800">
+                            <>
+                              <span className="text-red-600 font-bold">
+                                {item?.discountPrice?.toLocaleString("vi-VN")}đ
+                              </span>
+                            </>
+                          </td>
+                          {/* Số lượng */}
+                          <td className="text-center p-4">
+                            <div className="flex items-center justify-center space-x-2">
+                              <span className="text-sm font-medium">{item.quantity}</span>
+                            </div>
+                          </td>
+                          {/* Thành tiền */}
+                          <td className="text-right p-4 text-sm text-red-600 font-bold">
+                            {((item.discountPrice || item.price) * item.quantity).toLocaleString("vi-VN")}đ
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+
+                  </table>
+
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="bg-white shadow-md p-7">
             <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
               <FaMoneyBillWave className="text-green-500" /> Phương thức thanh toán

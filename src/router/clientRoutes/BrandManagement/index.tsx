@@ -105,7 +105,7 @@ const BrandsManagement = () => {
             navigate("/login");
             return;
         }
-        getAllBrands(token)
+        getAllBrands()
             .then((data: any) => {
                 setBrands(data.map((brand: any) => ({
                     id: brand.brandId,

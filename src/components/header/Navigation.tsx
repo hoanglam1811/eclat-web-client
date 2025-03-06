@@ -83,10 +83,6 @@ const navItems: NavItem[] = [
     to: RouteNames.PRODUCTS,
   },
   {
-    text: navigation.SPECIAL_CARE,
-    to: RouteNames.SPECIAL_CARE,
-  },
-  {
     text: navigation.BRANDS,
     to: RouteNames.BRANDS,
   },

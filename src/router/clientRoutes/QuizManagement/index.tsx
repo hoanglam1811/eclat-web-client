@@ -70,7 +70,7 @@ const SkincareQuiz = ({ }) => {
             }
             const data = await getAllQuiz(token);
             setQuizzes(data.result);
-            const skinTypesData = await getAllSkinTypes(token);
+            const skinTypesData = await getAllSkinTypes();
             setSkinTypes(skinTypesData.result);
             console.log(data)
         } catch (error) {

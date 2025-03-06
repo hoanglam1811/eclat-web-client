@@ -70,8 +70,8 @@ const FormCreateProduct = () => {
         try {
             setLoading(true);
             const [skinTypes, brands, categories, tags] = await Promise.all([
-                getAllSkinTypes(token),
-                getAllBrands(token),
+                getAllSkinTypes(),
+                getAllBrands(),
                 getAllCategories(token),
                 getAllTags(token)
             ]);

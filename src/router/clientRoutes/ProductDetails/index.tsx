@@ -194,6 +194,41 @@ const ProductDetails = () => {
         navigate(RouteNames.CART);
     };
 
+    const handleBuyNow = () => {
+        if (!selectedOption) {
+            notification.error({ message: "Vui lòng chọn một tùy chọn sản phẩm!" });
+            return;
+        }
+
+        const existingCart = JSON.parse(sessionStorage.getItem("cartItems") || "[]");
+
+        const productExists = existingCart.find((item: any) => item.optionId === selectedOption.optionId);
+
+        if (productExists) {
+            productExists.quantity += quantity;
+        } else {
+            existingCart.push({
+                id: product.productId,
+                optionId: selectedOption.optionId,
+                name: product.productName,
+                price: selectedOption.origin_price,
+                discountPrice: selectedOption.discPrice,
+                quantity: quantity,
+                imageUrl: selectedOption.optionImages?.[0],
+                optionValue: product.productName + " - " + selectedOption.optionValue,
+            });
+        }
+
+        sessionStorage.setItem("cartItems", JSON.stringify(existingCart));
+
+        sessionStorage.setItem("lastAddedProduct", JSON.stringify({
+            id: product.productId,
+            optionId: selectedOption.optionId
+        }));
+
+        navigate("/cart/payment/");
+    };
+
     const { pathname } = useLocation();
 
     useEffect(() => {
@@ -443,7 +478,7 @@ const ProductDetails = () => {
                                             Thêm vào giỏ
                                         </button>
                                         <button
-                                            onClick={handleAddToCart}
+                                            onClick={handleBuyNow}
                                             className="px-8 py-4 bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
                                         >
                                             Mua ngay

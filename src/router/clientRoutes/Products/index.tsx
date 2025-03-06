@@ -154,151 +154,155 @@ const Products = () => {
 
     return (
         <>
-            <section className="bg-gray-100 p-6">
-                <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
-                    <div>
-                        <Breadcrumb className="">
-                            <BreadcrumbList className="text-[#333]">
-                                <BreadcrumbItem>
-                                    <Link to="/" className="md:text-xl text-lg">
-                                        Trang chủ
-                                    </Link>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <p className="text-[#333] font-medium md:text-xl text-lg">
-                                        Danh sách sản phẩm
-                                    </p>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
-                    </div>
-                </div>
-            </section>
-
-            <div className="max-w-8xl mx-auto p-6 bg-gray-100">
-                <div className="flex gap-2">
-                    <div className="w-full md:w-1/5 p-6 bg-white shadow-md">
+            <div>
+                <section className="bg-gray-100 p-6">
+                    <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                         <div>
-                            <div className="flex bg-white mb-2">
-                                <Search className="text-gray-500 mr-2 mt-2" />
-                                <Input
-                                    type="text"
-                                    placeholder="Tìm kiếm tên sản phẩm..."
-                                    className="flex-1 px-4 border-none focus:ring-0 focus:outline-none"
-                                    value={searchTerm}
-                                    onChange={handleSearchChange}
-                                />
-                            </div>
-
-                            <h4 className="font-medium text-lg text-left">KHOẢNG GIÁ</h4>
-                            <Slider
-                                range
-                                min={0}
-                                max={10000000}
-                                step={50000}
-                                value={priceRange}
-                                onChange={handlePriceChange}
-                                tooltipVisible
-                                tipFormatter={(value: any) => `${value.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`} // Hiển thị giá trị bằng triệu đồng
-                            />
-                            <div className="mt-2 text-sm text-gray-600">
-                                <span>{`Từ: ${priceRange[0].toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`}</span> -
-                                <span>{` Đến: ${priceRange[1].toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`}</span>
-                            </div>
+                            <Breadcrumb className="">
+                                <BreadcrumbList className="text-[#333]">
+                                    <BreadcrumbItem>
+                                        <Link to="/" className="md:text-xl text-lg">
+                                            Trang chủ
+                                        </Link>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <p className="text-[#333] font-medium md:text-xl text-lg">
+                                            Danh sách sản phẩm
+                                        </p>
+                                    </BreadcrumbItem>
+                                </BreadcrumbList>
+                            </Breadcrumb>
                         </div>
-
-                        <div className="mt-4">
-                            <h4 className="font-medium text-lg text-left">THƯƠNG HIỆU</h4>
-                        </div>
-
-                        <div className="w-[100%] mt-1">
-                            <div>
-                                <Select
-                                    options={brands}
-                                    value={selectedBrands}
-                                    onChange={handleBrandChange}
-                                    style={{ width: '100%' }}
-                                    placeholder="Chọn thương hiệu"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mt-4">
-                            <h4 className="font-medium text-lg text-left">LOẠI DA</h4>
-                        </div>
-                        <div className="w-[100%] mt-1">
-                            <div style={{ maxHeight: 135, overflowY: 'auto' }}>
-                                <Select
-                                    options={skinTypes}
-                                    value={skinTypes.filter((skin: any) => selectedSkinTypes.includes(skin.value))}
-                                    onChange={handleSkinTypeChange}
-                                    style={{ width: '100%' }}
-                                    placeholder="Chọn loại da"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="mt-4">
-                            <h4 className="font-medium text-lg text-left">XUẤT XỨ</h4>
-                        </div>
-                        <div className="mt-1" >
-                            <Select
-                                options={countries}
-                                value={selectedOriginCountry}
-                                onChange={handleOriginCountryChange}
-                                style={{ width: '100%' }}
-                                placeholder="Chọn quốc gia"
-                            />
-                        </div>
-                        <Button
-                            danger
-                            className="bg-red-500 w-full mt-4"
-                            size="large"
-                            onClick={handleClearFilters}
-                        >Xoá tìm kiếm</Button>
                     </div>
+                </section>
 
-                    <section className="w-full md:w-4/5 p-6 bg-white shadow-md">
-                        <menu className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                            {isLoading ? (
-                                <ProductSkeleton />
-                            ) : error ? (
-                                <p className="text-center text-2xl font-semibold text-red-600 md:col-span-3 lg:col-span-4">
-                                    Lỗi khi tải sản phẩm.
-                                </p>
-                            ) : products.length === 0 ? (
-                                <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
-                                    Không có sản phẩm nào phù hợp.
-                                </p>
-                            ) : (
-                                paginatedmProducts.map((product: any) => (
-                                    <ProductCard key={product.id} product={product} handleBrandChange={handleBrandChange} />
-                                ))
-                            )}
+                <section>
+                    <div className="max-w-8xl mx-auto p-6 bg-gray-100">
+                        <div className="flex gap-2">
+                            <div className="w-full md:w-1/5 p-6 bg-white shadow-md">
+                                <div>
+                                    <div className="flex bg-white mb-2">
+                                        <Search className="text-gray-500 mr-2 mt-2" />
+                                        <Input
+                                            type="text"
+                                            placeholder="Tìm kiếm tên sản phẩm..."
+                                            className="flex-1 px-4 border-none focus:ring-0 focus:outline-none"
+                                            value={searchTerm}
+                                            onChange={handleSearchChange}
+                                        />
+                                    </div>
 
-                        </menu>
-                        <div style={{ marginTop: "20px", marginBottom: '10px', textAlign: 'right' }}>
-                            {Array.from({ length: totalPages }, (_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handlePageChange(index + 1)}
-                                    style={{
-                                        margin: "0 5px",
-                                        padding: "5px 10px",
-                                        backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
-                                        color: currentPage === index + 1 ? "white" : "black",
-                                        border: "none",
-                                        borderRadius: "5px",
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    {index + 1}
-                                </button>
-                            ))}
+                                    <h4 className="font-medium text-lg text-left">KHOẢNG GIÁ</h4>
+                                    <Slider
+                                        range
+                                        min={0}
+                                        max={10000000}
+                                        step={50000}
+                                        value={priceRange}
+                                        onChange={handlePriceChange}
+                                        tooltipVisible
+                                        tipFormatter={(value: any) => `${value.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`} // Hiển thị giá trị bằng triệu đồng
+                                    />
+                                    <div className="mt-2 text-sm text-gray-600">
+                                        <span>{`Từ: ${priceRange[0].toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`}</span> -
+                                        <span>{` Đến: ${priceRange[1].toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`}</span>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <h4 className="font-medium text-lg text-left">THƯƠNG HIỆU</h4>
+                                </div>
+
+                                <div className="w-[100%] mt-1">
+                                    <div>
+                                        <Select
+                                            options={brands}
+                                            value={selectedBrands}
+                                            onChange={handleBrandChange}
+                                            style={{ width: '100%' }}
+                                            placeholder="Chọn thương hiệu"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <h4 className="font-medium text-lg text-left">LOẠI DA</h4>
+                                </div>
+                                <div className="w-[100%] mt-1">
+                                    <div style={{ maxHeight: 135, overflowY: 'auto' }}>
+                                        <Select
+                                            options={skinTypes}
+                                            value={skinTypes.filter((skin: any) => selectedSkinTypes.includes(skin.value))}
+                                            onChange={handleSkinTypeChange}
+                                            style={{ width: '100%' }}
+                                            placeholder="Chọn loại da"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <h4 className="font-medium text-lg text-left">XUẤT XỨ</h4>
+                                </div>
+                                <div className="mt-1" >
+                                    <Select
+                                        options={countries}
+                                        value={selectedOriginCountry}
+                                        onChange={handleOriginCountryChange}
+                                        style={{ width: '100%' }}
+                                        placeholder="Chọn quốc gia"
+                                    />
+                                </div>
+                                <Button
+                                    danger
+                                    className="bg-red-500 w-full mt-4"
+                                    size="large"
+                                    onClick={handleClearFilters}
+                                >Xoá tìm kiếm</Button>
+                            </div>
+
+                            <section className="w-full md:w-4/5 p-6 bg-white shadow-md">
+                                <menu className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                                    {isLoading ? (
+                                        <ProductSkeleton />
+                                    ) : error ? (
+                                        <p className="text-center text-2xl font-semibold text-red-600 md:col-span-3 lg:col-span-4">
+                                            Lỗi khi tải sản phẩm.
+                                        </p>
+                                    ) : products.length === 0 ? (
+                                        <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
+                                            Không có sản phẩm nào phù hợp.
+                                        </p>
+                                    ) : (
+                                        paginatedmProducts.map((product: any) => (
+                                            <ProductCard key={product.id} product={product} handleBrandChange={handleBrandChange} />
+                                        ))
+                                    )}
+
+                                </menu>
+                                <div style={{ marginTop: "20px", marginBottom: '10px', textAlign: 'right' }}>
+                                    {Array.from({ length: totalPages }, (_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handlePageChange(index + 1)}
+                                            style={{
+                                                margin: "0 5px",
+                                                padding: "5px 10px",
+                                                backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                                                color: currentPage === index + 1 ? "white" : "black",
+                                                border: "none",
+                                                borderRadius: "5px",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            {index + 1}
+                                        </button>
+                                    ))}
+                                </div>
+                            </section>
                         </div>
-                    </section>
-                </div>
+                    </div>
+                </section>
             </div>
         </>
 

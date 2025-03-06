@@ -6,12 +6,20 @@ import clientRoutes from "./clientRoutes";
 import adminRoutes from "./adminRoutes";
 import commonRoutes from "./commonRoutes";
 import Main from "../components/layout/Main";
+import staffRoutes from "./clientRoutes/staff";
+import StaffMain from "../components/staff-layout/StaffMain";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <ClientLayout />,
     children: [...clientRoutes],
+    errorElement: <NotFound />,
+  },
+  {
+    path: "/staff",
+    element: <StaffMain />,
+    children: [...staffRoutes],
     errorElement: <NotFound />,
   },
   {

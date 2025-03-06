@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { z } from "zod";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaPen, FaCheckCircle, FaTag, FaEdit } from 'react-icons/fa';
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
@@ -88,7 +88,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
               onSubmit={form.handleSubmit(handleSubmit)}
               className="flex flex-col gap-6">
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Tên</Label>
+                <Label className="mb-3 text-left">Tên loại sản phẩm</Label>
                 <div className="relative">
                   <Input
                     {...form.register("categoryName")}
@@ -96,7 +96,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
+                  <FaTag className="absolute left-3 top-3 text-gray-500" />
                 </div>
                 {form.formState.errors.categoryName && <p className="text-red-500 text-sm">{form.formState.errors.categoryName.message}</p>}
               </div>
@@ -108,7 +108,7 @@ const AddCategoryModal = ({ isOpen, setIsOpen, fetchCategory }: AddCategoryModal
                     placeholder="Nhập mô tả"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
+                  <FaEdit className="absolute left-3 top-4 text-gray-500" />
                 </div>
                 {form.formState.errors.description && <p className="text-red-500 text-sm">{form.formState.errors.description.message}</p>}
               </div>

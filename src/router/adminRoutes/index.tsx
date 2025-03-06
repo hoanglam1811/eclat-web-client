@@ -2,40 +2,35 @@ import { Navigate, RouteObject } from "react-router-dom";
 import RouteNames from "../../constants/routeNames";
 import Billing from "./Billing";
 import Home from "./Home";
-import Profile from "./Profile";
-import Rtl from "./Rtl";
-import SignIn from "./SignIn";
-import SignUp from "./SignUp";
-import Tables from "./Tables";
+import StaffManagement from "./StaffManagement";
+import SkincareQuiz from "../clientRoutes/QuizManagement";
+import SkincareBlogManagement from "../clientRoutes/BlogManagement";
+import CustomerManagement from "./CustomerManagement";
 
 const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.BILLING,
-    element: <Billing/>,
+    element: <Billing />,
   },
   {
     path: RouteNames.ADMIN_HOME,
     element: <Home />,
   },
   {
-    path: RouteNames.ADMIN_PROFILE,
-    element: <Profile/>,
+    path: RouteNames.STAFF_MANAGEMENT,
+    element: <StaffManagement />,
   },
   {
-    path: RouteNames.ADMIN_RTL,
-    element: <Rtl />,
+    path: RouteNames.SKINCARE_QUIZ_MANAGEMENT,
+    element: <SkincareQuiz />,
   },
   {
-    path: RouteNames.ADMIN_SIGNIN,
-    element: <SignIn />,
+    path: RouteNames.BLOG_MANAGEMENT,
+    element: <SkincareBlogManagement />,
   },
   {
-    path: RouteNames.ADMIN_SIGNUP,
-    element: <SignUp />,
-  },
-  {
-    path: RouteNames.ADMIN_TABLES,
-    element: <Tables />,
+    path: RouteNames.ADMIN_CUSTOMER_MANAGEMENT,
+    element: <CustomerManagement />,
   }
 ];
 
@@ -48,8 +43,8 @@ const privateRoutes: RouteObject[] = [
 
 const adminRoutes: RouteObject[] = [
   {
-     path: "/admin",
-     element: <Navigate to={RouteNames.ADMIN_HOME} replace />,
+    path: "/admin",
+    element: <Navigate to={RouteNames.ADMIN_HOME} replace />,
   },
   ...publicRoutes,
 ];

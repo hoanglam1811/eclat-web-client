@@ -23,16 +23,16 @@ const ITEMS_PER_PAGE = 5;
 
 const CategoriesManagement = () => {
     const sampleCategories = [
-        { id: 1, name: "Cleanser", description: "Sản phẩm làm sạch da, loại bỏ bụi bẩn và dầu thừa." },
-        { id: 2, name: "Toner", description: "Cân bằng độ pH và dưỡng ẩm nhẹ nhàng cho da." },
-        { id: 3, name: "Moisturizer", description: "Kem dưỡng ẩm giúp da mềm mịn và ngăn ngừa khô da." },
-        { id: 4, name: "Sunscreen", description: "Kem chống nắng bảo vệ da khỏi tác hại của tia UV." },
-        { id: 5, name: "Serum", description: "Tinh chất đậm đặc hỗ trợ điều trị các vấn đề về da như thâm nám, lão hóa." },
-        { id: 6, name: "Exfoliator", description: "Sản phẩm tẩy tế bào chết, giúp da sáng và mịn màng hơn." },
-        { id: 7, name: "Sheet Mask", description: "Mặt nạ giấy cung cấp dưỡng chất và cấp ẩm tức thì." },
-        { id: 8, name: "Eye Cream", description: "Kem dưỡng mắt giúp giảm bọng mắt và nếp nhăn." },
-        { id: 9, name: "Facial Oil", description: "Dầu dưỡng hỗ trợ giữ ẩm và tái tạo da." },
-        { id: 10, name: "Spot Treatment", description: "Sản phẩm đặc trị các vấn đề cụ thể như mụn hoặc sẹo." },
+        { id: 1, categoryName: "Cleanser", description: "Sản phẩm làm sạch da, loại bỏ bụi bẩn và dầu thừa." },
+        { id: 2, categoryName: "Toner", description: "Cân bằng độ pH và dưỡng ẩm nhẹ nhàng cho da." },
+        { id: 3, categoryName: "Moisturizer", description: "Kem dưỡng ẩm giúp da mềm mịn và ngăn ngừa khô da." },
+        { id: 4, categoryName: "Sunscreen", description: "Kem chống nắng bảo vệ da khỏi tác hại của tia UV." },
+        { id: 5, categoryName: "Serum", description: "Tinh chất đậm đặc hỗ trợ điều trị các vấn đề về da như thâm nám, lão hóa." },
+        { id: 6, categoryName: "Exfoliator", description: "Sản phẩm tẩy tế bào chết, giúp da sáng và mịn màng hơn." },
+        { id: 7, categoryName: "Sheet Mask", description: "Mặt nạ giấy cung cấp dưỡng chất và cấp ẩm tức thì." },
+        { id: 8, categoryName: "Eye Cream", description: "Kem dưỡng mắt giúp giảm bọng mắt và nếp nhăn." },
+        { id: 9, categoryName: "Facial Oil", description: "Dầu dưỡng hỗ trợ giữ ẩm và tái tạo da." },
+        { id: 10, categoryName: "Spot Treatment", description: "Sản phẩm đặc trị các vấn đề cụ thể như mụn hoặc sẹo." },
     ];
     const token = useSelector((state: RootState) => state.token.token)
     const navigate = useNavigate();
@@ -43,7 +43,7 @@ const CategoriesManagement = () => {
     const [currentCategory, setCurrentCategory] = useState<any | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const filteredCategories = categories.filter(category =>
-        category.name.toLowerCase().includes(searchQuery.toLowerCase())
+        category.categoryName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -64,7 +64,7 @@ const CategoriesManagement = () => {
             const data = await getAllCategories(token)
             setCategories(data.map((category: any) => ({
                 id: category.categoryId,
-                name: category.categoryName,
+                categoryName: category.categoryName,
                 description: category.description
             }))
             );
@@ -176,7 +176,7 @@ const CategoriesManagement = () => {
                     }}
                 >
                     <div style={{ flex: 0.5, textAlign: "center" }}>{account.id}</div>
-                    <div style={{ flex: 2 }}>{account.name}</div>
+                    <div style={{ flex: 2 }}>{account.categoryName}</div>
                     <div style={{ flex: 2 }}>{account.description}</div>
                     <div style={{ flex: 1, textAlign: "center" }}>
                         <Tooltip title="Edit Category">

@@ -14,175 +14,39 @@ import { Button } from "../../../components/ui/button";
 import { DeleteOutlined, EyeOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import RouteNames from "../../../constants/routeNames";
-import { Input } from "antd";
+import { Input, Select } from "antd";
+import { getAllProducts } from "../../../services/ApiServices/productService";
+import { RootState } from "../../../store/store";
+import { useSelector } from "react-redux";
 
 const ITEMS_PER_PAGE = 5;
 
 const ProductsManagement = () => {
-    const sampleProducts = [
-        {
-            id: "1",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 50,
-            description: "Beautiful earrings with a unique palm design.",
-            origin_price: 835000,
-            disc_price: 120000,
-            origin_country: "USA",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand A",
-            average_rating: 4.5,
-            status: "Hết hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "2",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 30,
-            description: "Elegant necklace with a red birthstone.",
-            origin_price: 100000,
-            disc_price: 90000,
-            origin_country: "USA",
-            skinTypeId: "Sensitive Skin",
-            brandId: "Brand B",
-            average_rating: 4.8,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/glam_2.11.1_18a5ca6f9b814d9bb11125d8c6d2f704_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "3",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1_b5d9938d4e0d4b71b98a3ac1e059d73e_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "4",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Ngừng hoạt động",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "5",
-            name: "Son lỏ, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "6",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 50,
-            description: "Beautiful earrings with a unique palm design.",
-            origin_price: 835000,
-            disc_price: 120000,
-            origin_country: "USA",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand A",
-            average_rating: 4.5,
-            status: "Hết hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "7",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 30,
-            description: "Elegant necklace with a red birthstone.",
-            origin_price: 100000,
-            disc_price: 90000,
-            origin_country: "USA",
-            skinTypeId: "Sensitive Skin",
-            brandId: "Brand B",
-            average_rating: 4.8,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/glam_2.11.1_18a5ca6f9b814d9bb11125d8c6d2f704_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "8",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1_b5d9938d4e0d4b71b98a3ac1e059d73e_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "9",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "10",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        }
-    ];
-
-    const [products, setProducts] = useState(sampleProducts);
-    //const [categories, setCategories] = useState<any[]>([]);
+    const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [currentProduct, setCurrentProduct] = useState<any | null>(null);
+
     const navigate = useNavigate();
+    const token = useSelector((state: RootState) => state.token.token);
     const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState<string>("all");
+    const statusOptions = [
+      { value: "all", label: 'Tất cả' },
+      { value: "true", label: 'Hoạt động' },
+      { value: "false", label: 'Không hoạt động' }
+    ]
 
     const [currentPage, setCurrentPage] = useState<number>(1);
+    
     const filteredProducts = products.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        (product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.brandId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.skinTypeId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.origin_country.toLowerCase().includes(searchQuery.toLowerCase())
+    ) &&
+        (statusFilter === "all" || product.status === (statusFilter === "true" ? "Hoạt động" : "Không hoạt động"))
     );
+
 
     const totalPages = Math.ceil(filteredProducts?.length / ITEMS_PER_PAGE);
 
@@ -194,23 +58,42 @@ const ProductsManagement = () => {
         navigate(`/staff/product-update/${id}`);
     };
 
-    //   const fetchCategories = () => {
-    //     setLoading(true);
-    //     getAllCategories()
-    //       .then((data) => {
-    //         setCategories(data.data);
-    //       })
-    //       .catch((error) => {
-    //         console.error("Error fetching accounts:", error);
-    //       })
-    //       .finally(() => {
-    //         setLoading(false);
-    //       });
-    //   };
+    const fetchProducts = () => {
+        setLoading(true);
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+        getAllProducts()
+            .then((data) => {
+                setProducts(data.data.map((product: any) => {
+                    const totalQuantity = product.options.reduce((total: number, option: any) => total + option.quantity, 0);
+                    
+                    return {
+                        id: product.productId,
+                        name: product.productName,
+                        origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
+                        disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
+                        quantity: totalQuantity == 0 ? "Hết hàng" : totalQuantity,
+                        origin_country: product.originCountry,
+                        skinTypeId: product.skinType.skinName,
+                        brandId: product.brand.brandName,
+                        imageUrl: product.images[0]?.imageUrl,
+                        status: product.status ? "Hoạt động" : "Không hoạt động",
+                    };
+                }));                
+            })
+            .catch((error) => {
+                console.error("Error fetching accounts:", error);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    };
 
-    //   useEffect(() => {
-    //     fetchCategories();
-    //   }, []);
+    useEffect(() => {
+        fetchProducts();
+    }, []);
 
     const renderTable = () => (
         <Paper elevation={3} sx={{ padding: 3, borderRadius: 3, backgroundColor: "#fff" }}>
@@ -218,12 +101,12 @@ const ProductsManagement = () => {
             <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Input
-                        placeholder="Tìm kiếm theo tên sản phẩm"
+                        placeholder="Tìm kiếm theo tên sản phẩm, loại da, xuất xứ, thương hiệu.."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         prefix={<SearchOutlined style={{ color: "#3f51b5" }} />}
                         style={{
-                            width: '400px',
+                            width: '600px',
                             padding: '10px',
                             borderRadius: "8px",
                             border: "1px solid #ddd",
@@ -241,7 +124,21 @@ const ProductsManagement = () => {
                     >
                         <DeleteOutlined />
                     </Button>
+                    <div className="text-left ml-[100px]">
+                      <span>Trạng thái: </span>
+                      <Select
+                        options={statusOptions}
+                        value={statusOptions.find((option) => option.value == statusFilter)}
+                        onChange={(e:any) => {
+                          setStatusFilter(e)
+                        }}
+                        style={{ width: '100%' }}
+                        placeholder="Chọn trang thái"
+                        />
+                    </div>
                 </div>
+
+                
 
                 <Button
                     onClick={() => navigate(RouteNames.PRODUCT_ADDITION)}
@@ -280,6 +177,8 @@ const ProductsManagement = () => {
                 <div style={{ flex: 2 }}>Tên</div>
                 <div style={{ flex: 1 }}>Số lượng</div>
                 <div style={{ flex: 1 }}>Thương hiệu</div>
+                <div style={{ flex: 1 }}>Xuất xứ</div>
+                <div style={{ flex: 1 }}>Loại da</div>
                 <div style={{ flex: 1 }}>Trạng thái</div>
                 <div style={{ flex: 1, textAlign: "center" }}>Hành động</div>
             </div>
@@ -307,6 +206,8 @@ const ProductsManagement = () => {
                     <div style={{ flex: 2 }}>{account.name}</div>
                     <div style={{ flex: 1 }}>{account.quantity}</div>
                     <div style={{ flex: 1 }}>{account.brandId}</div>
+                    <div style={{ flex: 1 }}>{account.origin_country}</div>
+                    <div style={{ flex: 1 }}>{account.skinTypeId}</div>
                     <div style={{ flex: 1 }}>{account.status}</div>
                     <div style={{ flex: 1, textAlign: "center" }}>
                         <Tooltip title="Xem chi tiết">

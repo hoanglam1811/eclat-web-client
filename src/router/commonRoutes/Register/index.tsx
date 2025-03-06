@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { register } from '../../../services/ApiServices/authenticationService';
 import RegisterType from './data';
 import EmailVerify from './emailVerify';
-import { Button, notification } from 'antd';
+import { notification } from 'antd';
 import RouteNames from '../../../constants/routeNames';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
@@ -100,7 +100,7 @@ const Register = () => {
                         animation: "fadeIn 1s ease-in-out",
                     }}
                 >
-                    <h2 className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", color: "#578a3f", marginBottom: "30px" }}>
+                    <h2 className='font-bold' style={{ color: "#578a3f", marginBottom: "30px" }}>
                         ĐĂNG KÍ VỚI ÉCLAT
                     </h2>
 
@@ -183,7 +183,6 @@ const Register = () => {
                                 border: "none",
                                 cursor: "pointer",
                                 fontSize: "16px",
-                                fontFamily: "Montserrat, sans-serif",
                                 fontWeight: "600",
                                 transition: "background-color 0.3s ease",
                                 marginBottom: "15px",
@@ -199,7 +198,7 @@ const Register = () => {
                     }
 
                     {isEmailVerify && <EmailVerify email={registerData.email} />}
-                    <p className='font-bold' style={{ fontFamily: "Montserrat, sans-serif", fontSize: "14px", color: "#555" }}>
+                    <p className='font-bold' style={{ fontSize: "14px", color: "#555" }}>
                         Bạn đã có tài khoản?{" "}
                         <Link
                             to="/login"

@@ -25,20 +25,17 @@ const Account = () => {
     const [form] = Form.useForm();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    //console.log(users)
     const fetchAccount = async () => {
         try {
             setIsLoading(true);
             if (!users) return;
             const response = await getUserById(users.userId, token);
-            //console.log(response)
             if (response.code == 0) {
                 setUser(response.result);
             }
         }
         catch (err: any) {
             setError(err.toString());
-            //console.log(err);
         }
         finally {
             setIsLoading(false);
@@ -94,7 +91,7 @@ const Account = () => {
     return (
         <>
             {isLoading && <CircularProgress />}
-            <section className="bg-gray-100 p-6">
+            <section className="bg-gray-100 pt-40">
 
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
@@ -166,13 +163,13 @@ const Account = () => {
 
                     {/* Profile Details */}
                     <section className=" bg-white shadow-md rounded-lg p-6 border border-gray-200 col-start-5 col-end-12">
-                        <div className="flex justify-center items-center gap-2">
-                            <h2 className="text-lg font-bold text-gray-800">Thông Tin Tài Khoản</h2>
-                            <EditOutlined
-                                className="text-blue-500 cursor-pointer text-xl hover:text-blue-700 transition"
-                                onClick={handleOpenModal}
-                            />
+                        <div className="flex justify-between items-center border-b-2 border-gray-300 pb-2">
+                            <h2 className="text-2xl font-extrabold text-gray-800 flex items-center gap-2">
+                                <UserOutlined className="text-blue-500" />
+                                Thông Tin Tài Khoản
+                            </h2>
                         </div>
+
 
                         <div className="space-y-6 mt-3">
                             {/* Name */}
@@ -190,6 +187,15 @@ const Account = () => {
                             <div className="flex justify-between items-center">
                                 <span className="text-black font-bold">Số điện thoại:</span>
                                 <span className="font-medium text-black">{user.phone || "N/a"}</span>
+                            </div>
+
+                            <div className="flex justify-end mt-8">
+                                <Button
+                                    onClick={handleOpenModal}
+                                    className="bg-[#316ad3] text-white px-4 py-2 rounded hover:bg-[#51b8af]"
+                                >
+                                    Cập nhật
+                                </Button>
                             </div>
                         </div>
 

@@ -1,15 +1,3 @@
-/*!
-  =========================================================
-  * Muse Ant Design Dashboard - v1.0.0
-  =========================================================
-  * Product Page: https://www.creative-tim.com/product/muse-ant-design-dashboard
-  * Copyright 2021 Creative Tim (https://www.creative-tim.com)
-  * Licensed under MIT (https://github.com/creativetimofficial/muse-ant-design-dashboard/blob/main/LICENSE.md)
-  * Coded by Creative Tim
-  =========================================================
-  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
-
 import { useState, useEffect } from "react";
 
 import {
@@ -41,6 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { removeToken, removeUser } from "../../reducers/tokenSlice";
 import RouteNames from "../../constants/routeNames";
+import { vietRouteNames } from "../../constants/vietRouteNames";
 
 const ButtonContainer = styled.div`
   .ant-btn-primary {
@@ -262,7 +251,6 @@ function Header({
   handleSidenavType,
   handleFixedNavbar,
 }:any) {
-  const { Title, Text } = Typography;
 
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
@@ -272,7 +260,9 @@ function Header({
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => window.scrollTo(0, 0));
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, []);
 
   const showDrawer = () => setVisible(true);
   const hideDrawer = () => setVisible(false);
@@ -290,7 +280,7 @@ function Header({
 
   return (
     <>
-      <div className="setting-drwer" onClick={showDrawer}>
+      <div className="setting-drwer flex justify-center items-center" onClick={showDrawer}>
         {setting}
       </div>
       <Row gutter={[24, 0]}>
@@ -299,11 +289,12 @@ function Header({
               style={{ textTransform: "capitalize" }}
           >
             <Breadcrumb.Item>
-              <NavLink to="/admin">Pages</NavLink>
+              <NavLink to="/admin">Admin</NavLink>
             </Breadcrumb.Item>
             <Breadcrumb.Item 
             >
-              {name.replace("admin/", "")}
+              {!vietRouteNames[name] && name.replace("admin/", "")}
+              {vietRouteNames[name]}
             </Breadcrumb.Item>
           </Breadcrumb>
           <div className="ant-page-header-heading">
@@ -311,152 +302,16 @@ function Header({
               className="ant-page-header-heading-title"
               style={{ textTransform: "capitalize" }}
             >
-              {subName.replace("admin/", "")}
+              {!vietRouteNames[subName] && subName.replace("admin/", "")}
+              {vietRouteNames[subName]}
             </span>
           </div>
         </Col>
         <Col span={24} md={18} className="header-control">
-          <Badge size="small" count={4}>
-            <Dropdown overlay={menu} trigger={["click"]}>
-              <a
-                href="#pablo"
-                className="ant-dropdown-link"
-                onClick={(e) => e.preventDefault()}
-              >
-                {bell}
-              </a>
-            </Dropdown>
-          </Badge>
-          <Button type="link" onClick={showDrawer}>
-            {logsetting}
-          </Button>
-          <Button
-            type="link"
-            className="sidebar-toggler"
-            onClick={() => onPress()}
-          >
-            {toggler}
-          </Button>
-          <Drawer
-            className="settings-drawer"
-            mask={true}
-            width={360}
-            onClose={hideDrawer}
-            placement={placement}
-            visible={visible}
-          >
-            <div>
-              <div className="header-top">
-                <Title level={4}>
-                  Configurator
-                  <Text className="subtitle">See our dashboard options.</Text>
-                </Title>
-              </div>
-
-              <div className="sidebar-color">
-                <Title level={5}>Sidebar Color</Title>
-                <div className="theme-color mb-2">
-                  <ButtonContainer>
-                    <Button
-                      type="primary"
-                      onClick={() => handleSidenavColor("#1890ff")}
-                    >
-                      1
-                    </Button>
-                    <Button
-                      type="default"
-                      style={{ background: "#52c41a" }}
-                      onClick={() => handleSidenavColor("#52c41a")}
-                    >
-                      1
-                    </Button>
-                    <Button
-                      type="default"
-                      style={{ background: "#d9363e" }}
-                      onClick={() => handleSidenavColor("#d9363e")}
-                    >
-                      1
-                    </Button>
-                    <Button
-                      type="default"
-                      style={{ background: "#fadb14" }}
-                      onClick={() => handleSidenavColor("#fadb14")}
-                    >
-                      1
-                    </Button>
-
-                    <Button
-                      type="default"
-                      style={{ background: "#111" }}
-                      onClick={() => handleSidenavColor("#111")}
-                    >
-                      1
-                    </Button>
-                  </ButtonContainer>
-                </div>
-
-                <div className="sidebarnav-color mb-2">
-                  <Title level={5}>Sidenav Type</Title>
-                  <Text>Choose between 2 different sidenav types.</Text>
-                  <ButtonContainer className="trans">
-                    <Button
-                      type={sidenavType === "default" ? "primary" : "default"}
-                      onClick={() => {
-                        handleSidenavType("transparent");
-                        setSidenavType("transparent");
-                      }}
-                    >
-                      TRANSPARENT
-                    </Button>
-                    <Button
-                      type={sidenavType === "default" ? "primary" : "default"}
-                      onClick={() => {
-                        handleSidenavType("#fff");
-                        setSidenavType("white");
-                      }}
-                    >
-                      WHITE
-                    </Button>
-                  </ButtonContainer>
-                </div>
-                <div className="fixed-nav mb-2">
-                  <Title level={5}>Navbar Fixed </Title>
-                  <Switch onChange={(e) => handleFixedNavbar(e)} />
-                </div>
-                <div className="ant-docment">
-                  <ButtonContainer>
-                    <Button type="default" size="large">
-                      FREE DOWNLOAD
-                    </Button>
-                    <Button size="large">VIEW DOCUMENTATION</Button>
-                  </ButtonContainer>
-                </div>
-                <div className="viewstar">
-                  <a href="#pablo">{<StarOutlined />} Star</a>
-                  <a href="#pablo"> 190</a>
-                </div>
-
-                <div className="ant-thank">
-                  <Title level={5} className="mb-2">
-                    Thank you for sharing!
-                  </Title>
-                  <ButtonContainer className="social">
-                    <Button type="default">{<TwitterOutlined />}TWEET</Button>
-                    <Button type="default">{<FacebookFilled />}SHARE</Button>
-                  </ButtonContainer>
-                </div>
-              </div>
-            </div>
-          </Drawer>
           <Link to="#" onClick={handleLogout} className="btn-sign-in">
             {profile}
-            <span>Log out</span>
+            <span>Đăng xuất</span>
           </Link>
-          <Input
-            className="header-search"
-            placeholder="Type here..."
-            prefix={<SearchOutlined />}
-          />
         </Col>
       </Row>
     </>

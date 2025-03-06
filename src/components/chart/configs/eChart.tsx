@@ -1,4 +1,4 @@
-const eChart = {
+const eChart:any = {
   series: [
     {
       name: "Sales",
@@ -11,8 +11,7 @@ const eChart = {
     chart: {
       type: "bar",
       width: "100%",
-      height: "auto",
-
+      height: 300,
       toolbar: {
         show: false,
       },
@@ -38,35 +37,14 @@ const eChart = {
       strokeDashArray: 2,
     },
     xaxis: {
-      categories: [
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-      ],
+      categories: ["Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
       labels: {
         show: true,
         align: "right",
         minWidth: 0,
         maxWidth: 160,
         style: {
-          colors: [
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-          ],
+          colors: Array(9).fill("#fff"),
         },
       },
     },
@@ -77,25 +55,14 @@ const eChart = {
         minWidth: 0,
         maxWidth: 160,
         style: {
-          colors: [
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-            "#fff",
-          ],
+          colors: Array(9).fill("#fff"),
         },
       },
     },
 
     tooltip: {
       y: {
-        formatter: function (val:any) {
+        formatter: function (val: any) {
           return "$ " + val + " thousands";
         },
       },

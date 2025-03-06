@@ -1,244 +1,56 @@
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import { Breadcrumb, BreadcrumbList, BreadcrumbSeparator } from "../../../components/ui/breadcrumb";
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import ProductSkeleton from "./ProductSkeleton";
 import { ProductCard } from "../../../components/footer/components/Home";
-import { Select, Slider } from "antd";
-import { Carousel } from 'antd';
+import { Button, Input, Select, Slider } from "antd";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store/store";
+import { getAllProducts } from "../../../services/ApiServices/productService";
+import { getAllBrands } from "../../../services/ApiServices/brandService";
+import { getAllSkinTypes } from "../../../services/ApiServices/skinTypeService";
+import { originCountries } from "../FormAddProduct/originCountries";
+import { Search } from "lucide-react";
 
 
 const Products = () => {
+    const [searchTerm, setSearchTerm] = useState<string>("");
+
+
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
     const [priceRange, setPriceRange] = useState([0, 10000000]);
     const handlePriceChange = (value: any) => {
         setPriceRange(value);
     };
-    const [selectedBrands, setSelectedBrands] = useState([]);
-    const brands = [
-        {
-            label: 'Cocoon',
-            value: 'cocoon',
-            logo: 'https://mir-s3-cdn-cf.behance.net/project_modules/1400/202667140005381.6239fc9e2048c.png'
-        },
-        {
-            label: 'L\'Oreal',
-            value: 'loreal',
-            logo: 'https://cdn.worldvectorlogo.com/logos/l-oreal-3.svg'
-        },
-        {
-            label: 'CeraVe',
-            value: 'cerave',
-            logo: 'https://i.pinimg.com/originals/01/df/ad/01dfadb784cdcd91ebb730d30592b481.png'
-        },
-        {
-            label: 'Cetaphil',
-            value: 'cetaphil',
-            logo: 'https://www.cetaphil.com.vn/on/demandware.static/-/Sites/default/dwf51c375b/Cetaphil_Logo_285.png'
-        },
-        {
-            label: 'The Ordinary',
-            value: 'ordinary',
-            logo: 'https://logovectordl.com/wp-content/uploads/2020/12/the-ordinary-logo-vector.png'
-        },
-        {
-            label: 'Hada Labo',
-            value: 'hada_labo',
-            logo: 'https://hadalabo.com.vn/wp-content/uploads/2021/03/HDLB_logo_m.png'
-        },
-        {
-            label: 'Kiehl\'s',
-            value: 'kiehls',
-            logo: 'https://cdn.freebiesupply.com/logos/large/2x/kiehls-logo-png-transparent.png'
-        }
-    ];
+    const [selectedBrands, setSelectedBrands] = useState<any>([]);
+    const [brands, setBrands] = useState<any>([]);
 
     const handleBrandChange = (selectedValues: any) => {
         setSelectedBrands(selectedValues);
     };
 
-    const [selectedSkinTypes, setSelectedSkinTypes] = useState([]);
-    const skinTypes = [
-        { label: 'Da Dầu', value: 'oily' },
-        { label: 'Da Khô', value: 'dry' },
-        { label: 'Da Nhạy Cảm', value: 'sensitive' },
-        { label: 'Da Hỗn Hợp', value: 'combination' },
-        { label: 'Da Lão Hóa', value: 'aging' },
-        { label: 'Da Mụn', value: 'acne' },
-    ];
+    const [selectedSkinTypes, setSelectedSkinTypes] = useState<any>([]);
+    const [skinTypes, setSkinTypes] = useState<any>([]);
     const handleSkinTypeChange = (selectedValues: any) => {
         setSelectedSkinTypes(selectedValues);
     };
 
-    const [selectedOriginCountry, setSelectedOriginCountry] = useState([]);
-    const countries = [
-        { label: "Việt Nam", value: "vietnam" },
-        { label: "Hàn Quốc", value: "south_korea" },
-        { label: "Mỹ", value: "usa" },
-        { label: "Nhật Bản", value: "japan" },
-        { label: "Pháp", value: "france" },
-        { label: "Anh", value: "uk" },
-        { label: "Úc", value: "australia" },
-        { label: "Hà Lan", value: "netherlands" },
-        { label: "Đức", value: "germany" },
-        { label: "Thái Lan", value: "thailand" }
-    ];
+    const [selectedOriginCountry, setSelectedOriginCountry] = useState<any>([]);
+    const [countries, setCountries] = useState(originCountries.map((country: any) => (
+        { label: country, value: country }
+    )));
     const handleOriginCountryChange = (selectedValues: any) => {
         setSelectedOriginCountry(selectedValues);
     };
 
-    const products = [
-        {
-            id: "1",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 50,
-            description: "Beautiful earrings with a unique palm design.",
-            origin_price: 835000,
-            disc_price: 120000,
-            origin_country: "USA",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand A",
-            average_rating: 4.5,
-            status: "Hết hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "2",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 30,
-            description: "Elegant necklace with a red birthstone.",
-            origin_price: 100000,
-            disc_price: 90000,
-            origin_country: "USA",
-            skinTypeId: "Sensitive Skin",
-            brandId: "Brand B",
-            average_rating: 4.8,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/glam_2.11.1_18a5ca6f9b814d9bb11125d8c6d2f704_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "3",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1_b5d9938d4e0d4b71b98a3ac1e059d73e_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "4",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "5",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "6",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 50,
-            description: "Beautiful earrings with a unique palm design.",
-            origin_price: 835000,
-            disc_price: 120000,
-            origin_country: "USA",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand A",
-            average_rating: 4.5,
-            status: "Hết hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/thumb_4340a9c074534f69bb76537f11da26c5_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "7",
-            name: " Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 30,
-            description: "Elegant necklace with a red birthstone.",
-            origin_price: 100000,
-            disc_price: 90000,
-            origin_country: "USA",
-            skinTypeId: "Sensitive Skin",
-            brandId: "Brand B",
-            average_rating: 4.8,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/glam_2.11.1_18a5ca6f9b814d9bb11125d8c6d2f704_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "8",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1_b5d9938d4e0d4b71b98a3ac1e059d73e_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "9",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        },
-        {
-            id: "10",
-            name: "Son Merzy, Romand, FOIF, Romand #23 (Starry Edition)",
-            quantity: 20,
-            description: "Dainty butterfly necklace in gold.",
-            origin_price: 1200000,
-            disc_price: 600000,
-            origin_country: "Vietnam",
-            skinTypeId: "All Skin Types",
-            brandId: "Brand C",
-            average_rating: 4.9,
-            status: "Còn hàng",
-            imageUrl: "https://product.hstatic.net/1000006063/product/1200_x_1200_5b80186af6344e41b036b8dc310db177_1024x1024.png",
-            total_reviews: 200
-        }
-    ];
+    const [products, setProducts] = useState<any>([]);
+    const [productsFull, setProductsFull] = useState(products);
 
+    const token = useSelector((state: RootState) => state.token.token);
+    const navigate = useNavigate();
     const ITEMS_PER_PAGE = 10;
     const [currentPage, setCurrentPage] = useState<number>(1);
     const totalPages = Math.ceil(products?.length / ITEMS_PER_PAGE);
@@ -246,6 +58,92 @@ const Products = () => {
         (currentPage - 1) * ITEMS_PER_PAGE,
         currentPage * ITEMS_PER_PAGE
     );
+
+    useEffect(() => {
+        const storedSkinType = sessionStorage.getItem("selectedSkinType");
+        if (storedSkinType) {
+            const parsedSkinTypes = JSON.parse(storedSkinType);
+            setSelectedSkinTypes(parsedSkinTypes);
+        }
+    }, []);
+
+    useEffect(() => {
+        const storedBrand = sessionStorage.getItem("selectedBrand");
+        if (storedBrand) {
+            setSelectedBrands([JSON.parse(storedBrand)]);
+        }
+
+        const storedSkinType = sessionStorage.getItem("selectedSkinType");
+        if (storedSkinType) {
+            setSelectedSkinTypes(JSON.parse(storedSkinType));
+        }
+    }, []);
+
+    const handleClearFilters = () => {
+        setSelectedBrands([]);
+        setSelectedSkinTypes([]);
+        setSelectedOriginCountry([]);
+    }
+
+    const fetchProducts = async () => {
+        // if (!token) {
+        //     navigate("/login");
+        //     return;
+        // }
+        try {
+            setIsLoading(true);
+            const [products, brands, skinTypes] = await Promise.all([
+                getAllProducts(),
+                getAllBrands(),
+                getAllSkinTypes(),
+            ]);
+            console.log(products)
+            const allProducts = products.data
+            let productsData = allProducts.filter((product: any) => product.status === true).map((product: any) => ({
+                id: product.productId,
+                name: product.productName,
+                origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
+                disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
+                origin_country: product.originCountry,
+                skinTypeId: product.skinType.skinName,
+                brandId: product.brand.brandName,
+                imageUrl: product.images[0],
+            }));
+
+            setProducts(productsData);
+            setProductsFull(productsData);
+            setBrands(brands.map((brand: any) => ({
+                label: brand.brandName,
+                value: brand.brandName,
+                logo: brand.imgUrl
+            })));
+            setSkinTypes(skinTypes.result.map((skinType: any) => ({
+                label: skinType.skinName,
+                value: skinType.skinName
+            })));
+        } catch (error: any) {
+            setError(error.toString());
+            console.error("Error fetching skin types", error);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    };
+
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    useEffect(() => {
+        setProducts(productsFull.filter((product: any) =>
+            (selectedBrands.length === 0 || selectedBrands.includes(product.brandId)) &&
+            (selectedSkinTypes.length === 0 || selectedSkinTypes.includes(product.skinTypeId)) &&
+            (selectedOriginCountry.length === 0 || selectedOriginCountry.includes(product.origin_country)) &&
+            priceRange[0] <= product.disc_price && product.disc_price <= priceRange[1] &&
+            product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        ));
+    }, [selectedBrands, selectedSkinTypes, selectedOriginCountry, priceRange, searchTerm, productsFull]);
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -256,171 +154,155 @@ const Products = () => {
 
     return (
         <>
-            <section className="bg-gray-100 p-6">
-                <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
-                    <div>
-                        <Breadcrumb className="">
-                            <BreadcrumbList className="text-[#333]">
-                                <BreadcrumbItem>
-                                    <Link to="/" className="md:text-xl text-lg">
-                                        Trang chủ
-                                    </Link>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator />
-                                <BreadcrumbItem>
-                                    <p className="text-[#333] font-medium md:text-xl text-lg">
-                                        Danh sách sản phẩm
-                                    </p>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
+            <div>
+                <section className="bg-gray-100 p-6">
+                    <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
+                        <div>
+                            <Breadcrumb className="">
+                                <BreadcrumbList className="text-[#333]">
+                                    <BreadcrumbItem>
+                                        <Link to="/" className="md:text-xl text-lg">
+                                            Trang chủ
+                                        </Link>
+                                    </BreadcrumbItem>
+                                    <BreadcrumbSeparator />
+                                    <BreadcrumbItem>
+                                        <p className="text-[#333] font-medium md:text-xl text-lg">
+                                            Danh sách sản phẩm
+                                        </p>
+                                    </BreadcrumbItem>
+                                </BreadcrumbList>
+                            </Breadcrumb>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <div className="max-w-8xl mx-auto p-6 bg-gray-100 ">
-                <div style={{ width: '100%', height: '120px', overflow: 'hidden', }}>
-                    <div style={{ direction: 'rtl' }}>
-                        <Carousel
-                            autoplay
-                            autoplaySpeed={1500}
-                            dots={false}
-                            slidesToShow={4}
-                            slidesToScroll={1}
-                            infinite={true}
-                            effect="scrollx"
-                        >
-                            {brands.map((brand, index) => (
-                                <div
-                                    key={index}
-                                    style={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        alignItems: 'center',
-                                        height: '100%',
-                                    }}
-                                >
-                                    <img
-                                        src={brand.logo}
-                                        alt={brand.label}
-                                        style={{
-                                            maxHeight: '80px',
-                                            objectFit: 'contain',
-                                            marginTop: '25px', // Khoảng cách giữa các logo
-                                        }}
+                <section>
+                    <div className="max-w-8xl mx-auto p-6 bg-gray-100">
+                        <div className="flex gap-2">
+                            <div className="w-full md:w-1/5 p-6 bg-white shadow-md">
+                                <div>
+                                    <div className="flex bg-white mb-2">
+                                        <Search className="text-gray-500 mr-2 mt-2" />
+                                        <Input
+                                            type="text"
+                                            placeholder="Tìm kiếm tên sản phẩm..."
+                                            className="flex-1 px-4 border-none focus:ring-0 focus:outline-none"
+                                            value={searchTerm}
+                                            onChange={handleSearchChange}
+                                        />
+                                    </div>
+
+                                    <h4 className="font-medium text-lg text-left">KHOẢNG GIÁ</h4>
+                                    <Slider
+                                        range
+                                        min={0}
+                                        max={10000000}
+                                        step={50000}
+                                        value={priceRange}
+                                        onChange={handlePriceChange}
+                                        tooltipVisible
+                                        tipFormatter={(value: any) => `${value.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`} // Hiển thị giá trị bằng triệu đồng
+                                    />
+                                    <div className="mt-2 text-sm text-gray-600">
+                                        <span>{`Từ: ${priceRange[0].toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`}</span> -
+                                        <span>{` Đến: ${priceRange[1].toLocaleString("vi-VN", { style: "currency", currency: "VND" })}`}</span>
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <h4 className="font-medium text-lg text-left">THƯƠNG HIỆU</h4>
+                                </div>
+
+                                <div className="w-[100%] mt-1">
+                                    <div>
+                                        <Select
+                                            options={brands}
+                                            value={selectedBrands}
+                                            onChange={handleBrandChange}
+                                            style={{ width: '100%' }}
+                                            placeholder="Chọn thương hiệu"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <h4 className="font-medium text-lg text-left">LOẠI DA</h4>
+                                </div>
+                                <div className="w-[100%] mt-1">
+                                    <div style={{ maxHeight: 135, overflowY: 'auto' }}>
+                                        <Select
+                                            options={skinTypes}
+                                            value={skinTypes.filter((skin: any) => selectedSkinTypes.includes(skin.value))}
+                                            onChange={handleSkinTypeChange}
+                                            style={{ width: '100%' }}
+                                            placeholder="Chọn loại da"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="mt-4">
+                                    <h4 className="font-medium text-lg text-left">XUẤT XỨ</h4>
+                                </div>
+                                <div className="mt-1" >
+                                    <Select
+                                        options={countries}
+                                        value={selectedOriginCountry}
+                                        onChange={handleOriginCountryChange}
+                                        style={{ width: '100%' }}
+                                        placeholder="Chọn quốc gia"
                                     />
                                 </div>
-                            ))}
-                        </Carousel>
-                    </div>
-                </div>
-            </div>
-
-
-            <div className="max-w-8xl mx-auto p-6 bg-gray-100">
-                <div className="flex gap-2">
-                    <div className="w-full md:w-1/5 p-6 bg-white shadow-md">
-                        <div>
-                            <h4 className="font-medium text-lg text-left">KHOẢNG GIÁ</h4>
-                            <Slider
-                                range
-                                min={0}
-                                max={10000000}
-                                step={50000}
-                                value={priceRange}
-                                onChange={handlePriceChange}
-                                tooltipVisible
-                                tipFormatter={(value: any) => `${value / 1000}K VNĐ`} // Hiển thị giá trị bằng triệu đồng
-                            />
-                            <div className="mt-2 text-sm text-gray-600">
-                                <span>{`Từ: ${priceRange[0] / 1000}K VNĐ`}</span> -
-                                <span>{` Đến: ${priceRange[1] / 1000}K VNĐ`}</span>
+                                <Button
+                                    danger
+                                    className="bg-red-500 w-full mt-4"
+                                    size="large"
+                                    onClick={handleClearFilters}
+                                >Xoá tìm kiếm</Button>
                             </div>
-                        </div>
 
-                        <div className="mt-4">
-                            <h4 className="font-medium text-lg text-left">THƯƠNG HIỆU</h4>
-                        </div>
+                            <section className="w-full md:w-4/5 p-6 bg-white shadow-md">
+                                <menu className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+                                    {isLoading ? (
+                                        <ProductSkeleton />
+                                    ) : error ? (
+                                        <p className="text-center text-2xl font-semibold text-red-600 md:col-span-3 lg:col-span-4">
+                                            Lỗi khi tải sản phẩm.
+                                        </p>
+                                    ) : products.length === 0 ? (
+                                        <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
+                                            Không có sản phẩm nào phù hợp.
+                                        </p>
+                                    ) : (
+                                        paginatedmProducts.map((product: any) => (
+                                            <ProductCard key={product.id} product={product} handleBrandChange={handleBrandChange} />
+                                        ))
+                                    )}
 
-                        <div className="w-[100%] mt-1">
-                            <div>
-                                <Select
-                                    options={brands}
-                                    value={selectedBrands}
-                                    onChange={handleBrandChange}
-                                    style={{ width: '100%' }}
-                                    placeholder="Chọn thương hiệu"
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <h4 className="font-medium text-lg text-left">LOẠI DA</h4>
-                        </div>
-                        <div className="w-[100%] mt-1">
-                            <div style={{ maxHeight: 135, overflowY: 'auto' }}>
-                                <Select
-                                    options={skinTypes}
-                                    value={selectedSkinTypes}
-                                    onChange={handleSkinTypeChange}
-                                    style={{ width: '100%' }}
-                                    placeholder="Chọn loại da"
-                                />
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <h4 className="font-medium text-lg text-left">XUẤT XỨ</h4>
-                        </div>
-                        <div className="mt-1" >
-                            <Select
-                                options={countries}
-                                value={selectedOriginCountry}
-                                onChange={handleOriginCountryChange}
-                                style={{ width: '100%' }}
-                                placeholder="Chọn quốc gia"
-                            />
+                                </menu>
+                                <div style={{ marginTop: "20px", marginBottom: '10px', textAlign: 'right' }}>
+                                    {Array.from({ length: totalPages }, (_, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => handlePageChange(index + 1)}
+                                            style={{
+                                                margin: "0 5px",
+                                                padding: "5px 10px",
+                                                backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
+                                                color: currentPage === index + 1 ? "white" : "black",
+                                                border: "none",
+                                                borderRadius: "5px",
+                                                cursor: "pointer",
+                                            }}
+                                        >
+                                            {index + 1}
+                                        </button>
+                                    ))}
+                                </div>
+                            </section>
                         </div>
                     </div>
-
-                    <section className="w-full md:w-4/5 p-6 bg-white shadow-md">
-                        <menu className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
-                            {isLoading ? (
-                                <ProductSkeleton />
-                            ) : error ? (
-                                <p className="text-center text-2xl font-semibold text-red-600 md:col-span-3 lg:col-span-4">
-                                    Error loading products.
-                                </p>
-                            ) : products.length === 0 ? (
-                                <p className="text-center text-2xl font-semibold text-gray-600 md:col-span-3 lg:col-span-4">
-                                    No data found matching your search.
-                                </p>
-                            ) : (
-                                paginatedmProducts.map((product: any) => (
-                                    <ProductCard key={product.id} product={product} />
-                                ))
-                            )}
-
-                        </menu>
-                        <div style={{ marginTop: "20px", marginBottom: '10px', textAlign: 'right' }}>
-                            {Array.from({ length: totalPages }, (_, index) => (
-                                <button
-                                    key={index}
-                                    onClick={() => handlePageChange(index + 1)}
-                                    style={{
-                                        margin: "0 5px",
-                                        padding: "5px 10px",
-                                        backgroundColor: currentPage === index + 1 ? "#419f97" : "#f1f1f1",
-                                        color: currentPage === index + 1 ? "white" : "black",
-                                        border: "none",
-                                        borderRadius: "5px",
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    {index + 1}
-                                </button>
-                            ))}
-                        </div>
-                    </section>
-                </div>
+                </section>
             </div>
         </>
 

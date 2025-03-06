@@ -5,14 +5,10 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { z } from "zod";
 
-import { FaTimes, FaPen, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaPen, FaCheckCircle, FaBuilding, FaImage } from 'react-icons/fa';
 import { Label } from "../../../components/ui/label";
 import { Input } from "../../../components/ui/input";
 import { Button } from "../../../components/ui/button";
-import { Textarea } from "../../../components/ui/textarea";
-import { Modal, Upload } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-
 
 interface EditBrandModalProps {
   isOpen: boolean;
@@ -30,29 +26,12 @@ const EditBrandForm = ({ isOpen, setIsOpen, brand, fetchBrand }: EditBrandModalP
   const brandFormSchema = z.object({
     id: z.number(),
     name: z.string().min(1, "Vui lòng nhập tên"),
-    logo: z.array(
-      z.object({
-        name: z.string(),
-        url: z.string().optional(),
-        thumbUrl: z.string().optional(),
-      })
-    ).min(1, "Vui lòng tải lên logo"),
+    imgUrl: z.string().url("Vui lòng tải lên logo"),
   });
 
   const form = useForm<z.infer<typeof brandFormSchema>>({
     resolver: zodResolver(brandFormSchema),
   });
-
-  const handleCancel = () => setPreviewVisible(false);
-
-  const handlePreview = async (file: any) => {
-    setPreviewImage(file.thumbUrl || file.url);
-    setPreviewVisible(true);
-  };
-
-  const handleChange = ({ fileList: newFileList }: any) => {
-    setFileList(newFileList);
-  };
 
   // useEffect(() => {
   //     if (isOpen) {
@@ -101,7 +80,7 @@ const EditBrandForm = ({ isOpen, setIsOpen, brand, fetchBrand }: EditBrandModalP
               //onSubmit={form.handleSubmit(handleSubmit)} 
               className="flex flex-col gap-6">
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Tên</Label>
+                <Label className="mb-3 text-left">Tên thương hiệu</Label>
                 <div className="relative">
                   <Input
                     {...form.register("name")}
@@ -109,45 +88,40 @@ const EditBrandForm = ({ isOpen, setIsOpen, brand, fetchBrand }: EditBrandModalP
                     type="text"
                     className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                   />
-                  <FaPen className="absolute left-3 top-3 text-gray-500" />
+                  <FaBuilding className="absolute left-3 top-3 text-gray-500" />
                 </div>
                 {form.formState.errors.name && <p className="text-red-500 text-sm">{form.formState.errors.name.message}</p>}
               </div>
 
               {/* Logo Upload Field */}
               <div className="flex flex-col">
-                <Label className="mb-3 text-left">Logo</Label>
-                <Upload
-                  accept="image/*"
-                  listType="picture-card"
-                  fileList={fileList}
-                  onPreview={handlePreview}
-                  onChange={handleChange}
-                  beforeUpload={() => false} // Disable auto-upload
-                >
-                  {fileList.length < 1 && (
-                    <div className="flex flex-col items-center">
-                      <UploadOutlined className="text-2xl" />
-                      <div style={{ marginTop: 8 }}>Upload</div>
-                    </div>
-                  )}
-                </Upload>
-                {form.formState.errors.logo && (
+                <Label className="mb-3 text-left">Logo URL</Label>
+                <div className="relative">
+                  <Input
+                    {...form.register("imgUrl")}
+                    placeholder="Nhập URL"
+                    type="url"
+                    className="p-3 pl-10 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
+                  />
+                  <FaImage className="absolute left-3 top-3 text-gray-500" />
+                </div>
+                {form.formState.errors.imgUrl && (
                   <p className="text-red-500 text-sm">
-                    {form.formState.errors.logo.message}
+                    {form.formState.errors.imgUrl.message}
                   </p>
                 )}
               </div>
 
-              {/* Preview Modal */}
-              <Modal
-                visible={previewVisible}
-                footer={null}
-                onCancel={handleCancel}
-                className="rounded-lg"
-              >
-                <img alt="Preview" style={{ width: "100%" }} src={previewImage} />
-              </Modal>
+              {form.watch("imgUrl") && (
+                <div className="mt-4">
+                  <Label className="text-left">Xem trước</Label>
+                  <img
+                    src={form.watch("imgUrl")}
+                    alt="Logo Preview"
+                    className="w-full h-40 object-cover border rounded-md mt-2"
+                  />
+                </div>
+              )}
 
               <div className="flex justify-end">
                 <Button

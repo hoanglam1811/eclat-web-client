@@ -15,7 +15,7 @@ import { Menu, Button } from "antd";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 
-function Sidenav({ color }:any) {
+function Sidenav({ color }: any) {
   const { pathname } = useLocation();
   const page = pathname.replace("/", "");
 
@@ -162,9 +162,9 @@ function Sidenav({ color }:any) {
 
   return (
     <>
-      <div className="brand">
-        <img src={logo} alt="" />
-        <span>Muse Dashboard</span>
+      <div className="brand flex items-center gap-3">
+        <img className="w-[60px] h-[60px]" src={"/src/assets/Éclat.png"} alt="" />
+        <span>Éclat Dashboard</span>
       </div>
       <hr />
       <Menu theme="light" mode="inline">
@@ -182,7 +182,7 @@ function Sidenav({ color }:any) {
           </NavLink>
         </Menu.Item>
         <Menu.Item key="2">
-          <NavLink to="/admin/tables">
+          <NavLink to="/admin/customer-management">
             <span
               className="icon"
               style={{
@@ -191,7 +191,46 @@ function Sidenav({ color }:any) {
             >
               {tables}
             </span>
-            <span className="label">Tables</span>
+            <span className="label">Quản lý khách hàng</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="9">
+          <NavLink to="/admin/staff-management">
+            <span
+              className="icon"
+              style={{
+                background: page === "staff-management" ? color : "",
+              }}
+            >
+              {tables}
+            </span>
+            <span className="label">Quản lý nhân viên</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="10">
+          <NavLink to="/admin/skincare-quiz-management">
+            <span
+              className="icon"
+              style={{
+                background: page === "skincare-quiz-management" ? color : "",
+              }}
+            >
+              {tables}
+            </span>
+            <span className="label">Quản lý câu hỏi</span>
+          </NavLink>
+        </Menu.Item>
+        <Menu.Item key="1">
+          <NavLink to="/admin/blog-management">
+            <span
+              className="icon"
+              style={{
+                background: page === "blog-management" ? color : "",
+              }}
+            >
+              {tables}
+            </span>
+            <span className="label">Quản lý bài viết</span>
           </NavLink>
         </Menu.Item>
         <Menu.Item key="3">
@@ -207,65 +246,7 @@ function Sidenav({ color }:any) {
             <span className="label">Billing</span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item key="4">
-          <NavLink to="/admin/rtl">
-            <span
-              className="icon"
-              style={{
-                background: page === "rtl" ? color : "",
-              }}
-            >
-              {rtl}
-            </span>
-            <span className="label">RTL</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item className="menu-item-header" key="5">
-          Account Pages
-        </Menu.Item>
-        <Menu.Item key="6">
-          <NavLink to="/admin/profile">
-            <span
-              className="icon"
-              style={{
-                background: page === "profile" ? color : "",
-              }}
-            >
-              {profile}
-            </span>
-            <span className="label">Profile</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="7">
-          <NavLink to="/admin/sign-in">
-            <span className="icon">{signin}</span>
-            <span className="label">Sign In</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="8">
-          <NavLink to="/admin/sign-up">
-            <span className="icon">{signup}</span>
-            <span className="label">Sign Up</span>
-          </NavLink>
-        </Menu.Item>
       </Menu>
-      <div className="aside-footer">
-        <div
-          className="footer-box"
-          style={{
-            background: color,
-          }}
-        >
-          <span className="icon" style={{ color }}>
-            {dashboard}
-          </span>
-          <h6>Need Help?</h6>
-          <p>Please check our docs</p>
-          <Button type="primary" className="ant-btn-sm ant-btn-block">
-            DOCUMENTATION
-          </Button>
-        </div>
-      </div>
     </>
   );
 }

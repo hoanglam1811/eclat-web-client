@@ -15,7 +15,7 @@ import { Button } from "../../../components/ui/button";
 import AddBrandModal from "./AddBrandForm";
 import EditBrandForm from "./EditBrandForm";
 import { CloseCircleOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
-import { Input } from "antd";
+import { Avatar, Input, Typography } from "antd";
 import { RootState } from "../../../store/store";
 import { useSelector } from "react-redux";
 import { getAllBrands } from "../../../services/ApiServices/brandService";
@@ -35,7 +35,6 @@ const BrandsManagement = () => {
     const handleCloseImage = () => {
         setOpenImageModal(false);
     };
-    // const sampleBrands = [
     //     {
     //         id: "1",
     //         label: 'Cocoon',
@@ -82,12 +81,9 @@ const BrandsManagement = () => {
 
     const [brands, setBrands] = useState<any[]>([]);
     const token = useSelector((state: RootState) => state.token.token);
-    //const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-
     const [openAddBrand, setOpenAddBrand] = useState<boolean>(false);
-
     const [openEditBrand, setOpenEditBrand] = useState<boolean>(false);
     const [currentBrand, setCurrentBrand] = useState<any | null>(null);
     const [searchQuery, setSearchQuery] = useState('');

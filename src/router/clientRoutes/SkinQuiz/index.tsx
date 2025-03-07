@@ -134,7 +134,7 @@ export default function SkinQuiz() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-200 p-6">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-200 p-6 pt-40">
             <div className="w-full max-w-5xl bg-white p-8 rounded-2xl shadow-2xl">
                 <h1 className="text-4xl font-extrabold text-center text-gray-800 mb-8">Skincare Quiz</h1>
                 {quizzes.map((quiz: any, index: number) => (

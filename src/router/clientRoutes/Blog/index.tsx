@@ -56,7 +56,7 @@ export default function SkincareBlog() {
 
     return (
         <div
-            className="min-h-screen bg-gradient-to-r from-pink-100 to-blue-100 py-12 px-6"
+            className="min-h-screen bg-gradient-to-r from-pink-100 to-blue-100 py-12 px-6 pt-40"
         >
             <div className="max-w-5xl mx-auto text-center">
                 <h1 className="text-4xl font-bold text-gray-800 mb-4">✨ Blog Chăm Sóc Da ✨</h1>

@@ -99,7 +99,9 @@ const Products = () => {
             ]);
             console.log(products)
             const allProducts = products.data
-            let productsData = allProducts.filter((product: any) => product.status === true).map((product: any) => ({
+            let productsData = allProducts.filter((product: any) => 
+              product.status === true)
+              .map((product: any) => ({
                 id: product.productId,
                 name: product.productName,
                 origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
@@ -155,7 +157,7 @@ const Products = () => {
     return (
         <>
             <div>
-                <section className="bg-gray-100 p-6">
+                <section className="bg-gray-100 p-6 pt-40">
                     <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                         <div>
                             <Breadcrumb className="">

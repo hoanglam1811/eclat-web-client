@@ -40,7 +40,7 @@ export default function SkincareBlogDetails() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 py-10 px-6 lg:px-24">
+        <div className="min-h-screen bg-gray-50 py-10 px-6 lg:px-24 pt-40">
             <div className="flex justify-start">
                 <Button icon={<ArrowLeftOutlined />} className="mb-5" onClick={() => navigate(-1)}>
                     Quay lại

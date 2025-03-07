@@ -150,6 +150,7 @@ const ProductDetails = () => {
     }, [product]);
 
     const handleOptionSelect = (option: any) => {
+        setQuantity(1);
         if (selectedOption?.optionId === option.optionId) {
             setSelectedOption(null);
         } else {
@@ -241,7 +242,7 @@ const ProductDetails = () => {
 
     return (
         <>
-            <section className="bg-gray-100 p-6">
+            <section className="bg-gray-100 p-6 pt-40">
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>
                         <Breadcrumb className="">
@@ -418,8 +419,8 @@ const ProductDetails = () => {
                                                         return (
                                                             <div
                                                                 key={option.optionId}
-                                                                className={`flex relative items-center p-2 border rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 ${selectedOption == option && "border-4 border-orange-500 rounded-lg"}`}
-                                                                onClick={() => handleOptionSelect(option)}
+                                                                className={`flex relative items-center p-2 border ${option.quantity <= 0 && "cursor-not-allowed bg-gray-200"} rounded-lg shadow-sm cursor-pointer hover:bg-gray-100 ${selectedOption == option && "border-4 border-orange-500 rounded-lg"}`}
+                                                                onClick={() => option.quantity > 0 && handleOptionSelect(option)}
                                                             >
                                                                 <div className="w-2/3 h-8">
                                                                     <img
@@ -448,22 +449,26 @@ const ProductDetails = () => {
                                         <div className=" space-x-4 mb-6 flex items-center mt-4">
                                             <h4 className="text-lg font-semibold text-gray-700 mb-2 text-left flex flex-wrap">Số lượng:</h4>
                                             <button
-                                                onClick={() => handleQuantityChange(-1)}
+                                                onClick={() =>  handleQuantityChange(-1)}
                                                 className="px-4 py-2 bg-gray-200 text-lg rounded hover:bg-gray-300"
                                             >
                                                 -
                                             </button>
                                             <span className="text-xl">{quantity}</span>
                                             <button
-                                                onClick={() => handleQuantityChange(1)}
-                                                className="px-4 py-2 bg-gray-200 text-lg rounded hover:bg-gray-300"
+                                                onClick={() => selectedOption && quantity < selectedOption.quantity && handleQuantityChange(1)}
+                                                className="px-4 py-2 bg-gray-200 text-lg rounded hover:bg-gray-300 disabled:cursor-not-allowed"
+                                                disabled={selectedOption && quantity >= selectedOption.quantity}  
                                             >
                                                 +
                                             </button>
 
                                             {/* Tổng số lượng sản phẩm có sẵn từ tất cả options */}
-                                            <span className="text-lg text-gray-600 ml-4">
-                                                {`${product?.options?.reduce((total: any, option: any) => total + option.quantity, 0)} sản phẩm có sẵn`}
+                                            <span className={`text-lg  ml-4 ${product?.options?.reduce((total: any, option: any) => total + option.quantity, 0) <= 0
+                                              ? "text-red-500": "text-gray-600"}`}>
+                                              {product?.options?.reduce((total: any, option: any) => total + option.quantity, 0) <=0 ? "Hết hàng" :
+                                                (`${product?.options?.reduce((total: any, option: any) => total + option.quantity, 0)} sản phẩm có sẵn`) 
+                                              }
                                             </span>
                                         </div>
 
@@ -472,14 +477,18 @@ const ProductDetails = () => {
                                     {/* Action Buttons */}
                                     <div className="flex justify-center space-x-6">
                                         <button
-                                            onClick={handleAddToCart}
-                                            className="px-8 py-4 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
+                                            onClick={() => product?.options?.reduce((total: any, option: any) => total + option.quantity, 0) > 0 && handleAddToCart()}
+                                            disabled={product?.options?.reduce((total: any, option: any) => total + option.quantity, 0) <= 0}
+                                            className={`px-8 py-4 text-white font-semibold rounded-lg shadow-md transition duration-300 transform hover:scale-105 
+                                            ${product?.options?.reduce((total: any, option: any) => total + option.quantity, 0) <= 0 ? "bg-gray-300" : "bg-green-600 hover:bg-green-700"}`}
                                         >
                                             Thêm vào giỏ
                                         </button>
                                         <button
-                                            onClick={handleBuyNow}
-                                            className="px-8 py-4 bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300 transform hover:scale-105"
+                                            onClick={() => product?.options?.reduce((total: any, option: any) => total + option.quantity, 0) > 0 && handleBuyNow()}
+                                            disabled={product?.options?.reduce((total: any, option: any) => total + option.quantity, 0) <= 0}
+                                            className={`px-8 py-4 text-white font-semibold rounded-lg shadow-md transition duration-300 transform hover:scale-105
+                                            ${product?.options?.reduce((total: any, option: any) => total + option.quantity, 0) <= 0 ? "bg-gray-300" : "bg-orange-600 hover:bg-green-700"}`}
                                         >
                                             Mua ngay
                                         </button>

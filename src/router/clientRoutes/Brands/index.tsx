@@ -53,7 +53,7 @@ const Brands = () => {
 
     return (
         <>
-            <section className="bg-gray-100 p-6">
+            <section className="bg-gray-100 p-6 pt-40">
                 
                 <div className="bg-gray-100 top-0 left-0 items-start ml-8 z-10 ">
                     <div>

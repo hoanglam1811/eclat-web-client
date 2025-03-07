@@ -157,7 +157,7 @@ const Home = () => {
     return (
         <>
             {/* Carousel Section */}
-            <section style={{ backgroundColor: "#fdf5e6" }}>
+            <section className="pt-30" style={{ backgroundColor: "#fdf5e6" }}>
                 <Carousel autoplaySpeed={3000} autoplay >
                     <div>
                         <img

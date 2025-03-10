@@ -1,6 +1,5 @@
 import { Navigate, RouteObject } from "react-router-dom";
 import RouteNames from "../../constants/routeNames";
-import Billing from "./Billing";
 import Home from "./Home";
 import StaffManagement from "./StaffManagement";
 import SkincareQuiz from "../clientRoutes/QuizManagement";
@@ -8,10 +7,6 @@ import SkincareBlogManagement from "../clientRoutes/BlogManagement";
 import CustomerManagement from "./CustomerManagement";
 
 const publicRoutes: RouteObject[] = [
-  {
-    path: RouteNames.BILLING,
-    element: <Billing />,
-  },
   {
     path: RouteNames.ADMIN_HOME,
     element: <Home />,

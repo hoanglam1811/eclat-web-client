@@ -114,7 +114,7 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchRelatedProducts = async () => {
             console.log("product", product)
-            if (!product.brandId || !product.skinTypeId) {
+            if (!product.brand.brandId || !product.skinType.id) {
                 console.error("Thiếu dữ liệu brand hoặc skinType:", product);
                 return;
             }
@@ -124,19 +124,19 @@ const ProductDetails = () => {
                 const filteredProducts = allProducts.data.filter(
                     (item: any) =>
                         item.productId !== product.productId &&
-                        (item.brand.brandId === product.brandId ||
-                            item.skinType.id === product.skinTypeId)
+                        (item.brand.brandId === product.brand.brandId ||
+                            item.skinType.id === product.skinType.id)
                 ).map((product: any) => ({
                     id: product.productId,
                     name: product.productName,
                     origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
                     disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
                     origin_country: product.originCountry,
-                    skinTypeId: product.skinTypeId,
-                    brandId: product.brandId,
-                    imageUrl: product.images,
+                    skinTypeId: product.skinType.id,
+                    brandId: product.brand.brandName,
+                    imageUrl: product.images[0],
                 }));
-
+                console.log(filteredProducts)
                 setRelatedProducts(filteredProducts);
                 console.log("filteredProducts", filteredProducts)
             } catch (error) {
@@ -144,10 +144,11 @@ const ProductDetails = () => {
             }
         };
 
-        if (product && product.brandId && product.skinTypeId) {
+        if (product && product.brand.brandId && product.skinType.id) {
             fetchRelatedProducts();
         }
-    }, [product]);
+        console.log(product)
+    },[product]);
 
     const handleOptionSelect = (option: any) => {
         setQuantity(1);

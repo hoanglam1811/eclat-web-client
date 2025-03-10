@@ -108,7 +108,7 @@ function CustomerManagement() {
             <Card
               bordered={false}
               className="criclebox tablespace mb-24"
-              title="Tài khoản Staff"
+              title="Tài khoản khách hàng"
               extra={
                 <>
                   <Radio.Group onChange={onChange} defaultValue="a">

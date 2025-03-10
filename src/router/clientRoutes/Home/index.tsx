@@ -151,7 +151,7 @@ const Home = () => {
         slidesToShow: 1,
         slidesToScroll: 1,
         autoplay: true,
-        autoplaySpeed: 1500,
+        autoplaySpeed: 2000,
     };
 
     return (
@@ -295,8 +295,49 @@ const Home = () => {
                 </div>
             </section>
 
+            <section className="p-10 bg-orange-100">
+                <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-8">
+                    {/* Nội dung giới thiệu */}
+                    <div className="w-full md:w-3/5 ">
+                        <h3 className="text-3xl font-bold text-[#578a3f] mb-5">
+                            Khám Phá Làn Da Của Bạn Ngay Hôm Nay!
+                        </h3>
+                        <p className="text-gray-700 leading-relaxed text-lg text-left">
+                            Bạn có biết <span className="font-semibold text-[#578a3f]">làn da của mình thuộc loại nào</span> không?
+                            Hiểu đúng về làn da giúp bạn lựa chọn sản phẩm chăm sóc phù hợp nhất! ✨
+                            <br /><br />
+                            Hãy tham gia <span className="font-semibold text-[#578a3f]">Skin Quiz</span> - bài trắc nghiệm nhanh chóng và chính xác,
+                            giúp bạn xác định loại da <span className="text-[#578a3f]">chỉ trong 1 phút</span> và nhận gợi ý sản phẩm hoàn hảo dành riêng cho bạn. 💖
+                        </p>
 
-            <section className="p-6 bg-orange-100 pt-16 pb-13">
+                        <div className="mt-8">
+                            <button
+                                onClick={() => {
+                                    window.scrollTo({ top: 0, behavior: "smooth" });
+                                    navigate("/skin-quiz");
+                                }}
+                                className="px-6 py-3 text-lg font-semibold text-white bg-[#578a3f] rounded-lg shadow-md transition duration-300 hover:bg-[#466e32] hover:shadow-lg"
+                            >
+                                Bắt đầu Skin Quiz
+                            </button>
+                        </div>
+
+                    </div>
+                    {/* Hình ảnh minh họa */}
+                    <div className="w-full md:w-2/5 flex justify-center">
+                        <img
+                            src="https://www.timelessha.com/cdn/shop/files/Skin-Quiz-Pages_-Mobile_1_24a5be1d-ea76-4975-b373-b151cfabd703.jpg?v=1706775499"
+                            alt="Skin Quiz - Xác định loại da"
+                            className="w-full max-w-md max-h-[550px] object-cover rounded-xl shadow-lg transition-transform duration-300 hover:scale-105"
+                        />
+                    </div>
+
+
+                </div>
+            </section>
+
+
+            <section className="p-6 bg-orange-200 pt-16 pb-13">
                 <h2 className="text-center text-3xl font-bold mb-8 text-[#578a3f]">
                     KHÁCH HÀNG CỦA CHÚNG TÔI NÓI GÌ
                 </h2>
@@ -321,7 +362,7 @@ const Home = () => {
                 </div>
             </section>
 
-            <section className="p-6 bg-orange-200">
+            <section className="p-6 bg-orange-100">
                 <h2 className="text-center text-3xl font-extrabold my-8 text-[#578a3f] ">GÓC LÀM ĐẸP</h2>
 
                 <div className="mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">

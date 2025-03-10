@@ -60,12 +60,11 @@ export default function SkinQuiz() {
 
         console.log("Skin Type Names:", skinTypeNames);
 
-        if (skinTypeNames.length > 0) {
-            setSkinType(skinTypeNames.join(", "));
-            const firstSkinType = skinTypeNames[0];
-            sessionStorage.setItem("selectedSkinType", JSON.stringify([firstSkinType]));
+        if (skinTypeNames.length === 1) {
+            setSkinType(skinTypeNames[0]);
+            sessionStorage.setItem("selectedSkinType", JSON.stringify([skinTypeNames[0]]));
         } else {
-            setSkinType(null);
+            setSkinType(skinTypeNames.join(", "));
         }
     }, [quizzes, selectedAnswers]);
 
@@ -185,18 +184,16 @@ export default function SkinQuiz() {
                 <Modal
                     title="Kết quả phân tích da"
                     visible={isModalVisible}
-                    okText="Đến thử xem sao"
-                    cancelText="Bỏ lỡ"
-                    onOk={() => navigate("/products")}
-                    onCancel={() => navigate("/home")}
+                    okText={skinType.includes(",") ? null : "Đến thử xem sao"}
+                    cancelText={skinType.includes(",") ? null : "Bỏ lỡ"}
+                    onOk={skinType.includes(",") ? undefined : () => navigate("/products")}
+                    onCancel={skinType.includes(",") ? undefined : () => navigate("/home")}
                 >
                     <p className="text-lg font-semibold mb-4">Dưới đây là câu trả lời bạn đã chọn:</p>
                     <div className="max-h-[400px] overflow-y-auto pr-2">
-
                         <ul className="mb-4">
                             {quizzes.map((quiz, index) => {
                                 const selectedAnswer = quiz.answers.find((a: any) => a.id === selectedAnswers[quiz.id]);
-                                console.log(selectedAnswer);
                                 return (
                                     <li key={quiz.id} className="mb-2">
                                         <strong>Câu {index + 1}: </strong> {quiz.question_text}
@@ -213,6 +210,7 @@ export default function SkinQuiz() {
                                 );
                             })}
                         </ul>
+
                         <p className="text-lg">
                             Sau khi thu thập đáp án của bạn, có thể da của bạn thuộc loại{" "}
                             <strong className="text-green-600">{skinType}</strong>.
@@ -220,15 +218,14 @@ export default function SkinQuiz() {
 
                         {skinType.includes(",") && (
                             <p className="text-sm text-gray-600 mt-2">
-                                Chúng tôi chỉ được gợi ý cho bạn 1 loại da, nếu có thắc mắc gì thêm, chúng tôi khuyên bạn nên đến phòng khám da liễu để được tư vấn chi tiết hơn.
+                                Chúng tôi chỉ có thể gợi ý một loại da duy nhất. Nếu bạn có thắc mắc, hãy đến phòng khám da liễu để được tư vấn chuyên sâu hơn.
                             </p>
                         )}
 
-                        <p>Bạn có muốn xem thử các sản phẩm phù hợp với loại da này không?</p>
+                        {!skinType.includes(",") && <p>Bạn có muốn xem thử các sản phẩm phù hợp với loại da này không?</p>}
                     </div>
                 </Modal>
             )}
-
         </div>
     );
 }

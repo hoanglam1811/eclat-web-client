@@ -10,7 +10,7 @@ import { ApexOptions } from "apexcharts";
 
 function LineChart({ }) {
   const { Title } = Typography;
-  const [chartData, setChartData] = useState<any>({ dates: [], vnpayData: [], cashData: [] });
+  const [chartData, setChartData] = useState<any>({ dates: [], vnpayData: [], cashData: [], totalRevenue: 0 });
   const [selectedYear, setSelectedYear] = useState<any>(null);
 
   const handleYearChange = (selectedOption: any) => {
@@ -65,8 +65,8 @@ function LineChart({ }) {
       await fetchOrders();
       return
     }
-    console.log(selectedYear, selectedMonth);
     
+    let totalRevenue = 0;
     try{
       const orders = await getAllOrders(token);
       const revenueByDate: any = {};
@@ -76,13 +76,14 @@ function LineChart({ }) {
           const year = orderDate.getFullYear();
           const month = orderDate.getMonth() + 1;
           const date = orderDate.getDate();
-          
+ 
           // Format based on selection
           let key = `${date}/${month}/${year}`; // Default (day/month/year)
           if (selectedYear && !selectedMonth) key = `${month}/${year}`; // Month/Year if only year is selected
           // if (!selectedYear && !selectedMonth) key = `${year}`; // Group by year if no filter
           
           const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity, 0);
+          totalRevenue += revenue;
 
           if (!revenueByDate[key]) {
               revenueByDate[key] = { vnpay: 0, cash: 0 };
@@ -113,7 +114,7 @@ function LineChart({ }) {
           // Nếu chỉ chọn năm, tạo đủ 12 tháng
           dates = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
       }
-      setChartData({ dates, vnpayData, cashData });
+      setChartData({ dates, vnpayData, cashData, totalRevenue });
     } catch (error) {
       console.error("Error fetching orders:", error);
       notification.error({ message: "Đã có lỗi xảy ra!" })
@@ -192,12 +193,15 @@ function LineChart({ }) {
 
   const processChartData = (orders: any) => {
     const revenueByDate: any = {};
+    let totalRevenue = 0;
 
     orders.forEach((order: any) => {
       const date = new Date(order.createAt).toLocaleDateString("vi-VN");
-      
-      const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity * 1, 0);
+
+      const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity, 0);
       console.log("revenue", revenue);
+
+      totalRevenue += revenue;
 
       if (!revenueByDate[date]) {
         revenueByDate[date] = { vnpay: 0, cash: 0 };
@@ -211,6 +215,7 @@ function LineChart({ }) {
     });
     console.log("revenueByDate", revenueByDate);
 
+
     const dates = Object.keys(revenueByDate).sort((a, b) => {
       const [dayA, monthA, yearA] = a.split("/").map(Number);
       const [dayB, monthB, yearB] = b.split("/").map(Number);
@@ -220,15 +225,16 @@ function LineChart({ }) {
     const vnpayData = dates.map((date) => revenueByDate[date].vnpay);
     const cashData = dates.map((date) => revenueByDate[date].cash);
 
-    return { dates, vnpayData, cashData };
+    return { dates, vnpayData, cashData, totalRevenue };
   };
 
 
   return (
     <>
       <div className="linechart">
-        <Title level={5}>Doanh thu</Title>
-
+        <Title level={5}>
+          Doanh thu: {chartData.totalRevenue.toLocaleString("vi-VN")} VNĐ
+        </Title>
         <div className="sales">
           <ul>
             <li><MinusOutlined /> VNPAY</li>

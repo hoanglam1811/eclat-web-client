@@ -198,12 +198,11 @@ function StaffManagement() {
                         </>
                       ),
                       create_at: (
-                        <>
-                          <div className="ant-employed">
-                            <span>{user.create_at}</span>
-                          </div>
-                        </>
+                        <div className="ant-employed">
+                          <span>{new Date(user.create_at).toLocaleDateString("vi-VN")}</span>
+                        </div>
                       ),
+                                            
                       status: (
                         <>
                           <Button className={`${user.status ? "bg-green-500 text-white hover:bg-green-600" : "bg-gray-500 text-white"}`}>

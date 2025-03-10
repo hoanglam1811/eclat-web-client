@@ -72,7 +72,11 @@ const AccountOrder = () => {
                 };
             });
 
-            setOrders(formattedOrders);
+            const sortedOrders = formattedOrders.sort((a:any, b:any) => 
+                new Date(b.date).getTime() - new Date(a.date).getTime()
+            );
+
+            setOrders(sortedOrders);
         } catch (error) {
             console.error("Lỗi khi tải danh sách đơn hàng:", error);
         }
@@ -179,6 +183,7 @@ const AccountOrder = () => {
             title: "Ngày Mua",
             dataIndex: "date",
             key: "date",
+            sorter: (a:any, b:any) => new Date(b.date).getTime() - new Date(a.date).getTime(),
             render: (date: string) => {
                 const formattedDate = new Date(date).toLocaleDateString("vi-VN", {
                     month: "2-digit",
@@ -187,7 +192,7 @@ const AccountOrder = () => {
                 });
                 return formattedDate;
             }
-        },
+        },        
         {
             title: "Trạng Thái",
             dataIndex: "status",

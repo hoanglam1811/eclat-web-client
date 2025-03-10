@@ -31,22 +31,21 @@ const ProductsManagement = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>("all");
     const statusOptions = [
-      { value: "all", label: 'Tất cả' },
-      { value: "true", label: 'Hoạt động' },
-      { value: "false", label: 'Không hoạt động' }
+        { value: "all", label: 'Tất cả' },
+        { value: "true", label: 'Hoạt động' },
+        { value: "false", label: 'Không hoạt động' }
     ]
 
     const [currentPage, setCurrentPage] = useState<number>(1);
-    
+
     const filteredProducts = products.filter(product =>
         (product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brandId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.skinTypeId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.origin_country.toLowerCase().includes(searchQuery.toLowerCase())
-    ) &&
+            product.brandId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.skinTypeId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            product.origin_country.toLowerCase().includes(searchQuery.toLowerCase())
+        ) &&
         (statusFilter === "all" || product.status === (statusFilter === "true" ? "Hoạt động" : "Không hoạt động"))
     );
-
 
     const totalPages = Math.ceil(filteredProducts?.length / ITEMS_PER_PAGE);
 
@@ -66,29 +65,35 @@ const ProductsManagement = () => {
         }
         getAllProducts()
             .then((data) => {
-                setProducts(data.data.map((product: any) => {
-                    const totalQuantity = product.options.reduce((total: number, option: any) => total + option.quantity, 0);
-                    
-                    return {
-                        id: product.productId,
-                        name: product.productName,
-                        origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
-                        disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
-                        quantity: totalQuantity == 0 ? "Hết hàng" : totalQuantity,
-                        origin_country: product.originCountry,
-                        skinTypeId: product.skinType.skinName,
-                        brandId: product.brand.brandName,
-                        imageUrl: product.images[0]?.imageUrl,
-                        status: product.status ? "Hoạt động" : "Không hoạt động",
-                    };
-                }));                
+                const sortedProducts = data.data
+                    .map((product: any) => {
+                        const totalQuantity = product.options.reduce((total: number, option: any) => total + option.quantity, 0);
+
+                        return {
+                            id: product.productId,
+                            name: product.productName,
+                            origin_price: Math.min(...product.options.map((option: any) => option.optionPrice)),
+                            disc_price: Math.min(...product.options.map((option: any) => option.discPrice)),
+                            quantity: totalQuantity == 0 ? "Hết hàng" : totalQuantity,
+                            origin_country: product.originCountry,
+                            skinTypeId: product.skinType.skinName,
+                            brandId: product.brand.brandName,
+                            imageUrl: product.images[0]?.imageUrl,
+                            status: product.status ? "Hoạt động" : "Không hoạt động",
+                            createAt: new Date(product.createAt) // Chuyển về kiểu Date để sắp xếp
+                        };
+                    })
+                    .sort((a: any, b: any) => b.createAt.getTime() - a.createAt.getTime());
+
+                setProducts(sortedProducts);
             })
             .catch((error) => {
-                console.error("Error fetching accounts:", error);
+                console.error("Error fetching products:", error);
             })
             .finally(() => {
                 setLoading(false);
             });
+
     };
 
     useEffect(() => {
@@ -125,20 +130,20 @@ const ProductsManagement = () => {
                         <DeleteOutlined />
                     </Button>
                     <div className="text-left ml-[100px]">
-                      <span>Trạng thái: </span>
-                      <Select
-                        options={statusOptions}
-                        value={statusOptions.find((option) => option.value == statusFilter)}
-                        onChange={(e:any) => {
-                          setStatusFilter(e)
-                        }}
-                        style={{ width: '100%' }}
-                        placeholder="Chọn trang thái"
+                        <span>Trạng thái: </span>
+                        <Select
+                            options={statusOptions}
+                            value={statusOptions.find((option) => option.value == statusFilter)}
+                            onChange={(e: any) => {
+                                setStatusFilter(e)
+                            }}
+                            style={{ width: '100%' }}
+                            placeholder="Chọn trang thái"
                         />
                     </div>
                 </div>
 
-                
+
 
                 <Button
                     onClick={() => navigate(RouteNames.PRODUCT_ADDITION)}

@@ -4,13 +4,11 @@ import { FaShoppingCart, FaUserCircle, FaPhone, FaIdBadge, FaCheckCircle, FaUser
 import { MdDateRange, MdOutlinePayment } from "react-icons/md";
 import LineChart from "../../components/chart/LineChart";
 import { Label } from "../../components/ui/label";
-import { Input } from "../../components/ui/input";
-import { getAllPayments } from "../../services/ApiServices/vnpayService";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { getAllOrders } from "../../services/ApiServices/orderService";
 import { getAllUsers } from "../../services/ApiServices/userService";
-
+import { PieChart, Pie, Cell, Legend } from "recharts";
 
 interface Customer {
   id: string;
@@ -52,6 +50,16 @@ function Home() {
   const [totalCustomers, setTotalCustomers] = useState<number>(0);
   const [totalEmployees, setTotalEmployees] = useState<number>(0);
   const [totalOrders, setTotalOrders] = useState<number>(0);
+  const paymentData = [
+    { name: "VNPAY", value: order.filter(o => o.paymentMethod.toLowerCase() === "vnpay").length },
+    { name: "Tiền mặt", value: order.filter(o => o.paymentMethod.toLowerCase() === "cash").length }
+  ];
+  console.log(paymentData)
+
+  const COLORS = ["#0088FE", "#FFBB28"];
+  const renderCustomLabel = ({ name, percent }: { name: string; percent: number }) => {
+    return `${name}: ${(percent * 100).toFixed(0)}%`;
+  };
   console.log(selectedProduct)
 
   const totalQuantity = selectedProduct?.options
@@ -70,6 +78,10 @@ function Home() {
 
   const filteredOrders =
     filter === "all" ? order : order.filter((order) => order.paymentMethod.toUpperCase() === filter.toUpperCase());
+
+  const sortedOrders = [...filteredOrders].sort((a, b) =>
+    new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
+  );
 
   const showModal = (customer: any) => {
     setSelectedCustomer(customer);
@@ -122,39 +134,73 @@ function Home() {
 
   return (
     <div className="w-full">
-      <Row gutter={16} className="mb-6">
-        <Col xs={24} sm={8}>
-          <Card bordered={false} className="shadow-md rounded-lg">
-            <div className="flex items-center gap-4">
-              <FaShoppingCart className="text-blue-500 text-3xl" />
-              <Statistic title="Tổng Đơn Hàng" value={totalOrders} />
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card bordered={false} className="shadow-md rounded-lg">
-            <div className="flex items-center gap-4">
-              <FaUsers className="text-green-500 text-3xl" />
-              <Statistic title="Tổng Khách Hàng" value={totalCustomers} />
-            </div>
-          </Card>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Card bordered={false} className="shadow-md rounded-lg">
-            <div className="flex items-center gap-4">
-              <FaUserTie className="text-purple-500 text-3xl" />
-              <Statistic title="Tổng Nhân Viên" value={totalEmployees} />
-            </div>
-          </Card>
-        </Col>
-      </Row>
-      <Row className="w-full">
-        <Col xs={24} className="mb-24">
-          <Card bordered={false} className="criclebox h-full">
-            <LineChart />
-          </Card>
-        </Col>
-      </Row>
+      <div>
+        {/* Biểu đồ đường */}
+        <Row className="w-full">
+          <Col xs={24} className="mb-24">
+            <Card bordered={false} className="criclebox h-full">
+              <LineChart />
+            </Card>
+          </Col>
+        </Row>
+        <div>
+          <Row gutter={[16, 16]} className="mb-6 flex">
+            {/* Biểu đồ Tỷ lệ phương thức thanh toán (Chiếm 3 hàng, 1 cột) */}
+            <Col span={15} className="flex">
+              <Card bordered={false} className="shadow-md rounded-lg w-full flex-1 flex items-center justify-center">
+                <div className="flex flex-col items-center">
+                  <h3 className="text-lg font-semibold mb-4">Tỷ lệ phương thức thanh toán</h3>
+                  <PieChart width={350} height={300}>
+                    <Pie
+                      data={paymentData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={70}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      paddingAngle={5}
+                      dataKey="value"
+                      label={renderCustomLabel}
+                    >
+                      {paymentData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index]} />
+                      ))}
+                    </Pie>
+                    <Legend />
+                  </PieChart>
+                </div>
+              </Card>
+            </Col>
+
+            {/* Ba thẻ chỉ số (Mỗi cái chiếm 1 hàng, 1 cột, cách đều nhau) */}
+            <Col span={9} className="flex flex-col gap-4">
+              <Card bordered={false} className="shadow-md rounded-lg flex-1 flex items-center">
+                <div className="flex items-center gap-4">
+                  <FaShoppingCart className="text-blue-500 text-3xl" />
+                  <Statistic title="Tổng Đơn Hàng" value={totalOrders} />
+                </div>
+              </Card>
+
+              <Card bordered={false} className="shadow-md rounded-lg flex-1 flex items-center">
+                <div className="flex items-center gap-4">
+                  <FaUsers className="text-green-500 text-3xl" />
+                  <Statistic title="Tổng Khách Hàng" value={totalCustomers} />
+                </div>
+              </Card>
+
+              <Card bordered={false} className="shadow-md rounded-lg flex-1 flex items-center">
+                <div className="flex items-center gap-4">
+                  <FaUserTie className="text-purple-500 text-3xl" />
+                  <Statistic title="Tổng Nhân Viên" value={totalEmployees} />
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </div>
+
+
+
+      </div>
 
       <Row className="w-full">
         <Col xs={24} className="mb-24">
@@ -188,28 +234,41 @@ function Home() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredOrders.map((order, index) => (
+                  {sortedOrders.map((order, index) => (
                     <tr key={index}>
                       <td><h6>{order.orderId}</h6></td>
-                      <td
-                        style={{ maxWidth: "1000px", wordWrap: "break-word", whiteSpace: "normal" }}
-                      >
-                        {order.orderDetails.map((item: any, index: number) => (
-                          <div key={index}
-                          >
-                            <span>{item.quantity + " x "}</span>
-                            <span className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
-                              onClick={() => showProductModal(item.optionResponse[0].product)}
-                            >
-                              {item.optionResponse[0].product.productName + " "
-                                + item.optionResponse[0].optionValue +
-                                (index < order.orderDetails.length - 1 ? ", " : "")}</span>
-                          </div>
-                        ))}
 
+                      <td style={{ maxWidth: "1000px", wordWrap: "break-word", whiteSpace: "normal" }}>
+                        {order.orderDetails.map((item: any, index: number) => {
+                          const productName = `${item.optionResponse[0].product.productName} ${item.optionResponse[0].optionValue}`;
+
+                          return (
+                            <div key={index}>
+                              <span>{item.quantity} x </span>
+                              {productName.length > 50 ? (
+                                <Tooltip title={productName}>
+                                  <span
+                                    className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
+                                    onClick={() => showProductModal(item.optionResponse[0].product)}
+                                  >
+                                    {productName.slice(0, 50) + "..."}
+                                  </span>
+                                </Tooltip>
+                              ) : (
+                                <span
+                                  className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
+                                  onClick={() => showProductModal(item.optionResponse[0].product)}
+                                >
+                                  {productName}
+                                </span>
+                              )}
+                              {index < order.orderDetails.length - 1 ? ", " : ""}
+                            </div>
+                          );
+                        })}
                       </td>
-                      {/* <td><span className="text-xs font-weight-bold">{order.orderDetails */}
-                      {/*   .reduce((sum: number, item: any) => sum + item.quantity, 0)}</span></td> */}
+
+
                       <td>
                         <span
                           className="cursor-pointer text-blue-500 font-semibold flex items-center gap-1 hover:underline"
@@ -231,13 +290,14 @@ function Home() {
                         </span>
 
                       </td>
-                      <td >
+                      <td>
                         <div className="flex items-center gap-2">
                           <MdDateRange style={{ fontSize: "16px", color: "#1890ff" }} />
-                          {order.createAt.split(" ")[0]}
+                          {new Date(order.createAt).toLocaleDateString("vi-VN")}
                         </div>
-
                       </td>
+
+
                       <td>
                         <Tooltip
                           title={
@@ -261,7 +321,6 @@ function Home() {
                           </span>
                         </Tooltip>
                       </td>
-
 
                       <td >
                         <div className="flex items-center gap-2">

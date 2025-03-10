@@ -1,5 +1,5 @@
 import ReactApexChart from "react-apexcharts";
-import { Typography } from "antd";
+import { Button, notification, Select, Typography } from "antd";
 import { MinusOutlined } from "@ant-design/icons";
 import lineChart from "./configs/lineChart";
 import { RootState } from "../../store/store";
@@ -11,10 +11,118 @@ import { ApexOptions } from "apexcharts";
 function LineChart({ }) {
   const { Title } = Typography;
   const [chartData, setChartData] = useState<any>({ dates: [], vnpayData: [], cashData: [] });
+  const [selectedYear, setSelectedYear] = useState<any>(null);
+
+  const handleYearChange = (selectedOption: any) => {
+    if(selectedOption == 0) {
+      setSelectedYear(null)
+      return;
+    }
+    setSelectedYear(selectedOption);
+  };  
+  const [selectedMonth, setSelectedMonth] = useState<any>(null);
+
+  const handleMonthChange = (selectedOption: any) => {
+    if(selectedOption == 0) {
+      setSelectedMonth(null)
+      return;
+    }
+    setSelectedMonth(selectedOption);
+  };
+
+  const yearOptions = [
+    { value: 0, label: "Xóa lựa chọn" },
+      ...Array.from({ length: 30 }, (_, i) => ({
+          value: new Date().getFullYear() - i,
+          label: (new Date().getFullYear() - i).toString(),
+      }))
+  ];
+
+  
+  const monthOptions = [
+    { value: 0, label: "Xóa lựa chọn" },
+    { value: 1, label: "Tháng 1" },
+    { value: 2, label: "Tháng 2" },
+    { value: 3, label: "Tháng 3" },
+    { value: 4, label: "Tháng 4" },
+    { value: 5, label: "Tháng 5" },
+    { value: 6, label: "Tháng 6" },
+    { value: 7, label: "Tháng 7" },
+    { value: 8, label: "Tháng 8" },
+    { value: 9, label: "Tháng 9" },
+    { value: 10, label: "Tháng 10" },
+    { value: 11, label: "Tháng 11" },
+    { value: 12, label: "Tháng 12" },
+  ];
+
+  const handleSubmitLineChart = async () => {
+    if (!token) return;
+    if(selectedMonth && !selectedYear) {
+      notification.error({ message: "Vui lòng chọn năm!" })
+      return
+    }
+    if(!selectedMonth && !selectedYear) {
+      await fetchOrders();
+      return
+    }
+    console.log(selectedYear, selectedMonth);
+    
+    try{
+      const orders = await getAllOrders(token);
+      const revenueByDate: any = {};
+
+      orders.forEach((order: any) => {
+          const orderDate = new Date(order.createAt);
+          const year = orderDate.getFullYear();
+          const month = orderDate.getMonth() + 1;
+          const date = orderDate.getDate();
+          
+          // Format based on selection
+          let key = `${date}/${month}/${year}`; // Default (day/month/year)
+          if (selectedYear && !selectedMonth) key = `${month}/${year}`; // Month/Year if only year is selected
+          // if (!selectedYear && !selectedMonth) key = `${year}`; // Group by year if no filter
+          
+          const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity, 0);
+
+          if (!revenueByDate[key]) {
+              revenueByDate[key] = { vnpay: 0, cash: 0 };
+          }
+
+          if (order.paymentMethod.toLowerCase() === "vnpay") {
+              revenueByDate[key].vnpay += revenue;
+          } else if (order.paymentMethod.toLowerCase() === "cash") {
+              revenueByDate[key].cash += revenue;
+          }
+      });
+
+      let dates: string[] = [];
+      if (selectedYear && !selectedMonth) {
+          // Nếu chỉ chọn năm, tạo đủ 12 tháng
+          dates = Array.from({ length: 12 }, (_, i) => `${i + 1}/${selectedYear}`);
+      } else if (selectedYear && selectedMonth) {
+          // Nếu chọn cả năm và tháng, tạo đủ ngày trong tháng
+          const daysInMonth = new Date(selectedYear, selectedMonth, 0).getDate();
+          dates = Array.from({ length: daysInMonth }, (_, i) => `${i + 1}/${selectedMonth}/${selectedYear}`);
+      }
+
+      // Điền giá trị 0 nếu không có dữ liệu
+      const vnpayData = dates.map((date) => revenueByDate[date]?.vnpay || 0);
+      const cashData = dates.map((date) => revenueByDate[date]?.cash || 0);      
+      //Thay đổi lại tên 
+      if (selectedYear && !selectedMonth) {
+          // Nếu chỉ chọn năm, tạo đủ 12 tháng
+          dates = Array.from({ length: 12 }, (_, i) => `Tháng ${i + 1}`);
+      }
+      setChartData({ dates, vnpayData, cashData });
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      notification.error({ message: "Đã có lỗi xảy ra!" })
+    }
+  };
+
   const token = useSelector((state: RootState) => state.token.token);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
+  const fetchOrders = async () => {
       if (!token) return;
       try {
         const orders = await getAllOrders(token);
@@ -22,8 +130,12 @@ function LineChart({ }) {
         setChartData(processedData);
       } catch (error) {
         console.error("Error fetching orders:", error);
+        notification.error({ message: "Đã có lỗi xảy ra!" })
       }
     };
+
+  useEffect(() => {
+    
 
     fetchOrders();
   }, [token]);
@@ -98,9 +210,13 @@ function LineChart({ }) {
       }
     });
     console.log("revenueByDate", revenueByDate);
-    
 
-    const dates = Object.keys(revenueByDate).sort();
+    const dates = Object.keys(revenueByDate).sort((a, b) => {
+      const [dayA, monthA, yearA] = a.split("/").map(Number);
+      const [dayB, monthB, yearB] = b.split("/").map(Number);
+
+      return new Date(yearA, monthA - 1, dayA).getTime() - new Date(yearB, monthB - 1, dayB).getTime();
+    });
     const vnpayData = dates.map((date) => revenueByDate[date].vnpay);
     const cashData = dates.map((date) => revenueByDate[date].cash);
 
@@ -112,12 +228,32 @@ function LineChart({ }) {
     <>
       <div className="linechart">
         <Title level={5}>Doanh thu</Title>
+
         <div className="sales">
           <ul>
             <li><MinusOutlined /> VNPAY</li>
             <li><MinusOutlined /> Tiền mặt</li>
           </ul>
         </div>
+      </div>
+      <div className="w-full flex gap-2 justify-end items-center">
+        <Select
+            options={monthOptions}
+            value={selectedMonth}
+            onChange={handleMonthChange}
+            style={{ width: '20%' }}
+            placeholder="Chọn tháng"
+        />
+        <Select
+            options={yearOptions}
+            value={selectedYear}
+            onChange={handleYearChange}
+            style={{ width: '20%' }}
+            placeholder="Chọn năm"
+        />
+        
+        <Button type="primary" onClick={handleSubmitLineChart}>Tìm kiếm</Button>
+
       </div>
       <ReactApexChart options={options} series={series} type="area" height={350} />
     </>

@@ -10,7 +10,7 @@ import { ApexOptions } from "apexcharts";
 
 function LineChart({ }) {
   const { Title } = Typography;
-  const [chartData, setChartData] = useState<any>({ dates: [], vnpayData: [], cashData: [] });
+  const [chartData, setChartData] = useState<any>({ dates: [], vnpayData: [], cashData: [], totalRevenue: 0 });
   const token = useSelector((state: RootState) => state.token.token);
 
   useEffect(() => {
@@ -80,12 +80,15 @@ function LineChart({ }) {
 
   const processChartData = (orders: any) => {
     const revenueByDate: any = {};
+    let totalRevenue = 0;
 
     orders.forEach((order: any) => {
       const date = new Date(order.createAt).toLocaleDateString("vi-VN");
-      
-      const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity * 1, 0);
+
+      const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity, 0);
       console.log("revenue", revenue);
+
+      totalRevenue += revenue;
 
       if (!revenueByDate[date]) {
         revenueByDate[date] = { vnpay: 0, cash: 0 };
@@ -98,20 +101,22 @@ function LineChart({ }) {
       }
     });
     console.log("revenueByDate", revenueByDate);
-    
+
 
     const dates = Object.keys(revenueByDate).sort();
     const vnpayData = dates.map((date) => revenueByDate[date].vnpay);
     const cashData = dates.map((date) => revenueByDate[date].cash);
 
-    return { dates, vnpayData, cashData };
+    return { dates, vnpayData, cashData, totalRevenue };
   };
 
 
   return (
     <>
       <div className="linechart">
-        <Title level={5}>Doanh thu</Title>
+        <Title level={5}>
+          Doanh thu: {chartData.totalRevenue.toLocaleString("vi-VN")} VNĐ
+        </Title>
         <div className="sales">
           <ul>
             <li><MinusOutlined /> VNPAY</li>

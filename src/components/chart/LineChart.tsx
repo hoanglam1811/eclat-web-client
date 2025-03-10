@@ -84,7 +84,7 @@ function LineChart({ }) {
     orders.forEach((order: any) => {
       const date = new Date(order.createAt).toLocaleDateString("vi-VN");
       
-      const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity * 0.2, 0);
+      const revenue = order.orderDetails.reduce((sum: any, detail: any) => sum + detail.price * detail.quantity * 1, 0);
       console.log("revenue", revenue);
 
       if (!revenueByDate[date]) {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Card, Col, Row, Typography, Radio, Modal, Tooltip } from "antd";
-import { FaShoppingCart, FaUserCircle, FaPhone, FaIdBadge, FaCheckCircle } from "react-icons/fa";
+import { Card, Col, Row, Typography, Radio, Modal, Tooltip, Statistic } from "antd";
+import { FaShoppingCart, FaUserCircle, FaPhone, FaIdBadge, FaCheckCircle, FaUsers, FaUserTie } from "react-icons/fa";
 import { MdDateRange, MdOutlinePayment } from "react-icons/md";
 import LineChart from "../../components/chart/LineChart";
 import { Label } from "../../components/ui/label";
@@ -49,6 +49,9 @@ function Home() {
   const [users, setUsers] = useState<any[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
   const token = useSelector((state: RootState) => state.token.token);
+  const [totalCustomers, setTotalCustomers] = useState<number>(0);
+  const [totalEmployees, setTotalEmployees] = useState<number>(0);
+  const [totalOrders, setTotalOrders] = useState<number>(0);
   console.log(selectedProduct)
 
   const totalQuantity = selectedProduct?.options
@@ -85,8 +88,28 @@ function Home() {
 
       console.log(response);
       console.log("users", users);
-      setUsers(users.result);
-      setOrders(response);
+
+      if (users && users.result) {
+        setUsers(users.result);
+
+        const totalCustomers = users.result.filter((user: any) =>
+          Array.isArray(user.role) && user.role.some((r: string) => r === "Customer")
+        ).length;
+
+        const totalEmployees = users.result.filter((user: any) =>
+          Array.isArray(user.role) && user.role.some((r: string) => r === "Staff")
+        ).length;
+
+        setTotalCustomers(totalCustomers);
+        setTotalEmployees(totalEmployees);
+
+        console.log(`Tổng khách hàng: ${totalCustomers}, Tổng nhân viên: ${totalEmployees}`);
+      }
+
+      if (response) {
+        setOrders(response);
+        setTotalOrders(response.length);
+      }
       console.log(response);
     } catch (error) {
       console.error("Failed to fetch transactions:", error);
@@ -99,6 +122,32 @@ function Home() {
 
   return (
     <div className="w-full">
+      <Row gutter={16} className="mb-6">
+        <Col xs={24} sm={8}>
+          <Card bordered={false} className="shadow-md rounded-lg">
+            <div className="flex items-center gap-4">
+              <FaShoppingCart className="text-blue-500 text-3xl" />
+              <Statistic title="Tổng Đơn Hàng" value={totalOrders} />
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Card bordered={false} className="shadow-md rounded-lg">
+            <div className="flex items-center gap-4">
+              <FaUsers className="text-green-500 text-3xl" />
+              <Statistic title="Tổng Khách Hàng" value={totalCustomers} />
+            </div>
+          </Card>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Card bordered={false} className="shadow-md rounded-lg">
+            <div className="flex items-center gap-4">
+              <FaUserTie className="text-purple-500 text-3xl" />
+              <Statistic title="Tổng Nhân Viên" value={totalEmployees} />
+            </div>
+          </Card>
+        </Col>
+      </Row>
       <Row className="w-full">
         <Col xs={24} className="mb-24">
           <Card bordered={false} className="criclebox h-full">
@@ -125,7 +174,7 @@ function Home() {
                 </div>
               </div>
             </div>
-            <div className="ant-list-box table-responsive px-2">
+            <div className="ant-list-box table-responsive px-2 overflow-x-auto max-h-[370px]">
               <table className="width-100">
                 <thead >
                   <tr>
@@ -148,13 +197,13 @@ function Home() {
                         {order.orderDetails.map((item: any, index: number) => (
                           <div key={index}
                           >
-                            <span>{item.quantity+ " x "}</span>
+                            <span>{item.quantity + " x "}</span>
                             <span className="cursor-pointer text-blue-500 hover:underline whitespace-normal"
                               onClick={() => showProductModal(item.optionResponse[0].product)}
                             >
                               {item.optionResponse[0].product.productName + " "
-                              + item.optionResponse[0].optionValue + 
-                              (index < order.orderDetails.length - 1 ? ", " : "") }</span>
+                                + item.optionResponse[0].optionValue +
+                                (index < order.orderDetails.length - 1 ? ", " : "")}</span>
                           </div>
                         ))}
 
@@ -217,10 +266,10 @@ function Home() {
                       <td >
                         <div className="flex items-center gap-2">
                           <MdOutlinePayment style={{ fontSize: "16px" }} />
-                          {(order.paymentMethod === "Cash" ||  order.paymentMethod === "CASH")
+                          {(order.paymentMethod === "Cash" || order.paymentMethod === "CASH")
                             ? "Tiền mặt" :
-                          (order.paymentMethod === "VNPAY" || order.paymentMethod === "vnpay")
-                            ? "VNPay" : "Khác"}
+                            (order.paymentMethod === "VNPAY" || order.paymentMethod === "vnpay")
+                              ? "VNPay" : "Khác"}
                         </div>
 
                       </td>
@@ -325,18 +374,18 @@ function Home() {
                         Giá gốc
                       </Label>
                       <p className="w-full">{_option.optionPrice.toLocaleString("vi-VN", {
-                                      style: "currency",
-                                      currency: "VND",
-                                    })}</p>
+                        style: "currency",
+                        currency: "VND",
+                      })}</p>
                     </div>
                     <div className="col-span-1">
                       <Label className="block text-sm font-bold text-blue-500 text-left mb-1">
                         Giá khuyến mãi
                       </Label>
                       <p className="w-full">{_option.discPrice.toLocaleString("vi-VN", {
-                                      style: "currency",
-                                      currency: "VND",
-                                    })}</p>
+                        style: "currency",
+                        currency: "VND",
+                      })}</p>
                     </div>
                   </div>
 

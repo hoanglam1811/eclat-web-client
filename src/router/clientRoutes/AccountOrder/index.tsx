@@ -67,7 +67,7 @@ const AccountOrder = () => {
                     imageUrl: order.orderDetails[0]?.optionResponse[0]?.optionImages[0],
                     hasFeedback,
                     orderDetails: order.orderDetails,
-                    paymentMethod: order.paymentMethod === "Cash" ? "Tiền mặt" : order.paymentMethod === "vnpay" ? "VNPay" : "Khác",
+                    paymentMethod: order.paymentMethod === "CASH" || "Cash" ? "Tiền mặt" : order.paymentMethod === "vnpay" ? "VNPay" : "Khác",
                     totalPrices: order.totalPrices
                 };
             });
@@ -193,7 +193,7 @@ const AccountOrder = () => {
             dataIndex: "status",
             key: "status",
             render: (status: any) => {
-                let color = status === "Thành công" ? "green" : status === "Đã huỷ" ? "red" : "blue";
+                let color = status === "SUCCESS" ? "green" : status === "Đã huỷ" ? "red" : "blue";
                 return <Tag color={color}>{status}</Tag>;
             }
         },

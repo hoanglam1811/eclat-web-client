@@ -279,14 +279,18 @@ function Home() {
                       </td>
                       <td>
                         <span
-                          className={`px-2 py-1 rounded font-semibold ${order.status === "PAID" || order.status === "SUCCESS" || order.status === "success"
-                            ? "bg-green-500 text-white"
-                            : order.status === "Đã hủy"
-                              ? "bg-red-500 text-white"
+                          className={`px-2 py-1 rounded font-semibold ${
+                            order.status.toLowerCase() === "paid" || order.status.toLowerCase() === "success" ? "bg-green-500 text-white" :
+                            order.status.toLowerCase() === "failed" || order.status.toLowerCase() === "canceled" ? "bg-red-500 text-white" :
+                            order.status.toLowerCase() === "pending" ? "bg-orange-500 text-white"
                               : "bg-gray-300 text-black"
                             }`}
                         >
-                          {order.status === "PAID" || order.status === "success" || order.status === "SUCCESS" ? "Thành công" : "Đã huỷ"}
+                          {order.status === "PAID" || order.status === "success" || order.status === "SUCCESS" ? "Thành công" : 
+                          order.status.toLowerCase() === "failed" ? "Thất bại":
+                          order.status.toLowerCase() === "canceled" ? "Đã huỷ":
+                          order.status.toLowerCase() === "pending" ? "Đang chờ":
+                          "Khác"}
                         </span>
 
                       </td>

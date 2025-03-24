@@ -49,10 +49,13 @@ const AccountOrder = () => {
             if (!users) return;
             const response = await getOrdersByUserId(users.userId, token);
 
+            console.log(response)
+
             const formattedOrders = response.map((order: any) => {
                 const hasFeedback = order.orderDetails.some((detail: any) =>
                     detail.optionResponse.some((option: any) => option.product?.feedbacks?.length > 0)
                 );
+
 
                 return {
                     id: order.orderId,
@@ -63,11 +66,14 @@ const AccountOrder = () => {
                         .join(", "),
                     quantity: order.orderDetails.reduce((sum: number, item: any) => sum + item.quantity, 0),
                     date: order.createAt,
-                    status: order.status === "SUCCESS" || "PAID" ? "Thành công" : "Đã huỷ",
+                    status: order.status.toLowerCase() === "success" || order.status.toLowerCase() === "paid" ? "Thành công" : 
+                        order.status.toLowerCase() === "pending" ? "Đang chờ" :
+                        order.status.toLowerCase() === "canceled" ? "Đã huỷ" :
+                        order.status.toLowerCase() === "failed" ? "Thất bại" : "Khác",
                     imageUrl: order.orderDetails[0]?.optionResponse[0]?.optionImages[0],
                     hasFeedback,
                     orderDetails: order.orderDetails,
-                    paymentMethod: order.paymentMethod === "CASH" || "Cash" ? "Tiền mặt" : order.paymentMethod === "vnpay" ? "VNPay" : "Khác",
+                    paymentMethod: order.paymentMethod === "CASH" ||order.paymentMethod ===  "Cash" ? "Tiền mặt" : order.paymentMethod === "vnpay" || order.paymentMethod === "VNPAY" ? "VNPay" : "Khác",
                     totalPrices: order.totalPrices
                 };
             });
@@ -198,7 +204,12 @@ const AccountOrder = () => {
             dataIndex: "status",
             key: "status",
             render: (status: any) => {
-                let color = status === "SUCCESS" ? "green" : status === "Đã huỷ" ? "red" : "blue";
+                let color = status.toLowerCase() === "thành công" ? "green" :
+                status.toLowerCase() === "đã huỷ" ? "red" :
+                status.toLowerCase() === "thất bại" ? "red" :
+                status.toLowerCase() === "đang chờ" ? "orange" :
+                  "blue";
+                 console.log(status)
                 return <Tag color={color}>{status}</Tag>;
             }
         },

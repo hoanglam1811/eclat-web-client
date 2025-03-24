@@ -43,6 +43,8 @@ const RouteNames = {
   PAYMENT_ERROR: "/payment-error",
   PAYMENT_RETURN: "/vnpay-return",
   PAYMENT_NOT_FOUND: "/payment-not-found",
+  FEEDBACK_MANAGEMENT: "/admin/feedback-management",
+  
 };
 
 export default RouteNames;

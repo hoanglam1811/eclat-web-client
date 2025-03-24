@@ -399,8 +399,6 @@ const AccountOrder = () => {
                                             );
                                         })}
 
-
-
                                         <div className="flex justify-end mt-6">
                                             <Button onClick={handleCancel}>Đóng</Button>
                                         </div>

@@ -5,6 +5,7 @@ import StaffManagement from "./StaffManagement";
 import SkincareQuiz from "../clientRoutes/QuizManagement";
 import SkincareBlogManagement from "../clientRoutes/BlogManagement";
 import CustomerManagement from "./CustomerManagement";
+import FeedbackManagement from "./FeedbackManagement";
 
 const publicRoutes: RouteObject[] = [
   {
@@ -26,6 +27,10 @@ const publicRoutes: RouteObject[] = [
   {
     path: RouteNames.ADMIN_CUSTOMER_MANAGEMENT,
     element: <CustomerManagement />,
+  },
+  {
+    path: RouteNames.FEEDBACK_MANAGEMENT,
+    element: <FeedbackManagement />,
   }
 ];
 

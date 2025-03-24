@@ -3,6 +3,7 @@ import { Table, Tooltip, Tag, Button, Modal, Rate, Input } from "antd";
 import { getAllFeedback, getFeedbackByProductId } from "../../../services/ApiServices/feedbackService";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
+import { getAllOrders } from "../../../services/ApiServices/orderService";
 
 const { TextArea } = Input;
 
@@ -22,7 +23,28 @@ const FeedbackManagement = () => {
         try {
             const data = await getAllFeedback(token);
             console.log(data.result)
-            setFeedbacks(data.result);
+            const orders = await getAllOrders(token);
+            const feedbacksWithProduct = data.result.map((feedback: any) => {
+                let product = null;
+
+                orders.forEach((order: any) => {
+                    order.orderDetails.forEach((orderDetail: any) => {
+                        if (orderDetail.orderDetailId === feedback.orderDetailId) {
+                            product = orderDetail; // Gán product nếu tìm thấy
+                        }
+                    });
+                });
+
+                return {
+                    ...feedback,
+                    orderDetail: product, // Thêm product vào từng feedback
+                };
+            });
+
+
+            console.log(feedbacksWithProduct)
+            setFeedbacks(feedbacksWithProduct);
+
         } catch (error) {
             console.error("Error fetching feedbacks:", error);
         } finally {
@@ -37,7 +59,23 @@ const FeedbackManagement = () => {
 
     const columns = [
         { title: "Mã đơn", dataIndex: "orderDetailId", key: "orderId" },
-        { title: "Sản phẩm", dataIndex: "productName", key: "productName" },
+        {
+            title: "Sản phẩm",
+            dataIndex: "orderDetail",
+            key: "productName",
+            render: (record: any) => {
+                const productInfo =
+                    record.optionResponse[0].product.productName +
+                    " - " +
+                    record.optionResponse[0].optionValue || "N/A";
+
+                return (
+                    <Tooltip title={productInfo}>
+                        {productInfo.length > 50 ? productInfo.slice(0, 50) + "..." : productInfo}
+                    </Tooltip>
+                );
+            },
+        },
         {
             title: "Ngày mua",
             dataIndex: "createAt",
@@ -56,8 +94,8 @@ const FeedbackManagement = () => {
             key: "text",
             render: (text: any) => (
                 <Tooltip title={text}>
-                    <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", maxWidth: 300 }}>
-                        {text?.length > 50 ? text.slice(0, 50) + "..." : text}
+                    <span style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", maxWidth: 250 }}>
+                        {text?.length > 40 ? text.slice(0, 40) + "..." : text}
                     </span>
                 </Tooltip>
             ),
